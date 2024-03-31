@@ -14,12 +14,12 @@ import * as directives from "vuetify/directives"
 const myCustomLightTheme = {
     dark: false,
     colors: {
-        background: '#FFFFFF',
+        background: '#EEE',
         surface: '#F3EDF7',
-        'surface-bright': '#FFFFFF',
-        'surface-light': '#EEEEEE',
+        'surface-bright': '#FFF',
+        'surface-light': '#EEE',
         'surface-variant': '#424242',
-        'on-surface-variant': '#EEEEEE',
+        'on-surface-variant': '#EEE',
         primary: '#6750A4',
         'primary-darken-1': '#1F5592',
         secondary: '#48A9A6',
@@ -58,6 +58,7 @@ const vuetify = createVuetify({
             class: "font-weight-bold text-none",
             color: "primary"
         }
+
     },
     theme: {
         defaultTheme: "myCustomLightTheme",
