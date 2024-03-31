@@ -8,8 +8,8 @@
 
     <template #append>
       <v-btn variant="text" href="#AboutSite">О сайте</v-btn>
-      <v-btn variant="text">Возможности</v-btn>
-      <v-btn variant="text">О нас</v-btn>
+      <v-btn variant="text" href="#Capabilities">Возможности</v-btn>
+      <v-btn variant="text" href="#AboutUs">О нас</v-btn>
       <v-btn variant="flat" rounded>Войти</v-btn>
     </template>
   </v-app-bar>
