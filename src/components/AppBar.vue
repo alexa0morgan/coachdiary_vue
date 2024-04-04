@@ -5,10 +5,11 @@ import { ref } from 'vue'
 
 const { smAndUp } = useDisplay()
 const isMenuOpen = ref(false)
+
 </script>
 
 <template>
-  <v-navigation-drawer v-model="isMenuOpen">
+  <v-navigation-drawer v-model="isMenuOpen" v-if="!smAndUp">
     <v-list-item title="Дневник Тренера" :to="{name: 'home'}" />
     <v-divider />
     <v-list-item link href="/#AboutSite" title="О сайте" />
@@ -21,7 +22,7 @@ const isMenuOpen = ref(false)
       <router-link v-if="smAndUp" class="title" :to="{name: 'home'}">Дневник тренера</router-link>
     </v-app-bar-title>
     <template #prepend>
-      <v-btn v-if="!smAndUp" icon="mdi-menu" @click="isMenuOpen = true"/>
+      <v-btn v-if="!smAndUp" icon="mdi-menu" @click="isMenuOpen = true" />
     </template>
     <template #append>
       <template v-if="smAndUp">
