@@ -145,7 +145,7 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 
 section {
   padding-top: 60px;
-  margin: 40px 50px;
+  margin: 0 50px;
   font-size: 22px;
 }
 
@@ -186,7 +186,12 @@ section {
     grid-template-columns: 1fr;
   }
 
+  .header {
+    font-size: 30px;
+  }
+
   section {
+    padding-top: 30px;
     margin: 30px 10px;
   }
 
