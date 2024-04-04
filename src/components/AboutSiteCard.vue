@@ -20,9 +20,9 @@ defineProps<{
 .container {
   display: grid;
   grid-template-columns: auto 1fr;
-  margin: 40px 50px;
   align-items: center;
   gap: 120px;
+  margin-top: 40px;
 }
 
 .mirrored {
@@ -40,24 +40,21 @@ defineProps<{
 .img-border {
   border: 3px solid #f2df73;
   padding: 0 10px;
-  height: 450px;
+  height: 400px;
   aspect-ratio: 0.75;
 }
 
 .img {
   height: 100%;
+  filter: grayscale(100%);
 }
 
 .text {
   text-align: right;
-  font-size: 24px;
+  font-size: 22px;
 }
 
 @media (max-width: 1200px) {
-  .text {
-    font-size: 22px;
-  }
-
   .container {
     gap: 50px
   }
@@ -80,6 +77,15 @@ defineProps<{
   .text {
     text-align: left;
     font-size: 20px;
+  }
+}
+
+@media (max-width: 800px) {
+  .text {
+    font-size: 16px;
+  }
+  .container {
+    gap:20px
   }
 }
 
