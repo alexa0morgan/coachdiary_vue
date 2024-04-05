@@ -1,10 +1,13 @@
 <script setup lang="ts">
 
 import { useDisplay } from 'vuetify'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 const { smAndUp } = useDisplay()
 const isMenuOpen = ref(false)
+const route = useRoute()
+const isLoginPage = computed(() => route.name === 'login')
 
 </script>
 
@@ -31,7 +34,7 @@ const isMenuOpen = ref(false)
         <v-btn variant="text" href="/#AboutUs">О нас</v-btn>
       </template>
 
-      <v-btn variant="flat" :to="{name: 'login'}" rounded>Войти</v-btn>
+      <v-btn v-if="!isLoginPage" variant="flat" :to="{name: 'login'}" rounded>Войти</v-btn>
     </template>
   </v-app-bar>
 </template>
