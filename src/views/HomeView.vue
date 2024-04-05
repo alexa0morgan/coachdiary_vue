@@ -145,7 +145,7 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 
 section {
   padding-top: 60px;
-  margin: 0 50px;
+  margin: 0 50px 80px;
   font-size: 22px;
 }
 
@@ -192,7 +192,7 @@ section {
 
   section {
     padding-top: 30px;
-    margin: 30px 10px;
+    margin: 0 10px 30px;
   }
 
   .text {
