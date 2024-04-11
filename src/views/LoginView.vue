@@ -7,9 +7,35 @@ import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
+const passwordConfirmation = ref('')
 const router = useRouter()
 const isSendButtonDisabled = computed(() => {
   return !email.value?.trim().length || !password.value?.length
+})
+
+const pageState = ref<'signIn' | 'signUp' | 'restore'>('signIn')
+const title = computed(() => {
+  switch (pageState.value) {
+    case 'signUp':
+      return 'Регистрация'
+    case 'restore':
+      return 'Восстановление пароля'
+    case 'signIn':
+    default:
+      return 'Вход в систему'
+
+  }
+})
+const buttonText = computed(() => {
+  switch (pageState.value) {
+    case 'signUp':
+      return 'Зарегистрироваться'
+    case 'restore':
+      return 'Восстановить пароль'
+    case 'signIn':
+    default:
+      return 'Войти'
+  }
 })
 
 async function postLogin() {
@@ -22,7 +48,7 @@ async function postLogin() {
       router.push({ name: 'app' })
     }
   } catch {
-    alert("Произошла ошибка во время входа, попробуйте еще раз")
+    alert('Произошла ошибка во время входа, попробуйте еще раз')
   }
 }
 </script>
@@ -31,7 +57,7 @@ async function postLogin() {
   <AppBar />
   <v-main class="page">
     <div class="container rounded-lg">
-      <div class="text">Вход в систему</div>
+      <div class="text">{{ title }}</div>
       <div class="border-container">
         <v-text-field
           variant="outlined"
@@ -41,18 +67,28 @@ async function postLogin() {
           v-model="email"
         />
         <v-text-field
+          v-if="pageState !== 'restore'"
           variant="outlined"
           label="Пароль"
           type="password"
           clearable
           v-model="password"
         />
-        <v-btn text="Войти" rounded @click="postLogin" :disabled="isSendButtonDisabled" />
+        <v-text-field
+          v-if="pageState === 'signUp'"
+          variant="outlined"
+          label="Повторите пароль"
+          type="password"
+          clearable
+          v-model="passwordConfirmation"
+        />
+        <v-btn :text="buttonText" rounded @click="postLogin" :disabled="isSendButtonDisabled" />
       </div>
-      <div>
-        <v-btn text="Регистрация" variant="text" size="small" />
-        <v-btn text="Восстановление пароля" variant="text" size="small" />
+      <div v-if="pageState==='signIn'">
+        <v-btn text="Регистрация" variant="text" size="small" @click="pageState = 'signUp'" />
+        <v-btn text="Восстановление пароля" variant="text" size="small" @click="pageState = 'restore'" />
       </div>
+      <v-btn v-else text="Вернуться на страницу входа" variant="text" size="small" @click="pageState = 'signIn'" />
     </div>
   </v-main>
 </template>
@@ -65,10 +101,11 @@ async function postLogin() {
 
 .container {
   max-width: 500px;
+  width: 100%;
   text-align: center;
   align-items: stretch;
   color: rgb(var(--v-theme-primary));
-  padding: 50px 80px 100px;
+  padding: 50px 80px;
   background: rgb(var(--v-theme-surface));
   border: 1px solid rgb(var(--v-another-surface));
 }
