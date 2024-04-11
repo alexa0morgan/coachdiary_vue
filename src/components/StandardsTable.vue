@@ -46,7 +46,7 @@ const props = defineProps<{
 .table {
   width: 100%;
   border-spacing: 0;
-  border-radius: 10px;
+  border-radius: var(--v-border-radius);
   overflow: hidden;
   font-weight: bold;
 
