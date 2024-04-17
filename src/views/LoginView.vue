@@ -40,17 +40,28 @@ const buttonText = computed(() => {
 
 async function postLogin() {
   try {
-    const response = await fetch(import.meta.env.VITE_APP_API_BASE + '/api/signin', {
+    const requestData = { email: email.value, password: password.value }
+
+    const response = await fetch(import.meta.env.VITE_APP_API_BASE + '/api/login/', {
       method: 'post',
-      body: JSON.stringify({ email: email.value, password: password.value })
-    }).then(value => value.json())
-    if (true) {
+      body: JSON.stringify(requestData),
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+
+    if (response.ok) {
       router.push({ name: 'app' })
+    } else if (response.status === 401) {
+      alert('Неправильный логин и/или пароль, попробуйте еще раз')
+    } else {
+      throw new Error('Server error')
     }
   } catch {
     alert('Произошла ошибка во время входа, попробуйте еще раз')
   }
 }
+
 </script>
 
 <template>
