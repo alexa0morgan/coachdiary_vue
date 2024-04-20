@@ -22,7 +22,7 @@ const data = [
 </script>
 
 <template>
-  <AppBar mobile-title="Мои стандарты" />
+  <AppBar mobile-title="Мои нормативы" />
   <v-main>
     <TopPanel>
       <div class="buttons-panel">
@@ -44,12 +44,13 @@ const data = [
 
       <div>
         <div class="side-nav-buttons">
-          <v-btn text="Нормативы" variant="outlined" class="button side-nav-button" size="small"
+          <v-btn text="Стандарты" variant="outlined" class="button side-nav-button" size="small"
                  @click="pageType = 'standards'" :active="pageType==='standards'" />
           <v-btn text="Умения" variant="outlined" class="button side-nav-button" size="small"
                  @click="pageType = 'skills'" :active="pageType==='skills'" />
         </div>
-        <DataTableSideNav :data title="Нормативы" :is-page-type-skills="pageType==='skills'" />
+        <DataTableSideNav :data :title="pageType==='standards' ? 'Стандарты' : 'Умения'"
+                          :is-page-type-skills="pageType==='skills'" />
       </div>
     </div>
 
