@@ -15,7 +15,7 @@
 <style scoped>
 .container {
   padding: 5px 0;
-  min-height: 60px;
+  height: 60px;
   background-color: rgb(var(--v-theme-primary));
 }
 
@@ -26,5 +26,9 @@
   height: 100%;
   justify-content: space-between;
   align-items: center;
+  color: rgb(var(--v-theme-secondary));
+  font-size: 24px;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 </style>
