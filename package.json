@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
     "@mdi/font": "^7.4.47",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",

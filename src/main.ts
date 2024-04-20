@@ -10,6 +10,8 @@ import "vuetify/styles"
 import '@mdi/font/css/materialdesignicons.css'
 /*import {aliases, mdi} from "vuetify/iconsets"*/
 
+import {autoAnimatePlugin} from "@formkit/auto-animate/vue"
+
 import {createVuetify} from "vuetify";
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
@@ -37,6 +39,7 @@ const myCustomLightTheme = {
         'border-color': '#000000',
         'border-opacity': 0.12,
         'border-radius': '8px',
+        'border-button-radius': '12px',
         'high-emphasis-opacity': 0.87,
         'medium-emphasis-opacity': 0.60,
         'disabled-opacity': 0.38,
@@ -75,5 +78,6 @@ const app = createApp(App)
 app.use(vuetify)
 app.use(createPinia())
 app.use(router)
+app.use(autoAnimatePlugin)
 
 app.mount('#app')
