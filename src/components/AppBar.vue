@@ -19,7 +19,7 @@ const logoLink = computed(() => {
 const plusButtonLink = computed(() => {
   if (route.name === 'my-classes') {
     return { name: 'home' }
-  } else if (route.name === 'my-standards') {
+  } else if (route.name === 'my-normatives') {
     return { name: 'home' }
   }
   return ''
@@ -42,7 +42,7 @@ const props = defineProps<{
     </template>
     <template v-else>
       <v-list-item link :to="{name: 'my-classes'}" title="Мои классы" />
-      <v-list-item link :to="{name: 'my-standards'}" title="Мои нормативы" />
+      <v-list-item link :to="{name: 'my-normatives'}" title="Мои нормативы" />
       <v-list-item link :to="{name: 'profile'}" title="Профиль" />
     </template>
   </v-navigation-drawer>
@@ -73,7 +73,7 @@ const props = defineProps<{
 
         <template v-else-if="smAndUp">
           <v-btn variant="text" :to="{name: 'my-classes'}">Мои классы</v-btn>
-          <v-btn variant="text" :to="{name: 'my-standards'}">Мои нормативы</v-btn>
+          <v-btn variant="text" :to="{name: 'my-normatives'}">Мои нормативы</v-btn>
           <v-btn variant="flat" :to="{name: 'profile'}" rounded>Профиль</v-btn>
         </template>
 

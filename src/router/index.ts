@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
-import AppView from '@/views/AppView.vue'
 import MyClassesView from '@/views/MyClassesView.vue'
-import MyStandardsView from '@/views/MyStandardsView.vue'
+import MyNormativesView from '@/views/MyNormativesView.vue'
 import ProfileView from '@/views/ProfileView.vue'
+import CreateNormativeView from '@/views/CreateNormativeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,9 +31,14 @@ const router = createRouter({
       component: MyClassesView
     },
     {
-      path: '/app/my-standards',
-      name: 'my-standards',
-      component: MyStandardsView
+      path: '/app/my-normatives',
+      name: 'my-normatives',
+      component: MyNormativesView
+    },
+    {
+      path: '/app/my-normatives/create',
+      name: 'create-normative',
+      component: CreateNormativeView,
     },
     {
       path: '/app/profile',

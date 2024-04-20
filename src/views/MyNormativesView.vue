@@ -31,7 +31,8 @@ const data = [
                @click="activeLevelNumber = n" />
       </div>
       <template #right>
-        <v-btn icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))" :to="{name: 'home'}" />
+        <v-btn icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
+               :to="{name: 'create-normative'}" />
       </template>
     </TopPanel>
 
