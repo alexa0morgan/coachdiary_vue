@@ -59,26 +59,28 @@ const props = defineProps<{
 
     <template #append>
 
-      <template v-if="!isLoggedInView">
+      <div class="container">
+        <template v-if="!isLoggedInView">
 
-        <template v-if="smAndUp">
-          <v-btn variant="text" href="/#AboutSite">О сайте</v-btn>
-          <v-btn variant="text" href="/#Capabilities">Возможности</v-btn>
-          <v-btn variant="text" href="/#AboutUs">О нас</v-btn>
+          <template v-if="smAndUp">
+            <v-btn variant="text" href="/#AboutSite">О сайте</v-btn>
+            <v-btn variant="text" href="/#Capabilities">Возможности</v-btn>
+            <v-btn variant="text" href="/#AboutUs">О нас</v-btn>
+          </template>
+
+          <v-btn v-if="!isLoginPage" variant="flat" :to="{name: 'login'}" rounded>Войти</v-btn>
         </template>
 
-        <v-btn v-if="!isLoginPage" variant="flat" :to="{name: 'login'}" rounded>Войти</v-btn>
-      </template>
+        <template v-else-if="smAndUp">
+          <v-btn variant="text" :to="{name: 'my-classes'}">Мои классы</v-btn>
+          <v-btn variant="text" :to="{name: 'my-standards'}">Мои нормативы</v-btn>
+          <v-btn variant="flat" :to="{name: 'profile'}" rounded>Профиль</v-btn>
+        </template>
 
-      <template v-else-if="smAndUp">
-        <v-btn variant="text" :to="{name: 'my-classes'}">Мои классы</v-btn>
-        <v-btn variant="text" :to="{name: 'my-standards'}">Мои нормативы</v-btn>
-        <v-btn variant="flat" :to="{name: 'profile'}" rounded>Профиль</v-btn>
-      </template>
-
-      <template v-else-if="!smAndUp && plusButtonLink">
-        <v-btn variant="outlined" icon="mdi-plus" size="small" :to="plusButtonLink"/>
-      </template>
+        <template v-else-if="!smAndUp && plusButtonLink">
+          <v-btn variant="outlined" icon="mdi-plus" size="small" :to="plusButtonLink" />
+        </template>
+      </div>
 
     </template>
   </v-app-bar>
@@ -93,5 +95,10 @@ const props = defineProps<{
 .mobile-title {
   color: rgb(var(--v-theme-primary));
   font-weight: bold;
+}
+
+.container {
+  display: flex;
+  gap: 10px;
 }
 </style>

@@ -10,29 +10,31 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="gender-text">{{ gender === 'm' ? 'Мальчики' : 'Девочки' }}</div>
-  <table class="table">
-    <thead>
-    <tr>
-      <td>Ступень</td>
-      <td>Норма</td>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <td>Повышенная</td>
-      <td>{{ high }}</td>
-    </tr>
-    <tr>
-      <td>Средняя</td>
-      <td>{{ middle }}</td>
-    </tr>
-    <tr>
-      <td>Низкая</td>
-      <td>{{ low }}</td>
-    </tr>
-    </tbody>
-  </table>
+  <div>
+    <div class="gender-text">{{ gender === 'm' ? 'Мальчики' : 'Девочки' }}</div>
+    <table class="table">
+      <thead>
+      <tr>
+        <td>Ступень</td>
+        <td>Норма</td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Повышенная</td>
+        <td>{{ high }}</td>
+      </tr>
+      <tr>
+        <td>Средняя</td>
+        <td>{{ middle }}</td>
+      </tr>
+      <tr>
+        <td>Низкая</td>
+        <td>{{ low }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style scoped>
