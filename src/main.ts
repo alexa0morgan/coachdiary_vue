@@ -65,6 +65,16 @@ const vuetify = createVuetify({
             variant: "flat",
             class: "font-weight-bold text-none",
             color: "primary"
+        },
+        VTextField: {
+            variant:'outlined',
+            hideDetails: true,
+        },
+        VRadioGroup: {
+            hideDetails: true,
+        },
+        VCheckbox: {
+            hideDetails: true,
         }
 
     },
