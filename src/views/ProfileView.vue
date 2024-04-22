@@ -77,11 +77,11 @@ const isSetPasswordButtonDisabled = computed(() => {
 
 <div class="page">
     <div class="container rounded-lg">
-        <div>
+        <div class="container">
             <p class="text">{{startedName}}</p>
             <p class="text">Почта: <span class="non-bold-text">{{startedEmail}}</span></p>
         </div>
-        <div>
+        <div class="container">
             <v-text-field 
                 clearable 
                 label = "Полное имя"
@@ -111,7 +111,7 @@ const isSetPasswordButtonDisabled = computed(() => {
     </div>
     <div v-show="IsClicked" class="container rounded-lg">
         <div class="text">Смена пароля</div>
-        <div>
+        <div class="container">
             <v-text-field 
                 clearable 
                 type="password"
@@ -123,20 +123,16 @@ const isSetPasswordButtonDisabled = computed(() => {
                 label = "Новый пароль" 
                 type="password"
                 v-model="newPassword">
-            </v-text-field>
-            <v-text-field 
-                clearable 
-                label = "Подтверждение пароля" 
-                type="password"
-                v-model="passwordConfirmation">
-            </v-text-field>
-            <v-btn 
-                rounded
-                text="Установить"
-                :disabled="isSetPasswordButtonDisabled"
-                class="set-button"
-                @click="postPassword">
-            </v-btn>
+            </v-text-field> 
+            <div>
+                <v-btn 
+                    rounded
+                    text="Установить"
+                    :disabled="isSetPasswordButtonDisabled"
+                    class="set-button"
+                    @click="postPassword">
+                </v-btn>   
+            </div>        
         </div>
     </div>
 </div>
@@ -155,9 +151,9 @@ const isSetPasswordButtonDisabled = computed(() => {
         max-width: 800px;
         background: rgb(var(--v-theme-surface));
         padding: 50px 80px;
-        text-align: start;
+        text-align: center;
         display: grid;
-        gap : 30px;
+        gap : 10px;
     }
     .text{
         font-size: 24px;
