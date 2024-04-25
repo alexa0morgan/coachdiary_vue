@@ -65,8 +65,7 @@ async function postLogin() {
 </script>
 
 <template>
-  <AppBar />
-  <v-main class="page">
+  <div class="page">
     <div class="container rounded-lg">
       <div class="text">{{ title }}</div>
       <div class="border-container">
@@ -101,11 +100,12 @@ async function postLogin() {
       </div>
       <v-btn v-else text="Вернуться на страницу входа" variant="text" size="small" @click="pageState = 'signIn'" />
     </div>
-  </v-main>
+  </div>
 </template>
 
 <style scoped>
 .page {
+  height: 100%;
   display: grid;
   place-items: center;
 }

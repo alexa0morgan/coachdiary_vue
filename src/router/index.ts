@@ -12,39 +12,46 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      meta: {mobileTitle: 'Дневник тренера'},
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+
     },
     {
       path: '/app',
       name: 'app',
       /*component: AppView,*/
-      redirect: {name: 'my-classes'}
+      redirect: {name: 'my-classes'},
+      meta: {mobileTitle: 'Дневник тренера'},
     },
     {
       path: '/app/my-classes',
       name: 'my-classes',
-      component: MyClassesView
+      component: MyClassesView,
+      meta: {mobileTitle: 'Мои классы'},
     },
     {
       path: '/app/my-normatives',
       name: 'my-normatives',
-      component: MyNormativesView
+      component: MyNormativesView,
+      meta: {mobileTitle: 'Мои нормативы'},
     },
     {
       path: '/app/my-normatives/create',
       name: 'create-normative',
       component: CreateNormativeView,
+      meta: {mobileTitle: 'Создание норматива'},
     },
     {
       path: '/app/profile',
       name: 'profile',
-      component: ProfileView
-    }
+      component: ProfileView,
+      meta: {mobileTitle: 'Профиль'},
+    },
   ]
 })
 

@@ -25,10 +25,8 @@ const plusButtonLink = computed(() => {
   return ''
 })
 
+const mobileTitle = computed(() => route.meta.mobileTitle)
 
-const props = defineProps<{
-  mobileTitle?: string;
-}>()
 </script>
 
 <template>
