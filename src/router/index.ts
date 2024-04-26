@@ -4,7 +4,7 @@ import LoginView from '@/views/LoginView.vue'
 import MyClassesView from '@/views/MyClassesView.vue'
 import MyNormativesView from '@/views/MyNormativesView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import CreateNormativeView from '@/views/CreateNormativeView.vue'
+import CreateOrUpdateNormativeView from '@/views/CreateOrUpdateNormativeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,8 +43,14 @@ const router = createRouter({
     {
       path: '/app/my-normatives/create',
       name: 'create-normative',
-      component: CreateNormativeView,
+      component: CreateOrUpdateNormativeView,
       meta: {mobileTitle: 'Создание норматива'},
+    },
+    {
+      path: '/app/my-normatives/update/:id',
+      name: 'update-normative',
+      component: CreateOrUpdateNormativeView,
+      meta: {mobileTitle: 'Обновление норматива'},
     },
     {
       path: '/app/profile',
