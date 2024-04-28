@@ -3,34 +3,34 @@
 import AppBar from '@/components/AppBar.vue'
 import { ref, computed } from 'vue'
 
-const IsClicked = ref(false)
-var startedName = 'Петров Петр Петрович'
-var startedEmail = 'petr@gmail.com'
+const isClicked = ref(false)
+const currentName = ref('Петров Петр Петрович')
+const currentEmail = ref('petr@gmail.com')
 async function getData(){
     fetch('')
     .then(response=> response.json())
     .then(data=>{
-        startedName = data.name
-        startedEmail = data.email
+        currentName.value = data.name
+        currentEmail.value = data.email
     })
     .catch(()=>{
         alert('Ошибка доступа к данным')
     })
 }
-const name = ref(startedName)
-const email = ref(startedEmail)
+const name = ref(currentName.value)
+const email = ref(currentEmail.value)
 async function postData(){
     try {
         const requestData = { email: email.value, name: name.value }
         const response = await fetch('', {
-        method: 'post',
-        body: JSON.stringify(requestData),
-        headers: {
-            'content-type': 'application/json'
-        }
+            method: 'post',
+            body: JSON.stringify(requestData),
+            headers: {
+                'content-type': 'application/json'
+            }
         })
         if (response.ok) {
-            location.reload()
+            getData()
         }else{
             alert('Server error')
         }
@@ -41,7 +41,7 @@ async function postData(){
 
 async function postPassword(){
     try {
-        const requestData = { email: email.value, password: password.value }
+        const requestData = { passwordConfirmation: passwordConfirmation.value, password: password.value }
         const response = await fetch('', {
             method: 'post',
             body: JSON.stringify(requestData),
@@ -50,7 +50,9 @@ async function postPassword(){
             }
         })
         if (response.ok) {
-            location.reload()
+            password.value="";
+            newPassword.value=""
+            passwordConfirmation.value=""
         } else if (response.status === 401) {
             alert('Неправильный пароль, попробуйте еще раз')
         } else {
@@ -61,7 +63,7 @@ async function postPassword(){
     } 
 }
 const isSendButtonDisabled = computed(() => {
-  return (name.value?.trim()=== startedName &&  email.value?.trim()===startedEmail)
+  return (name.value?.trim()=== currentName.value &&  email.value?.trim()===currentEmail.value) || name.value?.trim().length==0 || email.value?.trim().length==0
 })
 const password = ref('')
 const newPassword= ref('')
@@ -78,8 +80,8 @@ const isSetPasswordButtonDisabled = computed(() => {
 <div class="page">
     <div class="container rounded-lg">
         <div class="container">
-            <p class="text">{{startedName}}</p>
-            <p class="text">Почта: <span class="non-bold-text">{{startedEmail}}</span></p>
+            <p class="text">{{currentName}}</p>
+            <p class="text">Почта: <span class="non-bold-text">{{currentEmail}}</span></p>
         </div>
         <div class="container">
             <v-text-field 
@@ -98,7 +100,7 @@ const isSetPasswordButtonDisabled = computed(() => {
                     variant="text"
                     rounded
                     text="Изменить пароль"
-                    @click="IsClicked = !IsClicked" >
+                    @click="isClicked = !isClicked" >
                 </v-btn>
                 <v-btn 
                     rounded 
@@ -109,7 +111,7 @@ const isSetPasswordButtonDisabled = computed(() => {
             </div>
         </div>
     </div>
-    <div v-show="IsClicked" class="container rounded-lg">
+    <div v-show="isClicked" class="container rounded-lg">
         <div class="text">Смена пароля</div>
         <div class="container">
             <v-text-field 
@@ -123,6 +125,12 @@ const isSetPasswordButtonDisabled = computed(() => {
                 label = "Новый пароль" 
                 type="password"
                 v-model="newPassword">
+            </v-text-field> 
+            <v-text-field 
+                clearable 
+                label = "Проверка пароля" 
+                type="password"
+                v-model="passwordConfirmation">
             </v-text-field> 
             <div>
                 <v-btn 
