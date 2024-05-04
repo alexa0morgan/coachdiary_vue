@@ -5,6 +5,7 @@ import MyClassesView from '@/views/MyClassesView.vue'
 import MyNormativesView from '@/views/MyNormativesView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import CreateNormativeView from '@/views/CreateNormativeView.vue'
+import StudentView from '@/views/StudentView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,11 @@ const router = createRouter({
       path: '/app/profile',
       name: 'profile',
       component: ProfileView
+    },
+    {
+      path: '/app/my-classes/:studentName',
+      name: 'student',
+      component: StudentView
     }
   ]
 })
