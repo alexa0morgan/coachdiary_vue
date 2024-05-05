@@ -1,4 +1,3 @@
-<!--suppress CssUnresolvedCustomProperty -->
 <script setup lang="ts">
 
 </script>

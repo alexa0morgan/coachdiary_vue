@@ -1,4 +1,3 @@
-<!--suppress CssUnresolvedCustomProperty -->
 <script setup lang="ts">
 
 import TopPanel from '@/components/TopPanel.vue'
