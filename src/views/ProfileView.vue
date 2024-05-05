@@ -60,7 +60,7 @@ async function postPassword(){
         }
     } catch {
         alert('Произошла ошибка во время входа, попробуйте еще раз')
-    } 
+    }
 }
 const isSendButtonDisabled = computed(() => {
   return (name.value?.trim()=== currentName.value &&  email.value?.trim()===currentEmail.value) || name.value?.trim().length==0 || email.value?.trim().length==0
@@ -84,26 +84,26 @@ const isSetPasswordButtonDisabled = computed(() => {
             <p class="text">Почта: <span class="non-bold-text">{{currentEmail}}</span></p>
         </div>
         <div class="text-fields">
-            <v-text-field 
-                clearable 
+            <v-text-field
+                clearable
                 label = "Полное имя"
                 v-model="name">
             </v-text-field>
-            <v-text-field 
-                clearable 
-                label = "Почта" 
+            <v-text-field
+                clearable
+                label = "Почта"
                 type="email"
                 v-model="email">
             </v-text-field>
             <div>
-                <!--<v-btn 
+                <!--<v-btn
                     variant="text"
                     rounded
                     text="Изменить пароль"
                     @click="isClicked = !isClicked" >
                 </v-btn>-->
-                <v-btn 
-                    rounded 
+                <v-btn
+                    rounded
                     text="Сохранить"
                     class="button"
                     :disabled="isSendButtonDisabled"
@@ -115,33 +115,33 @@ const isSetPasswordButtonDisabled = computed(() => {
     <div class="container rounded-lg">
         <div class="text">Смена пароля</div>
         <div class="text-fields">
-            <v-text-field 
-                clearable 
+            <v-text-field
+                clearable
                 type="password"
                 label = "Старый пароль"
                 v-model="password">
             </v-text-field>
-            <v-text-field 
-                clearable 
-                label = "Новый пароль" 
+            <v-text-field
+                clearable
+                label = "Новый пароль"
                 type="password"
                 v-model="newPassword">
-            </v-text-field> 
-            <v-text-field 
-                clearable 
-                label = "Проверка пароля" 
+            </v-text-field>
+            <v-text-field
+                clearable
+                label = "Проверка пароля"
                 type="password"
                 v-model="passwordConfirmation">
-            </v-text-field> 
+            </v-text-field>
             <div>
-                <v-btn 
+                <v-btn
                     rounded
                     text="Установить"
                     :disabled="isSetPasswordButtonDisabled"
                     class="set-button button"
                     @click="postPassword">
-                </v-btn>   
-            </div>        
+                </v-btn>
+            </div>
         </div>
     </div>
 </v-main>
@@ -190,5 +190,5 @@ const isSetPasswordButtonDisabled = computed(() => {
             background: transparent;
             padding: 20px;
         }
-    }   
+    }
 </style>

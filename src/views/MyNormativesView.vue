@@ -22,8 +22,6 @@ const data = [
 </script>
 
 <template>
-  <AppBar mobile-title="Мои нормативы" />
-  <v-main>
     <TopPanel>
       <div class="buttons-panel">
         <v-btn class="level-button button" v-for="n in 11" :text="n + ' УР'" :key="n"
@@ -55,7 +53,6 @@ const data = [
       </div>
     </div>
 
-  </v-main>
 </template>
 
 <style scoped>

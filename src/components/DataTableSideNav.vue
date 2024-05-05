@@ -37,8 +37,9 @@ watch(() => props.data, () => {
              block @click="onSelect(item.id)" :active="selectedId === item.id" :ripple="false" />
     </div>
     <div class="action-buttons">
-      <v-btn text="Изменить" variant="outlined" color="primary-darken-1" size="small"
-             @click="emit('edit', selectedId)" class="button action-button" />
+      <v-btn :to="{name: 'update-normative', params: {id: selectedId}}" text="Изменить" variant="outlined"
+             color="primary-darken-1" size="small"
+             class="button action-button" @click="emit('edit', selectedId)" />
       <v-btn variant="outlined" color="error" size="small" class="button action-button">
         Удалить
         <v-menu activator="parent">
