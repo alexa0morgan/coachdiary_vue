@@ -135,7 +135,9 @@ function toPreviousLevel() {
       </template>
 
     </FieldSet>
+    <v-btn text="Сохранить" color="primary" rounded class="button" />
   </div>
+
 
 </template>
 
@@ -202,5 +204,10 @@ function toPreviousLevel() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.button {
+  grid-column: span 2;
+  justify-self: end;
 }
 </style>
