@@ -77,13 +77,13 @@ const isSetPasswordButtonDisabled = computed(() => {
 <template>
 <AppBar mobile-title="Профиль"/>
 
-<div class="page">
+<v-main class="main">
     <div class="container rounded-lg">
-        <div class="container">
+        <div>
             <p class="text">{{currentName}}</p>
             <p class="text">Почта: <span class="non-bold-text">{{currentEmail}}</span></p>
         </div>
-        <div class="container">
+        <div class="text-fields">
             <v-text-field 
                 clearable 
                 label = "Полное имя"
@@ -95,25 +95,26 @@ const isSetPasswordButtonDisabled = computed(() => {
                 type="email"
                 v-model="email">
             </v-text-field>
-            <div class="buttons">
-                <v-btn 
+            <div>
+                <!--<v-btn 
                     variant="text"
                     rounded
                     text="Изменить пароль"
                     @click="isClicked = !isClicked" >
-                </v-btn>
+                </v-btn>-->
                 <v-btn 
                     rounded 
                     text="Сохранить"
+                    class="button"
                     :disabled="isSendButtonDisabled"
                     @click="postData">
                 </v-btn>
             </div>
         </div>
     </div>
-    <div v-show="isClicked" class="container rounded-lg">
+    <div class="container rounded-lg">
         <div class="text">Смена пароля</div>
-        <div class="container">
+        <div class="text-fields">
             <v-text-field 
                 clearable 
                 type="password"
@@ -137,22 +138,24 @@ const isSetPasswordButtonDisabled = computed(() => {
                     rounded
                     text="Установить"
                     :disabled="isSetPasswordButtonDisabled"
-                    class="set-button"
+                    class="set-button button"
                     @click="postPassword">
                 </v-btn>   
             </div>        
         </div>
     </div>
-</div>
+</v-main>
 
 </template>
 
 <style scoped>
-    .page{
-        margin-top: 80px;
-        display: grid;
-        place-items: start center;
+    .main{
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
         gap: 10px;
+        align-items: center;
     }
     .container{
         width: 100%;
@@ -161,7 +164,10 @@ const isSetPasswordButtonDisabled = computed(() => {
         padding: 50px 80px;
         text-align: center;
         display: grid;
-        gap : 10px;
+    }
+    .text-fields{
+        display:grid;
+        gap:10px;
     }
     .text{
         font-size: 24px;
@@ -176,7 +182,7 @@ const isSetPasswordButtonDisabled = computed(() => {
         display: flex;
         justify-content: space-between;
     }
-    .set-button{
+    .button{
         float:right
     }
     @media (max-width: 800px) {
