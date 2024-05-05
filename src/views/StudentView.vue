@@ -17,16 +17,22 @@ const studentInfo = {
     class: '1в',
     sex: 'девочка'
 }
-function dateBirth(stInfo:Record<string, any>){
-    let day = String(stInfo.dateBirth.getDate())
-    let month = String(stInfo.dateBirth.getMonth())
+function getClassNumber(cl:string){
+    if(cl.length >2){
+        return +cl.slice(0,2)
+    }
+    return +cl.slice(0,1)
+}
+function dateBirth(date:Date){
+    let day = String(date.getDate())
+    let month = String(date.getMonth())
     if(day.length==1){
         day = 0+day 
     }
     if(month.length==1){
         month = 0+month
     }
-    return day + '.' + month + '.' + String(stInfo.dateBirth.getFullYear())
+    return day + '.' + month + '.' + String(date.getFullYear())
 }
 </script>
 
@@ -36,7 +42,7 @@ function dateBirth(stInfo:Record<string, any>){
         <TopPanel>
             <div>{{ studentInfo.name }}</div>
         </TopPanel>
-        <LevelPanel class="level-panel"/>
+        <LevelPanel :classNumber="getClassNumber(studentInfo.class)" class="level-panel"/>
         <div class="main">
             <DataTable :data="normatives"/>
             <div class="info-panel">
@@ -44,7 +50,7 @@ function dateBirth(stInfo:Record<string, any>){
                 <v-list class="list">
                     <v-list-item class="list-item">
                         <v-list-item-title>день рождения:</v-list-item-title>
-                        <div>{{dateBirth(studentInfo)}}</div>
+                        <div>{{dateBirth(studentInfo.dateBirth)}}</div>
                     </v-list-item>
                     <v-list-item class="list-item">
                         <v-list-item-title>класс:</v-list-item-title>   

@@ -1,6 +1,9 @@
 <script setup lang="ts">
-    import { ref } from 'vue'
-    const activeLevelNumber = ref(1)
+import { ref } from 'vue'
+const activeLevelNumber = ref(1)
+const props = defineProps<{
+  classNumber: number;
+}>()
 
 </script>
 
@@ -9,7 +12,7 @@
     <div class="inner-container">
         <div class="buttons-panel">
             <span class="header">уровни</span>
-            <v-btn class="level-button button" v-for="n in 11" :text="n + ' уровень'" :key="n"
+            <v-btn class="level-button button" v-for="n in classNumber" :text="n + ' уровень'" :key="n"
                 :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="black"
                 @click="activeLevelNumber = n" />
         </div>
