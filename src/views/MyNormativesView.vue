@@ -47,7 +47,7 @@ const data = [
                  @click="pageType = 'skills'" :active="pageType==='skills'" />
         </div>
         <DataTableSideNav :data :title="pageType==='standards' ? 'Стандарты' : 'Умения'"
-                          :is-page-type-skills="pageType==='skills'" class="data-table-side-nav"/>
+                          :is-page-type-skills="pageType==='skills'" class="data-table-side-nav" page-type="normatives"/>
       </div>
     </div>
 
