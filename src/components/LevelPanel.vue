@@ -12,7 +12,7 @@ const props = defineProps<{
     <div class="inner-container">
         <div class="buttons-panel">
             <span class="header">уровни</span>
-            <v-btn class="level-button button" v-for="n in classNumber" :text="n + ' уровень'" :key="n"
+            <v-btn size="small" class="level-button button" v-for="n in classNumber" :text="n + ' уровень'" :key="n"
                 :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="black"
                 @click="activeLevelNumber = n" />
         </div>

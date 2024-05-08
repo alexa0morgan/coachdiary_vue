@@ -14,7 +14,7 @@ const studentInfo = {
     id: 0,
     name: 'Афанасьева Марина Владимировна',
     dateBirth: new Date(2018, 3, 3),
-    class: '1в',
+    class: '11в',
     sex: 'девочка'
 }
 function getClassNumber(cl:string){
