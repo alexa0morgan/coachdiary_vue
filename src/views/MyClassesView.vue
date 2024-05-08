@@ -99,6 +99,10 @@ const students = [
   gap: 10px;
   max-width: 1200px;
   margin: 30px auto 0;
+
+  @media (max-width: 1230px) {
+    margin-inline: 8px;
+  }
 }
 
 .data-table-side-nav {
