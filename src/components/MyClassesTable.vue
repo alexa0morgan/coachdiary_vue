@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+import type { VDataTable } from 'vuetify/components'
+
 const props = defineProps<{
   data: Item[]
 }>()
@@ -8,20 +10,20 @@ interface Item {
   number: number;
   name: string;
   gender: string;
-  result: number;
-  mark: number;
+  result?: number;
+  mark?: number;
 }
 
-const headers = [
-  { title: '№', value: 'number' },
+const headers: VDataTable['$props']['headers'] = [
+  { title: '№', value: 'number', width: 50 },
   { title: 'ФИО', value: 'name', sortable: true },
-  { title: 'ПОЛ', value: 'gender', sortable: true },
-  { title: 'Результат', value: 'result', sortable: true },
-  { title: 'Оценка', value: 'mark', sortable: true }
+  { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
+  { title: 'Результат', value: 'result', sortable: true, width: 120 },
+  { title: 'Оценка', value: 'mark', sortable: true, width: 102 }
 ]
 
 
-function getMarkColor(mark: number): string {
+function getMarkColor(mark?: number): string {
   switch (mark) {
     case 1:
     case 2:
@@ -51,7 +53,7 @@ function getMarkColor(mark: number): string {
     item-key="name"
   >
     <template #item.name="{item}">
-      <v-btn to="/app" variant="tonal">{{ item.name }}</v-btn>
+      <v-btn class="button" to="/app" variant="tonal">{{ item.name }}</v-btn>
     </template>
     <template #item.gender="{item}">
       <div class="gender">
@@ -65,26 +67,21 @@ function getMarkColor(mark: number): string {
           {{ item.gender === 'Ж' ? 'mdi-gender-female' : 'mdi-gender-male' }}
         </v-icon>
       </div>
-
     </template>
     <template #item.result="{item}">
-      <v-text-field v-model="item.result" class="result">
-      </v-text-field>
+      <v-text-field v-model="item.result" class="result" />
     </template>
     <template #item.mark="{item}">
       <div :class="getMarkColor(item.mark)" class="mark">{{ item.mark }}</div>
     </template>
     <template #footer.prepend>
-      <v-btn class="button" color="primary">Сохранить</v-btn>
+      <v-btn color="primary">Сохранить</v-btn>
       <div class="space" />
     </template>
   </v-data-table>
 </template>
 
 <style scoped>
-.result {
-  width: 70px;
-}
 
 .gender {
   display: flex;
@@ -111,6 +108,7 @@ function getMarkColor(mark: number): string {
     aspect-ratio: 1;*/
   font-size: 20px;
   font-weight: bold;
+  text-align: center;
   /*  text-align: center;
     line-height: 1;
     border-radius: 50%;
@@ -135,6 +133,16 @@ function getMarkColor(mark: number): string {
 .mark-great {
   color: green;
   /*  background-color: hsl(120, 100%, 90%);*/
+}
+
+.button {
+  height: auto !important;
+  padding-block: 5px;
+  margin-block: 5px;
+}
+
+.button:deep(.v-btn__content) {
+  white-space: normal !important;
 }
 
 .space {
