@@ -63,7 +63,7 @@ const students = [
     </div>
     <template #right>
       <v-btn icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
-             :to="{name: 'create-normative'}" />
+             :to="{name: 'create-student'}" />
     </template>
   </TopPanel>
 
