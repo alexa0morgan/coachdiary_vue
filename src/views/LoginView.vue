@@ -1,4 +1,3 @@
-<!--suppress CssUnresolvedCustomProperty -->
 <script setup lang="ts">
 
 import AppBar from '@/components/AppBar.vue'
@@ -65,8 +64,7 @@ async function postLogin() {
 </script>
 
 <template>
-  <AppBar />
-  <v-main class="page">
+  <div class="page">
     <div class="container rounded-lg">
       <div class="text">{{ title }}</div>
       <div class="border-container">
@@ -93,7 +91,7 @@ async function postLogin() {
           clearable
           v-model="passwordConfirmation"
         />
-        <v-btn :text="buttonText" rounded @click="postLogin" :disabled="isSendButtonDisabled" />
+        <v-btn :text="buttonText" rounded @click="postLogin" :disabled="isSendButtonDisabled" class="button"/>
       </div>
       <div v-if="pageState==='signIn'">
         <v-btn text="Регистрация" variant="text" size="small" @click="pageState = 'signUp'" />
@@ -101,11 +99,12 @@ async function postLogin() {
       </div>
       <v-btn v-else text="Вернуться на страницу входа" variant="text" size="small" @click="pageState = 'signIn'" />
     </div>
-  </v-main>
+  </div>
 </template>
 
 <style scoped>
 .page {
+  height: 100%;
   display: grid;
   place-items: center;
 }
@@ -121,20 +120,27 @@ async function postLogin() {
   border: 1px solid rgb(var(--v-another-surface));
 }
 
+.container :deep(.v-btn__content) {
+  font-weight: normal;
+}
+
 .text {
   font-size: 24px;
   color: black;
 }
 
 .border-container {
+  display: flex;
+  flex-direction: column;
   border-bottom: 2px solid rgb(var(--v-another-surface));
   border-top: 2px solid rgb(var(--v-another-surface));
   margin: 20px 0;
   padding: 20px 15px;
+  gap:16px;
 }
 
-.container :deep(.v-btn__content) {
-  font-weight: normal;
+.button {
+  align-self: center;
 }
 
 @media (max-width: 800px) {

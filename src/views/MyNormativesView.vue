@@ -1,10 +1,8 @@
-<!--suppress CssUnresolvedCustomProperty -->
 <script setup lang="ts">
 
 import StandardsTable from '@/components/StandardsTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import TopPanel from '@/components/TopPanel.vue'
-import AppBar from '@/components/AppBar.vue'
 import { ref } from 'vue'
 
 const activeLevelNumber = ref(1)
@@ -22,8 +20,6 @@ const data = [
 </script>
 
 <template>
-  <AppBar mobile-title="Мои нормативы" />
-  <v-main>
     <TopPanel>
       <div class="buttons-panel">
         <v-btn class="level-button button" v-for="n in 11" :text="n + ' УР'" :key="n"
@@ -51,11 +47,10 @@ const data = [
                  @click="pageType = 'skills'" :active="pageType==='skills'" />
         </div>
         <DataTableSideNav :data :title="pageType==='standards' ? 'Стандарты' : 'Умения'"
-                          :is-page-type-skills="pageType==='skills'" />
+                          :is-page-type-skills="pageType==='skills'" class="data-table-side-nav" page-type="normatives"/>
       </div>
     </div>
 
-  </v-main>
 </template>
 
 <style scoped>
@@ -64,7 +59,7 @@ const data = [
   grid-template-columns: 1fr 230px;
   gap: 10px;
   max-width: 1200px;
-  margin: 50px auto 0;
+  margin: 40px auto 0;
 }
 
 .skills-grid {
@@ -104,6 +99,10 @@ const data = [
 
 .side-nav-button.v-btn--active {
   background-color: rgb(var(--v-theme-surface));
+}
+
+.data-table-side-nav {
+  height: calc(100vh - 220px);
 }
 
 </style>

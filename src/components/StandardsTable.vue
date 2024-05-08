@@ -1,4 +1,3 @@
-<!--suppress CssUnresolvedCustomProperty -->
 
 <script setup lang="ts">
 const props = defineProps<{
@@ -21,7 +20,7 @@ const props = defineProps<{
       </thead>
       <tbody>
       <tr>
-        <td>Повышенная</td>
+        <td>Высокая</td>
         <td>{{ high }}</td>
       </tr>
       <tr>
@@ -72,11 +71,7 @@ const props = defineProps<{
     tr:nth-child(even) {
       background: rgb(var(--v-theme-surface));
     }
-
-
   }
-
 }
-
 
 </style>

@@ -1,14 +1,16 @@
-<!--suppress CssUnresolvedCustomProperty -->
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-const props = defineProps<{
+const { title, data, isNormativeTypeSkills, isContentStaticText, pageType } = defineProps<{
   title: string;
   data: {
     label: string;
     id: number;
   }[];
-  isPageTypeSkills?: boolean;
+  isNormativeTypeSkills?: boolean;
+  isContentStaticText?: boolean;
+  pageType?: 'student' | 'normatives';
+
 }>()
 
 const emit = defineEmits<{
@@ -17,14 +19,20 @@ const emit = defineEmits<{
   delete: [id: number, inAllLevels: boolean];
 }>()
 
-const selectedId = ref(props.data[0]?.id ?? -1)
+const editLinkDestination = computed(() => {
+  return pageType === 'student'
+    ? { name: 'update-normative', params: { id: selectedId.value } } // TODO Заменить на update-student
+    : { name: 'update-normative', params: { id: selectedId.value } }
+})
+
+const selectedId = ref(data[0]?.id ?? -1)
 
 function onSelect(id: number): void {
   selectedId.value = id
   emit('select', id)
 }
 
-watch(() => props.data, () => {
+watch(() => data, () => {
   selectedId.value = 1
 })
 </script>
@@ -32,13 +40,19 @@ watch(() => props.data, () => {
 <template>
   <div class="container">
     <div class="title">{{ title }}</div>
-    <div class="data" :class="{'grid': isPageTypeSkills}">
-      <v-btn v-for="item in data" :key="item.id" class="button" :text="item.label" variant="outlined" size="small"
-             block @click="onSelect(item.id)" :active="selectedId === item.id" :ripple="false" />
+    <div class="data" :class="{'grid': isNormativeTypeSkills}">
+      <template v-if="!isContentStaticText">
+        <v-btn v-for="item in data" :key="item.id" class="button" :text="item.label" variant="outlined" size="small"
+               block @click="onSelect(item.id)" :active="selectedId === item.id" :ripple="false" />
+      </template>
+      <template v-else>
+        <div v-for="item in data" :key="item.id" class="static-text">{{ item.label }}</div>
+      </template>
     </div>
-    <div class="action-buttons">
-      <v-btn text="Изменить" variant="outlined" color="primary-darken-1" size="small"
-             @click="emit('edit', selectedId)" class="button action-button" />
+    <div v-if="pageType" class="action-buttons">
+      <v-btn :to="editLinkDestination" text="Изменить" variant="outlined"
+             color="primary-darken-1" size="small"
+             class="button action-button" @click="emit('edit', selectedId)" />
       <v-btn variant="outlined" color="error" size="small" class="button action-button">
         Удалить
         <v-menu activator="parent">
@@ -61,8 +75,6 @@ watch(() => props.data, () => {
 
 <style scoped>
 .container {
-  height: calc(100dvh - 230px);
-
   display: grid;
   grid-template-rows: auto 1fr auto;
   text-align: center;
@@ -79,7 +91,6 @@ watch(() => props.data, () => {
   padding: 0 0 3px;
   border-bottom: 1px solid rgb(var(--v-another-surface));
 }
-
 
 .data {
   display: flex;
@@ -129,5 +140,17 @@ watch(() => props.data, () => {
   text-transform: uppercase !important;
   border-width: 2px;
   font-size: 12px;
+}
+
+.static-text {
+  font-size: 16px;
+  border: 1px solid rgb(var(--v-theme-primary));
+  border-radius: var(--v-border-radius);
+  color: rgb(var(--v-theme-primary));
+  font-weight: bold;
+  background-color: rgb(var(--v-theme-surface));
+  padding: 1px 16px;
+  letter-spacing: 1px;
+  line-height: 1.2;
 }
 </style>

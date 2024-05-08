@@ -1,4 +1,3 @@
-<!--suppress CssUnresolvedCustomProperty -->
 <script setup lang="ts">
 
 import { useDisplay } from 'vuetify'
@@ -25,10 +24,8 @@ const plusButtonLink = computed(() => {
   return ''
 })
 
+const mobileTitle = computed(() => route.meta.mobileTitle)
 
-const props = defineProps<{
-  mobileTitle?: string;
-}>()
 </script>
 
 <template>

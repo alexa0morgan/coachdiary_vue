@@ -1,4 +1,3 @@
-<!--suppress CssUnresolvedCustomProperty -->
 <script setup lang="ts">
 
 </script>
@@ -6,8 +5,8 @@
 <template>
   <div class="container">
     <div class="inner-container">
-      <slot/>
-      <slot name="right"/>
+      <slot />
+      <slot name="right" />
     </div>
   </div>
 </template>
@@ -30,5 +29,10 @@
   font-size: 24px;
   text-transform: uppercase;
   font-weight: bold;
+
+  @media (max-width: 1230px) {
+    padding-inline: 8px;
+  }
 }
+
 </style>
