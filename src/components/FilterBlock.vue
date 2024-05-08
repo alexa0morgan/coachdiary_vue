@@ -1,18 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const props = defineProps<{
-  data: Student[]
-}>()
-
-interface Student {
-  number: number;
-  name: string;
-  gender: string;
-  result: number;
-  mark: number;
-}
-
 function selectGender(gender: Gender): void {
   if (selectedGender.value === gender) {
     selectedGender.value = null

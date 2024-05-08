@@ -19,18 +19,18 @@ const normatives = [
 ]
 
 const students = [
-  { number: 1, name: 'Алимкулова Ширина Никитишна', gender: 'М', result: 1, mark: 5 },
-  { number: 2, name: 'Бакурова Диана Никитишна', gender: 'Ж', result: 2, mark: 4 },
-  { number: 1, name: 'Беляева Ника Никитишна', gender: 'М', result: 2, mark: 3 },
-  { number: 2, name: 'Бублик Матвей Никитишна', gender: 'Ж', result: 3, mark: 2 },
-  { number: 1, name: 'Передельский Никита Никитишна', gender: 'М', result: 4, mark: 1 },
-  { number: 2, name: 'Швенк Ева Никитишна', gender: 'Ж', result: 2, mark: 2 },
-  { number: 1, name: 'Трегуб Андрей Никитишна', gender: 'М', result: 1, mark: 1 },
-  { number: 2, name: 'Гаевский Александр Никитишна', gender: 'Ж', result: 1, mark: 2 },
-  { number: 1, name: 'Пятова Мария Никитишна', gender: 'М', result: 4, mark: 1 },
-  { number: 2, name: 'Доржиева Арьяна Никитишна', gender: 'Ж', result: 4, mark: 2 },
-  { number: 1, name: 'Имя 1', gender: 'М', result: 3, mark: 1 },
-  { number: 2, name: 'Имя 2', gender: 'Ж', result: 3, mark: 2 }
+  { number: 1111, name: 'Петров Артемий Юрьевич', gender: 'М', result: undefined, mark: undefined},
+  { number: 2, name: 'Шишкина Валерия Максимовна', gender: 'Ж', result: -4, mark: 4 },
+  { number: 3, name: 'Новикова Василиса Давидовна', gender: 'Ж', result: 2, mark: 5 },
+  { number: 4, name: 'Кудрявцев Юрий Максимович', gender: 'М', result: undefined, mark: undefined },
+  { number: 5, name: 'Федоров Андрей Никитич', gender: 'М', result: -19, mark: 2 },
+  { number: 6, name: 'Швенк Ева Никитишна', gender: 'Ж', result: 2, mark: 5 },
+  { number: 7, name: 'Борисов Герман Денисович', gender: 'М', result: 0, mark: 5 },
+  { number: 8, name: 'Захаров Матвей Никитич', gender: 'М', result: -7, mark: 3 },
+  { number: 9, name: 'Снегирева Ева Андреевна', gender: 'Ж', result: 5, mark: 5 },
+  { number: 10, name: 'Румянцева Ксения Никитична', gender: 'Ж', result: -4, mark: 4 },
+  { number: 11, name: 'Кондратьева Елена Глебовна', gender: 'Ж', result: 7, mark: 5 },
+  { number: 12, name: 'Иванова Елизавета Елисеевна', gender: 'Ж', result: -11, mark: 2 }
 ]
 </script>
 
@@ -69,7 +69,7 @@ const students = [
 
   <div class="grid">
 
-    <FilterBlock :data="students"/>
+    <FilterBlock />
 
     <MyClassesTable class="table" :data="students" />
 
