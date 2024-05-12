@@ -31,7 +31,7 @@
   font-weight: bold;
 
   @media (max-width: 1230px) {
-    padding-inline: 8px;
+    padding: 8px;
   }
 }
 

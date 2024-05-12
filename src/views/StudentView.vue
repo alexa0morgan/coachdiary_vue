@@ -46,8 +46,8 @@ function dateBirth(date:Date){
 
 <template>
     <div>
-        <TopPanel>
-            <div>{{ studentInfo.name }}</div>
+        <TopPanel class="top-panel">
+            <div class="top-panel-title">{{ studentInfo.name }}</div>
         </TopPanel>
         <LevelPanel :classNumber="getClassNumber(studentInfo.class)" class="level-panel"/>
         <div class="main">
@@ -91,6 +91,14 @@ function dateBirth(date:Date){
     gap: 10px;
     max-width: 1200px;
     margin: 10px auto 0;
+}
+@media (max-width: 1230px) {
+    .top-panel-title{
+        font-size: 14px;
+    }
+    .top-panel{
+        padding:0
+    }
 }
 .table{
     height: calc(100dvh - 230px);
