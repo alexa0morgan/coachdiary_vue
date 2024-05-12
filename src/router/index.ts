@@ -74,9 +74,10 @@ const router = createRouter({
       meta: { mobileTitle: 'Профиль' }
     },
     {
-      path: '/app/my-classes/:studentName',
+      path: '/app/my-classes/:id',
       name: 'student',
       component: StudentView,
+      meta:{ mobileTitle: 'Ученик'}
     },
   ]
 })
