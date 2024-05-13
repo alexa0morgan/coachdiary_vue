@@ -4,17 +4,32 @@ import AppBar from '@/components/AppBar.vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
+const router = useRouter()
+
+const name = ref('')
 const email = ref('')
 const password = ref('')
 const passwordConfirmation = ref('')
-const router = useRouter()
+
+const passwordType = ref<'password' | 'text'>('password')
+
 const isSendButtonDisabled = computed(() => {
-  return !email.value?.trim().length || !password.value?.length
+  if (!/.@./.test(email.value)) {
+    return true
+  }
+  if (pageType.value === 'signIn') {
+    return !password.value?.length
+  }
+  if (pageType.value === 'signUp') {
+    return !password.value?.length || !name.value?.length ||
+      !passwordConfirmation.value?.length || password.value !== passwordConfirmation.value
+  }
+  return false
 })
 
-const pageState = ref<'signIn' | 'signUp' | 'restore'>('signIn')
 const title = computed(() => {
-  switch (pageState.value) {
+  switch (pageType.value) {
     case 'signUp':
       return 'Регистрация'
     case 'restore':
@@ -26,7 +41,7 @@ const title = computed(() => {
   }
 })
 const buttonText = computed(() => {
-  switch (pageState.value) {
+  switch (pageType.value) {
     case 'signUp':
       return 'Зарегистрироваться'
     case 'restore':
@@ -37,28 +52,79 @@ const buttonText = computed(() => {
   }
 })
 
-async function postLogin() {
+const isLoading = ref(false)
+
+async function sendData() {
+  isLoading.value = true
   try {
-    const requestData = { email: email.value, password: password.value }
-
-    const response = await fetch(import.meta.env.VITE_APP_API_BASE + '/api/login/', {
-      method: 'post',
-      body: JSON.stringify(requestData),
-      headers: {
-        'content-type': 'application/json'
-      }
-    })
-
-    if (response.ok) {
-      router.push({ name: 'app' })
-    } else if (response.status === 401) {
-      alert('Неправильный логин и/или пароль, попробуйте еще раз')
-    } else {
-      throw new Error('Server error')
+    let response
+    if (pageType.value === 'signIn') {
+      response = await signIn()
+    } else if (pageType.value === 'signUp') {
+      response = await signUp()
+    } else if (pageType.value === 'restore') {
+      response = await restore()
+    }
+    if (response?.status === 'error') {
+      const errors = Object.values(response.details).flat().join('\n')
+      alert(errors)
     }
   } catch {
-    alert('Произошла ошибка во время входа, попробуйте еще раз')
+    alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
+  } finally {
+    isLoading.value = false
   }
+}
+
+async function signIn() {
+  const requestData = { email: email.value, password: password.value }
+
+  const response = await fetch(import.meta.env.VITE_APP_API_BASE + '/api/login/', {
+    method: 'post',
+    body: JSON.stringify(requestData),
+    headers: {
+      'content-type': 'application/json'
+    }
+  })
+
+  if (response.ok) {
+    router.push({ name: 'app' })
+  } else {
+    return response.json()
+  }
+}
+
+async function signUp() {
+  const requestData = {
+    email: email.value,
+    password: password.value,
+    confirm_password: passwordConfirmation.value,
+    name: name.value
+  }
+
+  const response = await fetch(import.meta.env.VITE_APP_API_BASE + '/api/create-user/', {
+    method: 'post',
+    body: JSON.stringify(requestData),
+    headers: {
+      'content-type': 'application/json'
+    }
+  })
+
+  if (response.ok) {
+    pageType.value = 'signIn'
+    email.value = ''
+    password.value = ''
+    name.value = ''
+    passwordConfirmation.value = ''
+    alert('Пользователь успешно создан')
+  } else {
+    return response.json()
+  }
+
+}
+
+async function restore() {
+  alert('К сожалению, данная функция еще не доступна, обратитесь по адресу почты поддержки: *адрес почты*')
 }
 
 </script>
@@ -69,35 +135,58 @@ async function postLogin() {
       <div class="text">{{ title }}</div>
       <div class="border-container">
         <v-text-field
+          v-if="pageType === 'signUp'"
+          v-model="name"
+          :disabled="isLoading"
+          variant="outlined"
+          label="Имя"
+          placeholder="ФИО"
+          clearable
+          persistent-clear
+        />
+        <v-text-field
+          v-model="email"
+          :disabled="isLoading"
           variant="outlined"
           label="Почта"
           placeholder="example@example.com"
           clearable
-          v-model="email"
+          persistent-clear
         />
         <v-text-field
-          v-if="pageState !== 'restore'"
+          v-if="pageType !== 'restore'"
+          v-model="password"
+          :disabled="isLoading"
+          :type="passwordType"
           variant="outlined"
           label="Пароль"
-          type="password"
           clearable
-          v-model="password"
+          persistent-clear
+          :append-inner-icon="password ? 'mdi-eye' : undefined"
+          @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
         />
         <v-text-field
-          v-if="pageState === 'signUp'"
+          v-if="pageType === 'signUp'"
+          v-model="passwordConfirmation"
+          :disabled="isLoading"
+          :type="passwordType"
           variant="outlined"
           label="Повторите пароль"
-          type="password"
           clearable
-          v-model="passwordConfirmation"
+          persistent-clear
+          :append-inner-icon="password ? 'mdi-eye' : undefined"
+          @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
         />
-        <v-btn :text="buttonText" rounded @click="postLogin" :disabled="isSendButtonDisabled" class="button"/>
+        <v-btn :text="buttonText" :disabled="isSendButtonDisabled || isLoading" class="button" rounded
+               @click="sendData" />
       </div>
-      <div v-if="pageState==='signIn'">
-        <v-btn text="Регистрация" variant="text" size="small" @click="pageState = 'signUp'" />
-        <v-btn text="Восстановление пароля" variant="text" size="small" @click="pageState = 'restore'" />
+      <div v-if="pageType==='signIn'">
+        <v-btn :disabled="isLoading" text="Регистрация" variant="text" size="small" @click="pageType = 'signUp'" />
+        <v-btn :disabled="isLoading" text="Восстановление пароля" variant="text" size="small" @click="pageType =
+        'restore'" />
       </div>
-      <v-btn v-else text="Вернуться на страницу входа" variant="text" size="small" @click="pageState = 'signIn'" />
+      <v-btn v-else :disabled="isLoading" text="Вернуться на страницу входа" variant="text" size="small"
+             @click="pageType = 'signIn'" />
     </div>
   </div>
 </template>
@@ -136,7 +225,7 @@ async function postLogin() {
   border-top: 2px solid rgb(var(--v-another-surface));
   margin: 20px 0;
   padding: 20px 15px;
-  gap:16px;
+  gap: 16px;
 }
 
 .button {
