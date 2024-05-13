@@ -1,11 +1,12 @@
 <script setup lang="ts">
 
-import AppBar from '@/components/AppBar.vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
 const router = useRouter()
+const userStore = useUserStore()
 
 const name = ref('')
 const email = ref('')
@@ -84,10 +85,12 @@ async function signIn() {
     body: JSON.stringify(requestData),
     headers: {
       'content-type': 'application/json'
-    }
+    },
+    credentials: 'include',
   })
 
   if (response.ok) {
+    userStore.login()
     router.push({ name: 'app' })
   } else {
     return response.json()
