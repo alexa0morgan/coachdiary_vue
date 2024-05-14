@@ -3,6 +3,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { post } from '@/utils'
 
 const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
 const router = useRouter()
@@ -80,14 +81,7 @@ async function sendData() {
 async function signIn() {
   const requestData = { email: email.value, password: password.value }
 
-  const response = await fetch(import.meta.env.VITE_APP_API_BASE + '/api/login/', {
-    method: 'post',
-    body: JSON.stringify(requestData),
-    headers: {
-      'content-type': 'application/json'
-    },
-    credentials: 'include',
-  })
+  const response = await post('/api/login/', requestData)
 
   if (response.ok) {
     userStore.login()
@@ -105,13 +99,7 @@ async function signUp() {
     name: name.value
   }
 
-  const response = await fetch(import.meta.env.VITE_APP_API_BASE + '/api/create-user/', {
-    method: 'post',
-    body: JSON.stringify(requestData),
-    headers: {
-      'content-type': 'application/json'
-    }
-  })
+  const response = await post('/api/create-user/', requestData)
 
   if (response.ok) {
     pageType.value = 'signIn'
