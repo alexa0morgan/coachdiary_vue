@@ -16,6 +16,9 @@
   padding: 5px 0;
   height: 60px;
   background-color: rgb(var(--v-theme-primary));
+  @media (max-width: 1230px) {
+    height: 40px;
+  }
 }
 
 .inner-container {

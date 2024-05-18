@@ -92,14 +92,6 @@ function dateBirth(date:Date){
     max-width: 1200px;
     margin: 10px auto 0;
 }
-@media (max-width: 1230px) {
-    .top-panel-title{
-        font-size: 14px;
-    }
-    .top-panel{
-        padding:0
-    }
-}
 .table{
     height: calc(100dvh - 230px);
 }
@@ -110,7 +102,7 @@ function dateBirth(date:Date){
     background-color: rgb(var(--v-theme-background));
     border: 1px solid rgb(var(--v-theme-primary));
     border-radius: var(--v-border-radius);
-    padding: 10px;
+    padding: 0 10px;
     height: calc(100dvh - 230px);
 }
 .info-title{
@@ -148,5 +140,29 @@ function dateBirth(date:Date){
 }
 .button.v-btn--active {
   background-color: rgb(var(--v-theme-surface));
+}
+@media (max-width: 1230px) {
+    .top-panel-title{
+        font-size: 14px;
+    }
+    .top-panel{
+        padding:0;
+        margin-bottom: 10px;
+    }
+    .main{
+        flex-direction: column;
+        align-items: center;
+        padding: 0 10px 10px;
+    }
+    .info-panel{
+        height: 300px;
+    }
+    .info-title{
+        font-size: 14px;
+        text-align: center;
+    }
+    .list-item:deep(.v-list-item){
+        width: 100px;
+    }
 }
 </style>

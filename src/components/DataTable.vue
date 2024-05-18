@@ -43,13 +43,12 @@ function itemRowBackground(item:Item) {
             :items-per-page-text="'cтрок на странице'"
             :show-current-page="true"
             item-key="id" 
-            class="table"> 
+            class="table"
+            :mobile="true"> 
             <template #item.result="{item}">
                 <v-text-field v-model="item.result" class="changeable-fields" />
             </template>
             <template #body.append>
-                <div class="free-tr">
-                </div>
                 <tr class="total-rate">
                     <td></td>
                     <td>Итого</td>
@@ -58,7 +57,7 @@ function itemRowBackground(item:Item) {
                 </tr>
             </template>
             <template #footer.prepend>
-                <v-btn color="primary">Сохранить</v-btn>
+                <v-btn class="button" color="primary">Сохранить</v-btn>
                 <div class="space" />
             </template>  
         </v-data-table>
@@ -73,9 +72,6 @@ function itemRowBackground(item:Item) {
     font-weight: bold;
     text-transform: capitalize;
     color: rgb(var(--v-theme-primary));
-}
-.free-tr{
-    height: 100%;
 }
 .changeable-fields{
     color: rgb(var(--v-theme-primary));
@@ -107,5 +103,29 @@ function itemRowBackground(item:Item) {
 }
 .table:deep(.v-data-table__tr):nth-child(odd) {
     background: rgb(var(--v-theme-background));
+}
+@media(max-width: 1280px){
+    .table{
+        font-weight: 400;
+        font-size: 10px;
+    }
+    .table:deep(.v-data-table__td){
+        height: 40px !important;
+    }
+    .table:deep(td){
+        height: 40px !important;
+    }
+    .table:deep(tr.v-data-table__tr){
+        height: 40px !important;
+    }
+    .changeable-fields{
+        font-weight: 400;
+    }
+    .changeable-fields:deep(.v-field__input){
+        font-size: 10px;
+    }
+    .button:deep(.v-btn__content){
+        font-size: 10px !important;
+    }
 }
 </style>
