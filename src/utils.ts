@@ -12,12 +12,12 @@ export function getCookie(name: string):string | null {
 }
 
 export function get(url: string, data?: Record<string | number, unknown>): Promise<Response> {
-  const urlObj = new URL(url);
+  const urlObj = new URL(import.meta.env.VITE_APP_API_BASE + url);
   for (const key in data) {
     urlObj.searchParams.append(key, data[key] as string);
   }
 
-  return fetch(import.meta.env.VITE_APP_API_BASE + urlObj.toString(), {
+  return fetch(urlObj.toString(), {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

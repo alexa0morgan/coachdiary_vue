@@ -27,9 +27,9 @@ const plusButtonLink = computed(() => {
   return ''
 })
 
-function logout() {
-/*  userStore.logout()
-  router.push({name: 'login'})*/
+async function logout() {
+  await userStore.logout()
+  router.push({name: 'login'})
 }
 
 const mobileTitle = computed(() => route.meta.mobileTitle)
