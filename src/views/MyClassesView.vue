@@ -9,6 +9,7 @@ import { get } from '@/utils'
 
 
 const activeLevelNumber = ref(-1)
+const selectedNormativeId = ref(-1)
 const className = ref('')
 
 const classesData = ref<Class[]>([])
@@ -89,7 +90,8 @@ const students = [
 
     <MyClassesTable class="table" :data="students" />
 
-    <DataTableSideNav :data="normatives" title="Нормативы" class="data-table-side-nav" />
+    <DataTableSideNav v-model="selectedNormativeId" :data="normatives" title="Нормативы" class="data-table-side-nav"
+                      :has-action-buttons="false"/>
   </div>
 
 
