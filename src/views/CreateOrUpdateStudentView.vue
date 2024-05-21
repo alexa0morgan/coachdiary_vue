@@ -3,16 +3,71 @@
 import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
 import { useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { get, post, put } from '@/utils'
+import type { StudentRequest } from '@/types/types'
 
 const route = useRoute()
 const pageType = ref(route.name as 'create-student' | 'update-student')
 
 const studentName = ref('')
 const genderType = ref<'f' | 'm' | null>(null)
-const date = ref('') //2024-05-08
+const birthdayDate = ref('') //2024-05-08
 const classNumber = ref(-1)
 const className = ref('')
+
+const isSaveButtonDisabled = computed(() => {
+  return !studentName.value || !genderType.value || !birthdayDate.value || classNumber.value === -1 ||
+    !className.value
+})
+
+onMounted(async () => {
+  if (pageType.value === 'update-student') {
+    const data = await get(`/api/students/${route.params.id}/`).then(res => res.json())
+    studentName.value = data.full_name
+    genderType.value = data.gender
+    birthdayDate.value = data.birthday
+    classNumber.value = data.student_class.number
+    className.value = data.student_class.class_name
+  }
+})
+
+
+async function createOrUpdateStudent() {
+  try {
+    const requestData: StudentRequest =  {
+      full_name: studentName.value,
+      student_class: {
+        number: classNumber.value,
+        class_name: className.value
+      },
+      birthday: birthdayDate.value,
+      gender: genderType.value as 'f' | 'm'
+    }
+    const currentId = pageType.value === 'update-student' ? `${route.params.id}/` : ''
+    const currentMethod = pageType.value === 'update-student' ? put : post
+
+    const response = await currentMethod(`/api/students/` + currentId, requestData)
+
+    if (response.ok) {
+      alert('Ученик создан')
+      studentName.value = ''
+      genderType.value = null
+      birthdayDate.value = ''
+      classNumber.value = -1
+      className.value = ''
+    } else {
+      const data = await response.json()
+      if (data?.status === 'error') {
+        const errors = Object.values(data.details).flat().join('\n')
+        alert(errors)
+      }
+    }
+
+  } catch (e) {
+    alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
+  }
+}
 </script>
 
 <template>
@@ -23,27 +78,28 @@ const className = ref('')
 
       <FieldSet title="Пол">
         <v-radio-group v-model="genderType">
-          <v-radio label="Женский" value="standard" />
-          <v-radio label="Мужской" value="skill" />
+          <v-radio label="Женский" value="f" />
+          <v-radio label="Мужской" value="m" />
         </v-radio-group>
       </FieldSet>
 
-      <v-text-field v-model="date" class="text-field" label="Дата рождения" type="date" />
+      <v-text-field v-model="birthdayDate" class="text-field" label="Дата рождения" type="date" />
 
     </div>
 
     <FieldSet class="class" title="Класс">
       <div>
         <p class="levels-text">Уровень</p>
-        <v-radio-group class="radio-group" height="100px">
-          <v-radio v-for="n in 11" :key="n" v-model="classNumber" :label="n.toString()" :value="n"
-                   density="compact"/>
+        <v-radio-group v-model="classNumber" class="radio-group" height="100px">
+          <v-radio v-for="n in 11" :key="n" :label="n.toString()" :value="n"
+                   density="compact" />
         </v-radio-group>
       </div>
       <v-text-field v-model="className" class="text-field class-name" label="Буква" />
     </FieldSet>
 
-    <v-btn text="Сохранить" color="primary" rounded class="button" />
+    <v-btn :disabled="isSaveButtonDisabled" text="Сохранить" color="primary" rounded class="button"
+           @click="createOrUpdateStudent" />
   </div>
 </template>
 
