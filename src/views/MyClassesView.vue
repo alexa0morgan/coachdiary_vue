@@ -1,12 +1,32 @@
 <script setup lang="ts">
 import TopPanel from '@/components/TopPanel.vue'
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyClassesTable from '@/components/MyClassesTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
+import type { Class } from '@/types/types'
+import { get } from '@/utils'
+
 
 const activeLevelNumber = ref(-1)
 const className = ref('')
+
+const classesData = ref<Class[]>([])
+
+onMounted(async () => {
+  classesData.value = await get('/api/classes/').then(res => res.json())
+})
+
+const classes = computed(() =>
+  classesData.value
+    .reduce((acc, v) => {
+      if (!(v.number in acc)) {
+        acc[v.number] = [] as string[]
+      }
+      acc[v.number].push(v.class_name)
+      return acc
+    }, {} as Record<number, string[]>)
+)
 
 
 const normatives = [
@@ -19,7 +39,7 @@ const normatives = [
 ]
 
 const students = [
-  { number: 1111, name: 'Петров Артемий Юрьевич', gender: 'М', result: undefined, mark: undefined},
+  { number: 1111, name: 'Петров Артемий Юрьевич', gender: 'М', result: undefined, mark: undefined },
   { number: 2, name: 'Шишкина Валерия Максимовна', gender: 'Ж', result: -4, mark: 4 },
   { number: 3, name: 'Новикова Василиса Давидовна', gender: 'Ж', result: 2, mark: 5 },
   { number: 4, name: 'Кудрявцев Юрий Максимович', gender: 'М', result: undefined, mark: undefined },
@@ -32,26 +52,22 @@ const students = [
   { number: 11, name: 'Кондратьева Елена Глебовна', gender: 'Ж', result: 7, mark: 5 },
   { number: 12, name: 'Иванова Елизавета Елисеевна', gender: 'Ж', result: -11, mark: 2 }
 ]
+
+
 </script>
 
 <template>
   <TopPanel>
     <div class="buttons-panel">
-      <v-btn class="level-button top-button" v-for="n in 11" :key="n"
-             :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="rgb(var(--v-theme-secondary))"
-             @click="activeLevelNumber = n; className = ''">
-        {{ n }}{{ activeLevelNumber === n ? className : '' }}
+      <v-btn class="level-button top-button" v-for="(v, key) in classes" :key
+             :variant="activeLevelNumber === key ? 'flat' : 'outlined'" color="rgb(var(--v-theme-secondary))"
+             @click="activeLevelNumber = key; className = ''">
+        {{ key }}{{ activeLevelNumber === key ? className : '' }}
         <v-menu activator="parent" location="bottom center" offset="5" transition="slide-y-transition">
           <v-list density="compact" bg-color="rgb(var(--v-theme-primary))"
                   base-color="rgb(var(--v-theme-secondary))" elevation="0">
-            <v-list-item class="text-center" @click="className = 'A'">
-              <v-list-item-title>А</v-list-item-title>
-            </v-list-item>
-            <v-list-item class="text-center" @click="className = 'Б'">
-              <v-list-item-title>Б</v-list-item-title>
-            </v-list-item>
-            <v-list-item class="text-center" @click="className = 'В'">
-              <v-list-item-title>В</v-list-item-title>
+            <v-list-item v-for="letter in v" :key='key + letter' class="text-center" @click="className = letter">
+              <v-list-item-title>{{ letter }}</v-list-item-title>
             </v-list-item>
             <v-list-item class="text-center" @click="() => {}">
               <v-list-item-title>Отмена</v-list-item-title>
