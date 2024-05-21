@@ -33,10 +33,10 @@ const classes = computed(() =>
 const normatives = [
   { id: 1, label: 'бег 100м' },
   { id: 2, label: 'метание мяча' },
-  { id: 3, label: 'прыжок в длину прыжок в длину 2 раз lkbfsdf sdfsd dsf' },
-  { id: 4, label: 'прыжок в длину прыжок в длину 2 раз lkbfsdf sdfsd dsf' },
-  { id: 5, label: 'прыжок в длину прыжок в длину 2 раз lkbfsdf sdfsd dsf' },
-  { id: 6, label: 'прыжок в длину прыжок в длину 2 раз lkbfsdf sdfsd dsf' }
+  { id: 3, label: 'прыжок в длину прыжок в длину 2 раз  dsf' },
+  { id: 4, label: 'прыжок в длину прыжок в длину 2 раз dsf' },
+  { id: 5, label: 'прыжок в длину прыжок в длину 2 раз dsf' },
+  { id: 6, label: 'прыжок в длину прыжок в длину 2 раз dsf' }
 ]
 
 const students = [

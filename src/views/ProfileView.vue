@@ -56,7 +56,7 @@ async function postPassword() {
     } else if (response.status === 401) {
       alert('Неправильный пароль, попробуйте еще раз')
     } else {
-      throw new Error('Server error')
+      alert('Произошла ошибка во время входа, попробуйте еще раз')
     }
   } catch {
     alert('Произошла ошибка во время входа, попробуйте еще раз')

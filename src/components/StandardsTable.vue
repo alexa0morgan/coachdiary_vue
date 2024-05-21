@@ -1,6 +1,6 @@
 
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   gender: 'm' | 'f';
   high: number;
   middle: number;
