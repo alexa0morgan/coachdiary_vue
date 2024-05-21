@@ -5,7 +5,7 @@ import FieldSet from '@/components/FieldSet.vue'
 import { useRoute } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import { get, post, put } from '@/utils'
-import type { StudentRequest } from '@/types/types'
+import type { Student, StudentRequest } from '@/types/types'
 
 const route = useRoute()
 const pageType = ref(route.name as 'create-student' | 'update-student')
@@ -23,7 +23,7 @@ const isSaveButtonDisabled = computed(() => {
 
 onMounted(async () => {
   if (pageType.value === 'update-student') {
-    const data = await get(`/api/students/${route.params.id}/`).then(res => res.json())
+    const data: Student = await get(`/api/students/${route.params.id}/`).then(res => res.json())
     studentName.value = data.full_name
     genderType.value = data.gender
     birthdayDate.value = data.birthday
@@ -32,10 +32,9 @@ onMounted(async () => {
   }
 })
 
-
 async function createOrUpdateStudent() {
   try {
-    const requestData: StudentRequest =  {
+    const requestData: StudentRequest = {
       full_name: studentName.value,
       student_class: {
         number: classNumber.value,
