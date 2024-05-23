@@ -2,14 +2,16 @@
 
 import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import type { Normative, NormativeRequest } from '@/types/types'
+import { get, post, put } from '@/utils'
 
 const route = useRoute()
 const pageType = ref(route.name as 'create-normative' | 'update-normative')
 
 const normativeName = ref('')
-const levelType = ref<'standard' | 'skill' | null>(null)
+const normativeType = ref<'standard' | 'skill' | null>(null)
 
 const currentLevel = ref(-1)
 const levelNumbers = ref<number[]>([])
@@ -21,22 +23,22 @@ interface Level {
 }
 
 interface LevelValues {
-  high?: number;
-  middle?: number;
-  low?: number;
+  high: number;
+  middle: number;
+  low: number;
 }
 
 for (let i = 1; i <= 11; i++) {
   levels.value[i] = {
     girls: {
-      high: undefined,
-      middle: undefined,
-      low: undefined
+      high: 0,
+      middle: 0,
+      low: 0
     },
     boys: {
-      high: undefined,
-      middle: undefined,
-      low: undefined
+      high: 0,
+      middle: 0,
+      low: 0
     }
   }
 }
@@ -73,21 +75,112 @@ function toPreviousLevel() {
   }
 }
 
+async function createOrUpdateNormative() {
+  try {
+    const requestData: NormativeRequest = {
+      standard: {
+        name: normativeName.value,
+        has_numeric_value: normativeType.value === 'standard'
+      },
+      levels: Object
+        .entries(levels.value)
+        .filter(([key]) => levelNumbers.value.includes(+key))
+        .map(([key, value]) => [
+          {
+            level_number: +key,
+            low_level_value: value.girls.low,
+            middle_level_value: value.girls.middle,
+            high_level_value: value.girls.high,
+            gender: 'f' as const
+          },
+          {
+            level_number: +key,
+            low_level_value: value.boys.low,
+            middle_level_value: value.boys.middle,
+            high_level_value: value.boys.high,
+            gender: 'm' as const
+          }
+        ])
+        .flat()
+    }
+
+    const currentId = pageType.value === 'update-normative' ? `${route.params.id}/` : ''
+    const currentMethod = pageType.value === 'update-normative' ? put : post
+
+    const response = await currentMethod(`/api/standards/` + currentId, requestData)
+
+    if (response.ok) {
+      alert('Норматив создан')
+      normativeName.value = ''
+      normativeType.value = null
+      levelNumbers.value = []
+    } else {
+      const data = await response.json()
+      if (data?.status === 'error') {
+        const errors = Object.values(data.details).flat().join('\n')
+        alert(errors)
+      }
+    }
+  } catch (e) {
+    alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
+  }
+}
+
+const isSaveButtonDisabled = computed(() => {
+  return !normativeName.value
+    || !normativeType.value
+    || levelNumbers.value.length === 0
+    || (
+      Object
+        .entries(levels.value)
+        .some(([key, value]) =>
+          levelNumbers.value.includes(+key) && (
+            value.girls.high === 0
+            || value.girls.middle === 0
+            || value.girls.low === 0
+            || value.boys.low === 0
+            || value.boys.middle === 0
+            || value.boys.high === 0
+          )
+        )
+      && normativeType.value !== 'skill'
+    )
+})
+
+onMounted(async () => {
+  if (pageType.value === 'update-normative') {
+    const data: Normative = await get(`/api/standards/${route.params.id}/`).then(res => res.json())
+    normativeName.value = data.standard.name
+    normativeType.value = data.standard.has_numeric_value ? 'standard' : 'skill'
+
+    for (const level of data.levels) {
+      const key = level.gender === 'f' ? 'girls' : 'boys'
+      levels.value[level.level_number][key] = {
+        high: level.high_level_value,
+        middle: level.middle_level_value,
+        low: level.low_level_value
+      }
+
+      if (!levelNumbers.value.includes(level.level_number)) levelNumbers.value.push(level.level_number)
+    }
+
+    currentLevel.value = Math.min(...levelNumbers.value) ?? -1
+  }
+})
+
 </script>
 
 <template>
 
-  <TopPanel>{{pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива'}}</TopPanel>
+  <TopPanel>{{ pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива' }}</TopPanel>
   <div class="grid" v-auto-animate>
 
     <FieldSet title="Тип">
-      <v-radio-group v-model="levelType" :disabled="pageType === 'update-normative'" row>
+      <v-radio-group v-model="normativeType" :disabled="pageType === 'update-normative'" row>
         <v-radio label="Стандарт" value="standard" />
         <v-radio label="Умение" value="skill" />
       </v-radio-group>
     </FieldSet>
-
-
 
     <v-text-field v-model="normativeName" label="Название" class="normative-name" />
 
@@ -101,26 +194,30 @@ function toPreviousLevel() {
       </div>
     </FieldSet>
 
-    <FieldSet v-if="levelType==='standard'" title="Нормы">
+    <FieldSet v-if="normativeType==='standard'" title="Нормы">
       <template v-if="levelNumbers.length && currentLevel !== -1">
         <div class="standards-table">
           <div class="standards">
             <div class="standards-table-title">Девочки</div>
-            <v-text-field v-model="levels[currentLevel].girls.high" label="Повышенная ступень" type="number" min="0"
+            <v-text-field v-model.number="levels[currentLevel].girls.high" label="Повышенная ступень" type="number"
+                          min="0"
                           density="comfortable" />
-            <v-text-field v-model="levels[currentLevel].girls.middle" label="Средняя ступень" type="number" min="0"
+            <v-text-field v-model.number="levels[currentLevel].girls.middle" label="Средняя ступень" type="number"
+                          min="0"
                           density="comfortable" />
-            <v-text-field v-model="levels[currentLevel].girls.low" label="Низкая ступень" type="number" min="0"
+            <v-text-field v-model.number="levels[currentLevel].girls.low" label="Низкая ступень" type="number" min="0"
                           density="comfortable" />
 
           </div>
           <div class="standards">
             <div class="standards-table-title">Мальчики</div>
-            <v-text-field v-model="levels[currentLevel].boys.high" label="Повышенная ступень" type="number" min="0"
+            <v-text-field v-model.number="levels[currentLevel].boys.high" label="Повышенная ступень" type="number"
+                          min="0"
                           density="comfortable" />
-            <v-text-field v-model="levels[currentLevel].boys.middle" label="Средняя ступень" type="number" min="0"
+            <v-text-field v-model.number="levels[currentLevel].boys.middle" label="Средняя ступень" type="number"
+                          min="0"
                           density="comfortable" />
-            <v-text-field v-model="levels[currentLevel].boys.low" label="Низкая ступень" type="number" min="0"
+            <v-text-field v-model.number="levels[currentLevel].boys.low" label="Низкая ступень" type="number" min="0"
                           density="comfortable" />
           </div>
         </div>
@@ -130,12 +227,13 @@ function toPreviousLevel() {
                  prepend-icon="mdi-arrow-left" @click="toPreviousLevel" />
           <div>{{ currentLevel }} ур</div>
           <v-btn :disabled="isNextLevelButtonDisabled" text="Следующий уровень" variant="text"
-                 append-icon="mdi-arrow-right" @click="toNextLevel"/>
+                 append-icon="mdi-arrow-right" @click="toNextLevel" />
         </div>
       </template>
 
     </FieldSet>
-    <v-btn text="Сохранить" color="primary" rounded class="button" />
+    <v-btn :disabled="isSaveButtonDisabled" text="Сохранить" color="primary" rounded class="button"
+           @click="createOrUpdateNormative" />
   </div>
 
 

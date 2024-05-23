@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppBar from '@/components/AppBar.vue'
 import AboutSiteCart from '@/components/AboutSiteCard.vue'
 import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 </script>

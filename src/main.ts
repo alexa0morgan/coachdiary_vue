@@ -8,7 +8,6 @@ import router from './router'
 
 import "vuetify/styles"
 import '@mdi/font/css/materialdesignicons.css'
-/*import {aliases, mdi} from "vuetify/iconsets"*/
 
 import {autoAnimatePlugin} from "@formkit/auto-animate/vue"
 

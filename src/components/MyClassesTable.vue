@@ -2,7 +2,7 @@
 
 import type { VDataTable } from 'vuetify/components'
 
-const props = defineProps<{
+defineProps<{
   data: Item[]
 }>()
 
