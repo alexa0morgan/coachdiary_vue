@@ -34,7 +34,8 @@ interface Student {
 const studentInfo = ref<Student>()
 
 async function getStudentById(studentId : number){
-    const response = await get(`/api/students/${studentId}`)
+    const response = await get(`/api/students/${studentId}/`)
+    alert(studentId)
     if(response.ok){
         response.json()
         .then(data => {
@@ -110,7 +111,7 @@ getStudentById(studentId())
 <template>
     <div>
         <TopPanel class="top-panel">
-            <div class="top-panel-title">Афанасьева Марина Владимировна</div>
+            <div class="top-panel-title">{{ studentInfo?.fullName ? studentInfo?.fullName : 'студент не найден'}}</div>
         </TopPanel>
         <LevelPanel :classNumber="11" class="level-panel"/>
         <div class="main">
