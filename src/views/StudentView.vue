@@ -3,7 +3,71 @@ import {ref} from 'vue'
 import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
 import DataTable from '@/components/DataTable.vue'
+import DataTableSideNav from '@/components/DataTableSideNav.vue'
+import {get} from '@/utils'
 
+const studentId = () => {
+    const urlParts = window.location.pathname.split('/');
+    return +urlParts[urlParts.length - 1] 
+}
+
+/*async function getNormativesById(normativeId:number){
+    const response = await get(`/api/students/${normativeId}/standards/`)
+    if(response.ok){
+        response.json()
+        .then(data => {
+        if (typeof data === 'object' && data !== null && 'name' in data && 'email' in data) {
+            currentName.value = data.name;
+            currentEmail.value = data.email;
+            name.value = currentName.value;
+            email.value = currentEmail.value;
+        }
+        })
+    }
+}*/
+interface Student {
+  fullName: string;
+  class: Record<string, string | number>;
+  birthday: string;
+  gender: string
+}
+const studentInfo = ref<Student>()
+
+async function getStudentById(studentId : number){
+    const response = await get(`/api/students/${studentId}`)
+    if(response.ok){
+        response.json()
+        .then(data => {
+            if (typeof data === 'object' && data !== null && 'full_name' in data && 'student_class' in data && 'birthday' in data && 'gender' in data) {
+                studentInfo.value = {
+                    fullName : data.full_name,
+                    class : data.student_class,
+                    birthday : data.birthday, 
+                    gender : data.gender
+                }
+            }
+        })
+        .catch(() => {
+            alert('Ошибка доступа к данным')
+        })
+    }
+}
+const labels = (info : Student | undefined) => {
+    let infoLabels = []
+    infoLabels.push({
+        id: 0,
+        label: `Дата рождения: ${info?.birthday}`
+    })
+    infoLabels.push({
+        id: 1,
+        label: `Класс ${info?.class.number} ${info?.class.class_name}`
+    })
+    infoLabels.push({
+        id: 2,
+        label: `Пол: ${info?.gender === 'm' ? 'мальчик' : 'девочка'}`
+    })
+    return infoLabels
+}
 const normatives = [
     { id: 0, number:1, normative: 'бег 100м', result: 15, rate: 5 },
     { id: 1, number:2, normative: 'метание мяча', result: 60, rate: 5},
@@ -18,13 +82,9 @@ const normatives = [
     { id: 10, number:11, normative: 'метание мяча', result: 60, rate: 5},
     { id: 11, number:12, normative: 'прыжок в длину', result: 1.20, rate: 4 },
 ]
-const studentInfo = {
-    id: 0,
-    name: 'Афанасьева Марина Владимировна',
-    dateBirth: new Date(2018, 3, 3),
-    class: '11в',
-    sex: 'девочка'
-}
+
+
+
 function getClassNumber(cl:string){
     if(cl.length >2){
         return +cl.slice(0,2)
@@ -42,40 +102,21 @@ function dateBirth(date:Date){
     }
     return day + '.' + month + '.' + String(date.getFullYear())
 }
+
+getStudentById(studentId())
+
 </script>
 
 <template>
     <div>
         <TopPanel class="top-panel">
-            <div class="top-panel-title">{{ studentInfo.name }}</div>
+            <div class="top-panel-title">Афанасьева Марина Владимировна</div>
         </TopPanel>
-        <LevelPanel :classNumber="getClassNumber(studentInfo.class)" class="level-panel"/>
+        <LevelPanel :classNumber="11" class="level-panel"/>
         <div class="main">
             <DataTable class="table" :data="normatives"/>
-            <div class="info-panel">
-                <div>
-                    <div class="info-title">информация</div>
-                    <v-list class="list">
-                        <v-list-item class="list-item">
-                            <v-list-item-title>день рождения:</v-list-item-title>
-                            <div>{{dateBirth(studentInfo.dateBirth)}}</div>
-                        </v-list-item>
-                        <v-list-item class="list-item">
-                            <v-list-item-title>класс:</v-list-item-title>   
-                            <div>{{studentInfo.class}}</div>
-                        </v-list-item>
-                        <v-list-item class="list-item">
-                            <v-list-item-title>пол:</v-list-item-title>
-                            <div>{{studentInfo.sex}}</div>
-                        </v-list-item>
-                    </v-list>
-                </div>
-                <div class="buttons">
-                    <v-btn text="Изменить" variant="outlined" color="primary-darken-1" size="small"
-                         class="button action-button" />
-                    <v-btn text="Удалить" variant="outlined" color="error" size="small" class="button action-button"/>
-                </div>
-            </div>
+            <DataTableSideNav
+            class="info-panel" :title="'Информация'" :data="labels(studentInfo)" :isContentStaticText="true" :pageType="'student'"/>
         </div>
 
     </div>
@@ -96,13 +137,13 @@ function dateBirth(date:Date){
     height: calc(100dvh - 230px);
 }
 .info-panel{
-    display: flex;
+    /*display: flex;
     flex-direction: column;
     justify-content: space-between;
     background-color: rgb(var(--v-theme-background));
     border: 1px solid rgb(var(--v-theme-primary));
     border-radius: var(--v-border-radius);
-    padding: 0 10px;
+    padding: 0 10px;*/
     height: calc(100dvh - 230px);
 }
 .info-title{

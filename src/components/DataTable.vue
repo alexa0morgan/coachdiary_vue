@@ -25,10 +25,6 @@ const headers: VDataTable['$props']['headers'] = [
   { title: 'оценка', value: 'rate', sortable: true, width:  120},
 ]
 
-function itemRowBackground(item:Item) {
-    return {class: item.number % 2 == 0 ? 'row-back-1' : 'row-back-2'}
-}
-
 
 
 </script>

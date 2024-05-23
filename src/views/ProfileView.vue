@@ -1,65 +1,60 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import {get, patch, put } from '@/utils'
 
-const currentName = ref('Петров Петр Петрович')
-const currentEmail = ref('petr@gmail.com')
 
+const currentName = ref('')
+const currentEmail = ref('')
+const name = ref('')
+const email = ref('')
 async function getData() {
-  fetch('')
-    .then(response => response.json())
+  const response = await get('/api/profile/')
+  if (response.ok){
+    response.json()
     .then(data => {
-      currentName.value = data.name
-      currentEmail.value = data.email
+      if (typeof data === 'object' && data !== null && 'name' in data && 'email' in data) {
+        currentName.value = data.name;
+        currentEmail.value = data.email;
+        name.value = currentName.value;
+        email.value = currentEmail.value;
+      }
     })
     .catch(() => {
       alert('Ошибка доступа к данным')
     })
-}
-
-const name = ref(currentName.value)
-const email = ref(currentEmail.value)
-
-async function postData() {
-  try {
-    const requestData = { email: email.value, name: name.value }
-    const response = await fetch('', {
-      method: 'post',
-      body: JSON.stringify(requestData),
-      headers: {
-        'content-type': 'application/json'
-      }
-    })
-    if (response.ok) {
-      getData()
-    } else {
-      alert('Server error')
-    }
-  } catch {
-    alert('Произошла ошибка во время входа, попробуйте еще раз')
   }
 }
-
-async function postPassword() {
+async function patchData() {
   try {
-    const requestData = { passwordConfirmation: passwordConfirmation.value, password: password.value }
-    const response = await fetch('', {
-      method: 'post',
-      body: JSON.stringify(requestData),
-      headers: {
-        'content-type': 'application/json'
-      }
-    })
+    const requestData = currentEmail.value === email.value ?  {name: name.value } : {email: email.value, name: name.value }
+    const response = await patch('/api/profile/', requestData)
+    if (response.ok) {
+      getData()
+    } 
+    else {
+      return response.json()
+    }
+  } 
+  catch {
+    alert('Произошла ошибка, попробуйте еще раз')
+  }
+}
+async function putPassword() {
+  try {
+    const requestData = { new_password: newPassword.value, confirm_new_password: passwordConfirmation.value, current_password: password.value }
+    const response = await put('/api/profile/', requestData)
     if (response.ok) {
       password.value = ''
       newPassword.value = ''
       passwordConfirmation.value = ''
-    } else if (response.status === 401) {
-      alert('Неправильный пароль, попробуйте еще раз')
-    } else {
-      throw new Error('Server error')
+      alert('Пароль успешно обновлен')
+    } 
+    else{
+      return response.json()
     }
-  } catch {
-    alert('Произошла ошибка во время входа, попробуйте еще раз')
+  } 
+  catch {
+    alert('Произошла ошибка обновления пароля, попробуйте позже')
   }
 }
 
@@ -72,14 +67,14 @@ const passwordConfirmation = ref('')
 const isSetPasswordButtonDisabled = computed(() => {
   return !(password.value?.trim().length && newPassword.value?.trim().length && newPassword.value?.trim() === passwordConfirmation.value?.trim())
 })
-/*getData()*/
+getData()
 </script>
 
 <template>
   <div class="main">
     <div class="container rounded-lg">
       <div class="text">
-        {{ currentName }} <br />
+        Имя: <span class="non-bold-text">{{ currentName }} </span> <br />
         Почта: <span class="non-bold-text">{{ currentEmail }}</span>
       </div>
       <div class="text-fields">
@@ -97,7 +92,7 @@ const isSetPasswordButtonDisabled = computed(() => {
           text="Сохранить"
           class="button"
           :disabled="isSendButtonDisabled"
-          @click="postData" />
+          @click="patchData" />
       </div>
     </div>
     <div class="container rounded-lg">
@@ -123,7 +118,7 @@ const isSetPasswordButtonDisabled = computed(() => {
           text="Установить"
           :disabled="isSetPasswordButtonDisabled"
           class="button"
-          @click="postPassword" />
+          @click="putPassword" />
       </div>
     </div>
   </div>

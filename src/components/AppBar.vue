@@ -2,11 +2,14 @@
 
 import { useDisplay } from 'vuetify'
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
+const userStore = useUserStore()
 const { smAndUp } = useDisplay()
 const isMenuOpen = ref(false)
 const route = useRoute()
+const router = useRouter()
 const isLoginPage = computed(() => route.name === 'login')
 
 const isLoggedInView = computed(() => route.path.startsWith('/app'))
@@ -23,6 +26,11 @@ const plusButtonLink = computed(() => {
   }
   return ''
 })
+
+function logout() {
+  userStore.logout()
+  router.push({name: 'login'})
+}
 
 const mobileTitle = computed(() => route.meta.mobileTitle)
 
@@ -71,7 +79,8 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
         <template v-else-if="smAndUp">
           <v-btn variant="text" :to="{name: 'my-classes'}">Мои классы</v-btn>
           <v-btn variant="text" :to="{name: 'my-normatives'}">Мои нормативы</v-btn>
-          <v-btn variant="flat" :to="{name: 'profile'}" rounded>Профиль</v-btn>
+          <v-btn variant="text" :to="{name: 'profile'}">Профиль</v-btn>
+          <v-btn variant="flat" rounded @click="logout">Выйти</v-btn>
         </template>
 
         <template v-else-if="!smAndUp && plusButtonLink">
