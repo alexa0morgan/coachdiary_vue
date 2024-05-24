@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import type {GenderNullable, FilterData } from '@/types/types'
 
-function selectGender(gender: Gender): void {
-  if (selectedGender.value === gender) {
-    selectedGender.value = null
+const filterData = defineModel<FilterData>({required:true})
+
+const emit = defineEmits<{
+  accept: []
+}>()
+
+function selectGender(gender: GenderNullable): void {
+  if (filterData.value.gender === gender) {
+    filterData.value.gender = null
   } else {
-    selectedGender.value = gender
+    filterData.value.gender = gender
   }
 }
-type Gender = 'f' | 'm' | null
-const selectedGender = ref<Gender>(null)
-const marksList = ref<number[]>([])
+
 const currentYear = new Date().getFullYear()
-const birthYearFrom = ref<number | null>()
-const birthYearUntil = ref<number | null>()
 
 function clearFilters(): void {
-  selectedGender.value = null
-  marksList.value = []
-  birthYearFrom.value = null
-  birthYearUntil.value = null
+  filterData.value.gender = null
+  filterData.value.grades = []
+  filterData.value.birthYearFrom = null
+  filterData.value.birthYearUntil = null
+  emit('accept')
 }
+
 </script>
 
 <template>
@@ -31,10 +35,10 @@ function clearFilters(): void {
         <div>
           <div class="title">Пол</div>
           <div class="filter-gender">
-            <v-btn class="button" text="Ж" variant="outlined" size="small" :ripple="false" :active="selectedGender
+            <v-btn class="button" text="Ж" variant="outlined" size="small" :ripple="false" :active="filterData.gender
             === 'f'" @click="selectGender('f')" />
             <v-btn class="button" text="М" variant="outlined" size="small" :ripple="false"
-                   :active="selectedGender==='m'"
+                   :active="filterData.gender==='m'"
                    @click="selectGender('m')" />
           </div>
         </div>
@@ -43,8 +47,8 @@ function clearFilters(): void {
           <div class="title">Оценка</div>
           <div class="checkbox-group">
             <v-checkbox v-for="n in 4" :key="n" :label="(n +1).toString()" :value="n+1"
-                        density="compact" v-model="marksList" />
-            <v-checkbox label="Нет" value="0" density="compact" v-model="marksList" />
+                        density="compact" v-model="filterData.grades" />
+            <v-checkbox label="Нет" :value="null" density="compact" v-model="filterData.grades" />
           </div>
         </div>
 
@@ -52,9 +56,9 @@ function clearFilters(): void {
           <div class="title title-year">Год рождения</div>
           <div class="filter-year">
             <v-text-field label="От" type="number" density="compact" min="1900" :max="currentYear - 5"
-                          v-model="birthYearFrom" />
+                          v-model.number="filterData.birthYearFrom" />
             <v-text-field label="До" type="number" density="compact" min="1900" :max="currentYear - 5"
-                          v-model="birthYearUntil" />
+                          v-model.number="filterData.birthYearUntil" />
           </div>
         </div>
       </div>
@@ -62,7 +66,8 @@ function clearFilters(): void {
       <div class="action-buttons">
         <v-btn text="Сбросить" variant="outlined" color="error" size="small" class="button action-button"
                @click="clearFilters" />
-        <v-btn text="Принять" variant="outlined" color="primary-darken-1" size="small" class="button action-button" />
+        <v-btn text="Принять" variant="outlined" color="primary-darken-1" size="small" class="button action-button"
+        @click="emit('accept')"/>
       </div>
 
     </div>

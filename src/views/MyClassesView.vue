@@ -96,21 +96,24 @@ function activeLevelClick(classNumber: number, letter: string) {
   selectedNormativeId.value = -1
 }
 
-const students = [
-  { number: 1111, name: 'Петров Артемий Юрьевич', gender: 'М', result: undefined, mark: undefined },
-  { number: 2, name: 'Шишкина Валерия Максимовна', gender: 'Ж', result: -4, mark: 4 },
-  { number: 3, name: 'Новикова Василиса Давидовна', gender: 'Ж', result: 2, mark: 5 },
-  { number: 4, name: 'Кудрявцев Юрий Максимович', gender: 'М', result: undefined, mark: undefined },
-  { number: 5, name: 'Федоров Андрей Никитич', gender: 'М', result: -19, mark: 2 },
-  { number: 6, name: 'Швенк Ева Никитишна', gender: 'Ж', result: 2, mark: 5 },
-  { number: 7, name: 'Борисов Герман Денисович', gender: 'М', result: 0, mark: 5 },
-  { number: 8, name: 'Захаров Матвей Никитич', gender: 'М', result: -7, mark: 3 },
-  { number: 9, name: 'Снегирева Ева Андреевна', gender: 'Ж', result: 5, mark: 5 },
-  { number: 10, name: 'Румянцева Ксения Никитична', gender: 'Ж', result: -4, mark: 4 },
-  { number: 11, name: 'Кондратьева Елена Глебовна', gender: 'Ж', result: 7, mark: 5 },
-  { number: 12, name: 'Иванова Елизавета Елисеевна', gender: 'Ж', result: -11, mark: 2 }
-]
+const filters = ref<FilterData>({
+  gender: null,
+  grades: [],
+  birthYearFrom: null,
+  birthYearUntil: null
+})
 
+const filteredData = ref<StudentsValueResponse[]>([])
+
+function acceptFilters() {
+  filteredData.value = studentsValueData.value
+    .filter(student =>
+      (filters.value.gender ? student.gender === filters.value.gender : true)
+      && (filters.value.grades.length ? filters.value.grades.includes(student.grade)  : true)
+      && (filters.value.birthYearFrom ? +student.birthday.slice(0, 4) >= filters.value.birthYearFrom : true)
+      && (filters.value.birthYearUntil ? +student.birthday.slice(0, 4) <= filters.value.birthYearUntil : true)
+    )
+}
 
 </script>
 
@@ -145,7 +148,7 @@ const students = [
 
   <div class="grid">
 
-    <FilterBlock />
+    <FilterBlock v-model="filters" @accept="acceptFilters" />
 
     <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType" />
 
