@@ -18,14 +18,14 @@ const emit = defineEmits<{
   delete: [id: number, inAllLevels: boolean];
 }>()
 
-const selectedId = defineModel<number>({ required: true })
+const selectedId = defineModel<number>()
 
 function onSelect(id: number): void {
   selectedId.value = id
 }
 
 watch(() => data, () => {
-  selectedId.value = 1
+  selectedId.value = -1
 })
 </script>
 
