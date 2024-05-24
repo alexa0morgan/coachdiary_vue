@@ -107,12 +107,15 @@ async function createOrUpdateNormative() {
 
     const response = await currentMethod(`/api/standards/` + currentId, requestData)
 
-    if (response.ok) {
+    if (response.ok && pageType.value==='create-normative') {
       alert('Норматив создан')
       normativeName.value = ''
       normativeType.value = null
       levelNumbers.value = []
-    } else {
+    } else if(response.ok && pageType.value === 'update-normative') {
+      alert('Данные о нормативе обновлены')
+    }
+    else {
       const data = await response.json()
       if (data?.status === 'error') {
         const errors = Object.values(data.details).flat().join('\n')
@@ -132,14 +135,14 @@ const isSaveButtonDisabled = computed(() => {
       Object
         .entries(levels.value)
         .some(([key, value]) =>
-          levelNumbers.value.includes(+key) && (
-            value.girls.high === 0
-            || value.girls.middle === 0
-            || value.girls.low === 0
-            || value.boys.low === 0
-            || value.boys.middle === 0
-            || value.boys.high === 0
-          )
+            levelNumbers.value.includes(+key) && (
+              value.girls.high === 0
+              || value.girls.middle === 0
+              || value.girls.low === 0
+              || value.boys.low === 0
+              || value.boys.middle === 0
+              || value.boys.high === 0
+            )
         )
       && normativeType.value !== 'skill'
     )
