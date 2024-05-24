@@ -1,4 +1,7 @@
-export type Normative = {
+export type GenderNullable = Gender | null
+export type Gender = 'f' | 'm'
+
+export type NormativeResponse = {
   id: number,
   standard: {
     name: string,
@@ -10,7 +13,7 @@ export type Normative = {
     low_level_value: number,
     middle_level_value: number,
     high_level_value: number,
-    gender: 'f' | 'm',
+    gender: Gender,
   }[]
 }
 
@@ -24,7 +27,7 @@ export type NormativeRequest = {
     low_level_value: number,
     middle_level_value: number,
     high_level_value: number,
-    gender: 'f' | 'm',
+    gender: Gender,
   }[]
 }
 
@@ -36,7 +39,7 @@ export type Student = {
     class_name: string
   },
   birthday: string,
-  gender: 'f' | 'm',
+  gender: Gender,
 }
 
 export type StudentRequest = {
@@ -46,7 +49,7 @@ export type StudentRequest = {
     class_name: string
   },
   birthday: string,
-  gender: 'f' | 'm',
+  gender: Gender,
 }
 
 export type Class = {

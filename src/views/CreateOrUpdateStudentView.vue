@@ -5,13 +5,13 @@ import FieldSet from '@/components/FieldSet.vue'
 import { useRoute } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import { get, post, put } from '@/utils'
-import type { Student, StudentRequest } from '@/types/types'
+import type { Gender, GenderNullable, Student, StudentRequest } from '@/types/types'
 
 const route = useRoute()
 const pageType = ref(route.name as 'create-student' | 'update-student')
 
 const studentName = ref('')
-const genderType = ref<'f' | 'm' | null>(null)
+const genderType = ref<GenderNullable>(null)
 const birthdayDate = ref('') //2024-05-08
 const classNumber = ref(-1)
 const className = ref('')
@@ -41,7 +41,7 @@ async function createOrUpdateStudent() {
         class_name: className.value
       },
       birthday: birthdayDate.value,
-      gender: genderType.value as 'f' | 'm'
+      gender: genderType.value as Gender
     }
     const currentId = pageType.value === 'update-student' ? `${route.params.id}/` : ''
     const currentMethod = pageType.value === 'update-student' ? put : post
