@@ -5,14 +5,14 @@ import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import TopPanel from '@/components/TopPanel.vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { del, get } from '@/utils'
-import type { Normative } from '@/types/types'
+import type { NormativeResponse } from '@/types/types'
 import router from '@/router'
 
 const activeLevelNumber = ref(-1)
 const pageType = ref<'standards' | 'skills'>('standards')
 
 const selectedId = ref(-1)
-const normatives = ref<Normative[]>([])
+const normatives = ref<NormativeResponse[]>([])
 
 onMounted(async () => {
   normatives.value = await get('/api/standards/').then(res => res.json())
@@ -27,7 +27,7 @@ async function setFirst(levelNumber?: number): Promise<void> {
 
 const levels = computed(() =>
   Array.from(normatives.value
-    .filter(normative => normative.standard.has_numeric_value === (pageType.value === 'standards'))
+    .filter(normative => normative.has_numeric_value === (pageType.value === 'standards'))
     .reduce((acc, v) => {
       for (const level of v.levels) {
         acc.add(level.level_number)
@@ -38,13 +38,13 @@ const levels = computed(() =>
 
 const simplifiedNormatives = computed(() =>
   normatives.value
-    .filter(normative => normative.standard.has_numeric_value === (pageType.value === 'standards'))
+    .filter(normative => normative.has_numeric_value === (pageType.value === 'standards'))
     .filter(normative => normative.levels.some(level => level.level_number === activeLevelNumber.value))
-    .toSorted((a, b) => a.standard.name.localeCompare(b.standard.name))
+    .toSorted((a, b) => a.name.localeCompare(b.name))
 
     .map(normative => ({
       id: normative.id,
-      label: normative.standard.name
+      label: normative.name
     }))
 )
 

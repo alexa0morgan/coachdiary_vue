@@ -1,21 +1,38 @@
 <script setup lang="ts">
 import TopPanel from '@/components/TopPanel.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyClassesTable from '@/components/MyClassesTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
-import type { Class } from '@/types/types'
+import type {
+  StudentResponse,
+  ClassRequest,
+  NormativeResponse,
+  StudentsValueResponse,
+  FilterData
+} from '@/types/types'
 import { get } from '@/utils'
 
 
 const activeLevelNumber = ref(-1)
-const selectedNormativeId = ref(-1)
 const className = ref('')
+const selectedNormativeId = ref(-1)
 
-const classesData = ref<Class[]>([])
+const selectedNormativeType = computed<'standard' | 'skill'>(() => {
+  if (normativesData.value.find(v => v.id === selectedNormativeId.value)?.has_numeric_value) {
+    return 'standard'
+  } else {
+    return 'skill'
+  }
+})
+
+const classesData = ref<ClassRequest[]>([])
+const normativesData = ref<NormativeResponse[]>([])
+const studentsValueData = ref<StudentsValueResponse[]>([])
 
 onMounted(async () => {
   classesData.value = await get('/api/classes/').then(res => res.json())
+  normativesData.value = await get('/api/standards/').then(res => res.json())
 })
 
 const classes = computed(() =>
@@ -29,49 +46,94 @@ const classes = computed(() =>
     }, {} as Record<number, string[]>)
 )
 
+const normatives = computed(() =>
+  normativesData.value
+    .filter(normative => normative.levels.some(level => level.level_number === activeLevelNumber.value))
+    .toSorted((a, b) => a.name.localeCompare(b.name))
 
-const normatives = [
-  { id: 1, label: 'бег 100м' },
-  { id: 2, label: 'метание мяча' },
-  { id: 3, label: 'прыжок в длину прыжок в длину 2 раз  dsf' },
-  { id: 4, label: 'прыжок в длину прыжок в длину 2 раз dsf' },
-  { id: 5, label: 'прыжок в длину прыжок в длину 2 раз dsf' },
-  { id: 6, label: 'прыжок в длину прыжок в длину 2 раз dsf' }
-]
+    .map(normative => ({
+      id: normative.id,
+      label: normative.name
+    }))
+)
 
-const students = [
-  { number: 1111, name: 'Петров Артемий Юрьевич', gender: 'М', result: undefined, mark: undefined },
-  { number: 2, name: 'Шишкина Валерия Максимовна', gender: 'Ж', result: -4, mark: 4 },
-  { number: 3, name: 'Новикова Василиса Давидовна', gender: 'Ж', result: 2, mark: 5 },
-  { number: 4, name: 'Кудрявцев Юрий Максимович', gender: 'М', result: undefined, mark: undefined },
-  { number: 5, name: 'Федоров Андрей Никитич', gender: 'М', result: -19, mark: 2 },
-  { number: 6, name: 'Швенк Ева Никитишна', gender: 'Ж', result: 2, mark: 5 },
-  { number: 7, name: 'Борисов Герман Денисович', gender: 'М', result: 0, mark: 5 },
-  { number: 8, name: 'Захаров Матвей Никитич', gender: 'М', result: -7, mark: 3 },
-  { number: 9, name: 'Снегирева Ева Андреевна', gender: 'Ж', result: 5, mark: 5 },
-  { number: 10, name: 'Румянцева Ксения Никитична', gender: 'Ж', result: -4, mark: 4 },
-  { number: 11, name: 'Кондратьева Елена Глебовна', gender: 'Ж', result: 7, mark: 5 },
-  { number: 12, name: 'Иванова Елизавета Елисеевна', gender: 'Ж', result: -11, mark: 2 }
-]
+async function getStudentsData() {
+  if (selectedNormativeId.value === -1) return
 
+  const currentClasses = classesData.value
+    .filter(klass =>
+      klass.number === activeLevelNumber.value
+      && (className.value ? klass.class_name === className.value : true)
+    )
+    .map(klass => klass.id.toString())
+  try {
+    const currentStudents: StudentResponse[] = await get('/api/students/', {
+      'student_class[]': currentClasses
+    }).then(res => res.json())
+    const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/', {
+      'class_id[]': currentClasses,
+      standard_id: selectedNormativeId.value
+    }).then(res => res.json())
+
+    studentsValueData.value = currentStudents.map(student => {
+      const result = currentStudentsValue.find(v => v.id === student.id)
+      return result ?? {
+        ...student,
+        value: null,
+        grade: null //TODO спросить у робота насчет null
+      }
+    })
+    filteredData.value = studentsValueData.value
+  } catch {
+    alert('Ошибка при получении данных, попробуйте позже')
+  }
+}
+
+function activeLevelClick(classNumber: number, letter: string) {
+  activeLevelNumber.value = classNumber
+  className.value = letter
+  filteredData.value = []
+  selectedNormativeId.value = -1
+}
+
+const filters = ref<FilterData>({
+  gender: null,
+  grades: [],
+  birthYearFrom: null,
+  birthYearUntil: null
+})
+
+const filteredData = ref<StudentsValueResponse[]>([])
+
+function acceptFilters() {
+  filteredData.value = studentsValueData.value
+    .filter(student =>
+      (filters.value.gender ? student.gender === filters.value.gender : true)
+      && (filters.value.grades.length ? filters.value.grades.includes(student.grade)  : true)
+      && (filters.value.birthYearFrom ? +student.birthday.slice(0, 4) >= filters.value.birthYearFrom : true)
+      && (filters.value.birthYearUntil ? +student.birthday.slice(0, 4) <= filters.value.birthYearUntil : true)
+    )
+}
 
 </script>
 
 <template>
   <TopPanel>
     <div class="buttons-panel">
-      <v-btn class="level-button top-button" v-for="(v, key) in classes" :key
-             :variant="activeLevelNumber === key ? 'flat' : 'outlined'" color="rgb(var(--v-theme-secondary))"
-             @click="activeLevelNumber = key; className = ''">
-        {{ key }}{{ activeLevelNumber === key ? className : '' }}
-        <v-menu activator="parent" location="bottom center" offset="5" transition="slide-y-transition">
+      <v-btn class="level-button top-button" v-for="n in 11" :key="n"
+             :disabled="!(n in classes)"
+             :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="rgb(var(--v-theme-secondary))">
+        {{ n }}{{ activeLevelNumber === n ? className : '' }}
+        <v-menu activator="parent" location="bottom center" offset="5"
+                transition="slide-y-transition">
           <v-list density="compact" bg-color="rgb(var(--v-theme-primary))"
                   base-color="rgb(var(--v-theme-secondary))" elevation="0">
-            <v-list-item v-for="letter in v" :key='key + letter' class="text-center" @click="className = letter">
-              <v-list-item-title>{{ letter }}</v-list-item-title>
+            <v-list-item v-for="letter in classes[n]" :key='n + letter' class="text-center"
+                         @click="activeLevelClick(n, letter)">
+              <v-list-item-title>{{ letter.toUpperCase() }}</v-list-item-title>
             </v-list-item>
-            <v-list-item class="text-center" @click="() => {}">
-              <v-list-item-title>Отмена</v-list-item-title>
+            <v-list-item class="text-center" @click="activeLevelClick(n, '')">
+              <v-list-item-title>Параллель</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -86,12 +148,12 @@ const students = [
 
   <div class="grid">
 
-    <FilterBlock />
+    <FilterBlock v-model="filters" @accept="acceptFilters" />
 
-    <MyClassesTable class="table" :data="students" />
+    <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType" />
 
     <DataTableSideNav v-model="selectedNormativeId" :data="normatives" title="Нормативы" class="data-table-side-nav"
-                      :has-action-buttons="false"/>
+                      :has-action-buttons="false" @update:model-value="getStudentsData" />
   </div>
 
 

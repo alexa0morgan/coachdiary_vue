@@ -1,7 +1,9 @@
 
 <script setup lang="ts">
+import type { Gender } from '@/types/types'
+
 defineProps<{
-  gender: 'm' | 'f';
+  gender: Gender;
   high: number;
   middle: number;
   low: number;

@@ -14,20 +14,24 @@ const { title, data, isNormativeTypeSkills, isContentStaticText, hasActionButton
 }>()
 
 const emit = defineEmits<{
-  edit: [id: number];
-  delete: [id: number, inAllLevels: boolean];
+  edit: [];
+  delete: [inAllLevels: boolean];
 }>()
 
+<<<<<<< HEAD
 //const selectedId = defineModel<number>({ required: true })
 
 const selectedId = defineModel<number>({ default: 1 })
+=======
+const selectedId = defineModel<number>({default: -1, required: false})
+>>>>>>> master
 
 function onSelect(id: number): void {
   selectedId.value = id
 }
 
 watch(() => data, () => {
-  selectedId.value = 1
+  selectedId.value = -1
 })
 </script>
 
@@ -46,15 +50,15 @@ watch(() => data, () => {
     <div v-if="hasActionButtons" class="action-buttons">
       <v-btn text="Изменить" variant="outlined"
              color="primary-darken-1" size="small"
-             class="button action-button" @click="emit('edit', selectedId)" />
+             class="button action-button" @click="emit('edit')" />
       <v-btn v-if="hasDeleteMenu" variant="outlined" color="error" size="small" class="button action-button">
         Удалить
         <v-menu activator="parent">
           <v-list density="compact">
-            <v-list-item @click="emit('delete', selectedId, false)">
+            <v-list-item @click="emit('delete', false)">
               <v-list-item-title>у уровня</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="emit('delete', selectedId, true)">
+            <v-list-item @click="emit('delete', true)">
               <v-list-item-title>у всех уровней</v-list-item-title>
             </v-list-item>
             <v-list-item @click="() => {}">
@@ -78,7 +82,7 @@ watch(() => data, () => {
                   Disagree
                 </v-btn>
 
-                <v-btn color="error" @click="isActive.value = false; emit('delete', selectedId, false)">
+                <v-btn color="error" @click="isActive.value = false; emit('delete', false)">
                   Agree
                 </v-btn>
               </template>

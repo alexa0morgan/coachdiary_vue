@@ -4,7 +4,7 @@ import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { Normative, NormativeRequest } from '@/types/types'
+import type { NormativeResponse, NormativeRequest } from '@/types/types'
 import { get, post, put } from '@/utils'
 
 const route = useRoute()
@@ -78,10 +78,8 @@ function toPreviousLevel() {
 async function createOrUpdateNormative() {
   try {
     const requestData: NormativeRequest = {
-      standard: {
-        name: normativeName.value,
-        has_numeric_value: normativeType.value === 'standard'
-      },
+      name: normativeName.value,
+      has_numeric_value: normativeType.value === 'standard',
       levels: Object
         .entries(levels.value)
         .filter(([key]) => levelNumbers.value.includes(+key))
@@ -109,12 +107,15 @@ async function createOrUpdateNormative() {
 
     const response = await currentMethod(`/api/standards/` + currentId, requestData)
 
-    if (response.ok) {
+    if (response.ok && pageType.value==='create-normative') {
       alert('Норматив создан')
       normativeName.value = ''
       normativeType.value = null
       levelNumbers.value = []
-    } else {
+    } else if(response.ok && pageType.value === 'update-normative') {
+      alert('Данные о нормативе обновлены')
+    }
+    else {
       const data = await response.json()
       if (data?.status === 'error') {
         const errors = Object.values(data.details).flat().join('\n')
@@ -134,14 +135,14 @@ const isSaveButtonDisabled = computed(() => {
       Object
         .entries(levels.value)
         .some(([key, value]) =>
-          levelNumbers.value.includes(+key) && (
-            value.girls.high === 0
-            || value.girls.middle === 0
-            || value.girls.low === 0
-            || value.boys.low === 0
-            || value.boys.middle === 0
-            || value.boys.high === 0
-          )
+            levelNumbers.value.includes(+key) && (
+              value.girls.high === 0
+              || value.girls.middle === 0
+              || value.girls.low === 0
+              || value.boys.low === 0
+              || value.boys.middle === 0
+              || value.boys.high === 0
+            )
         )
       && normativeType.value !== 'skill'
     )
@@ -149,9 +150,9 @@ const isSaveButtonDisabled = computed(() => {
 
 onMounted(async () => {
   if (pageType.value === 'update-normative') {
-    const data: Normative = await get(`/api/standards/${route.params.id}/`).then(res => res.json())
-    normativeName.value = data.standard.name
-    normativeType.value = data.standard.has_numeric_value ? 'standard' : 'skill'
+    const data: NormativeResponse = await get(`/api/standards/${route.params.id}/`).then(res => res.json())
+    normativeName.value = data.name
+    normativeType.value = data.has_numeric_value ? 'standard' : 'skill'
 
     for (const level of data.levels) {
       const key = level.gender === 'f' ? 'girls' : 'boys'
