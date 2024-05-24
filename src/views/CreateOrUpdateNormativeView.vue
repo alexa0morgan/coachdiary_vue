@@ -4,7 +4,7 @@ import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { Normative, NormativeRequest } from '@/types/types'
+import type { NormativeResponse, NormativeRequest } from '@/types/types'
 import { get, post, put } from '@/utils'
 
 const route = useRoute()
@@ -78,10 +78,8 @@ function toPreviousLevel() {
 async function createOrUpdateNormative() {
   try {
     const requestData: NormativeRequest = {
-      standard: {
-        name: normativeName.value,
-        has_numeric_value: normativeType.value === 'standard'
-      },
+      name: normativeName.value,
+      has_numeric_value: normativeType.value === 'standard',
       levels: Object
         .entries(levels.value)
         .filter(([key]) => levelNumbers.value.includes(+key))
@@ -149,9 +147,9 @@ const isSaveButtonDisabled = computed(() => {
 
 onMounted(async () => {
   if (pageType.value === 'update-normative') {
-    const data: Normative = await get(`/api/standards/${route.params.id}/`).then(res => res.json())
-    normativeName.value = data.standard.name
-    normativeType.value = data.standard.has_numeric_value ? 'standard' : 'skill'
+    const data: NormativeResponse = await get(`/api/standards/${route.params.id}/`).then(res => res.json())
+    normativeName.value = data.name
+    normativeType.value = data.has_numeric_value ? 'standard' : 'skill'
 
     for (const level of data.levels) {
       const key = level.gender === 'f' ? 'girls' : 'boys'

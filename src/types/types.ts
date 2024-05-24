@@ -3,10 +3,8 @@ export type Gender = 'f' | 'm'
 
 export type NormativeResponse = {
   id: number,
-  standard: {
-    name: string,
-    has_numeric_value: boolean
-  },
+  name: string,
+  has_numeric_value: boolean
   levels: {
     id: number,
     level_number: number,
@@ -18,10 +16,8 @@ export type NormativeResponse = {
 }
 
 export type NormativeRequest = {
-  standard: {
-    name: string,
-    has_numeric_value: boolean
-  },
+  name: string,
+  has_numeric_value: boolean
   levels: {
     level_number: number,
     low_level_value: number,
@@ -31,7 +27,7 @@ export type NormativeRequest = {
   }[]
 }
 
-export type Student = {
+export type StudentResponse = {
   id: number,
   full_name: string,
   student_class: {
@@ -52,7 +48,8 @@ export type StudentRequest = {
   gender: Gender,
 }
 
-export type Class = {
+export type ClassRequest = {
+  id: number
   class_name: string,
   number: number,
   recruitment_year: number
