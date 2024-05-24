@@ -54,3 +54,23 @@ export type ClassRequest = {
   number: number,
   recruitment_year: number
 }
+
+export type StudentsValueResponse = {
+  id: number,
+  full_name: string,
+  student_class: {
+    number: number,
+    class_name: string
+  },
+  birthday: string,
+  gender: Gender,
+  value: number | null,
+  grade: number | null
+}
+
+export type FilterData = {
+  gender: GenderNullable,
+  grades: (number| null)[],
+  birthYearFrom: number | null,
+  birthYearUntil: number | null
+}

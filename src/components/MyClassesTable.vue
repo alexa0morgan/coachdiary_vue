@@ -1,31 +1,39 @@
 <script setup lang="ts">
 
 import type { VDataTable } from 'vuetify/components'
+import type { StudentsValueResponse } from '@/types/types'
+import { computed } from 'vue'
 
-defineProps<{
-  data: Item[]
+const {standardType} = defineProps<{
+  data: StudentsValueResponse[]
+  standardType: 'standard' | 'skill'
 }>()
 
-interface Item {
-  number: number;
-  name: string;
-  gender: string;
-  result?: number;
-  mark?: number;
-}
+const headers = computed<VDataTable['$props']['headers']>(() => {
+  if (standardType === 'standard') {
+    return [
+      { title: 'ID', value: 'id', width: 50 },
+      { title: 'Класс', value: 'class', width: 70 },
+      { title: 'ФИО', value: 'full_name', sortable: true },
+      { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
+      { title: 'Результат', value: 'value', sortable: true, width: 120 },
+      { title: 'Оценка', value: 'grade', sortable: true, width: 102 }
+    ]
+  } else {
+    return [
+      { title: 'ID', value: 'id', width: 50 },
+      { title: 'Класс', value: 'class', width: 70 },
+      { title: 'ФИО', value: 'full_name', sortable: true },
+      { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
+      { title: 'Оценка', value: 'value', sortable: true, width: 120 },
+    ]
+  }
 
-const headers: VDataTable['$props']['headers'] = [
-  { title: '№', value: 'number', width: 50 },
-  { title: 'ФИО', value: 'name', sortable: true },
-  { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
-  { title: 'Результат', value: 'result', sortable: true, width: 120 },
-  { title: 'Оценка', value: 'mark', sortable: true, width: 102 }
-]
+})
 
 
 function getMarkColor(mark?: number): string {
   switch (mark) {
-    case 1:
     case 2:
       return 'mark-bad'
     case 3:
@@ -48,31 +56,34 @@ function getMarkColor(mark?: number): string {
     :sort-by="[{ key: 'name', order: 'asc' }]"
     :fixed-header="true"
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
-    :items-per-page-text="'Строк на странице'"
     :show-current-page="true"
+    no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив слева"
     item-key="name"
   >
-    <template #item.name="{item}">
-      <v-btn class="button" to="/app" variant="tonal">{{ item.name }}</v-btn>
+    <template #item.class="{item}">
+      {{ item.student_class.number + item.student_class.class_name }}
+    </template>
+    <template #item.full_name="{item}">
+      <v-btn class="button" to="/app" variant="tonal">{{ item.full_name }}</v-btn>
     </template>
     <template #item.gender="{item}">
       <div class="gender">
-        {{ item.gender }}
+        {{ item.gender === 'f' ? 'Ж' : 'М' }}
         <v-icon
           :class="{
-          female: item.gender === 'Ж',
-          male: item.gender === 'М'
+          female: item.gender === 'f',
+          male: item.gender === 'm'
         }"
           class="gender-icon">
-          {{ item.gender === 'Ж' ? 'mdi-gender-female' : 'mdi-gender-male' }}
+          {{ item.gender === 'f' ? 'mdi-gender-female' : 'mdi-gender-male' }}
         </v-icon>
       </div>
     </template>
-    <template #item.result="{item}">
-      <v-text-field v-model="item.result" class="result" />
+    <template #item.value="{item}">
+      <v-text-field v-model="item.value" class="result" />
     </template>
-    <template #item.mark="{item}">
-      <div :class="getMarkColor(item.mark)" class="mark">{{ item.mark }}</div>
+    <template #item.grade="{item}">
+      <div :class="getMarkColor(item.grade ?? 0)" class="mark">{{ item.grade }}</div>
     </template>
     <template #footer.prepend>
       <v-btn color="primary">Сохранить</v-btn>
@@ -104,35 +115,26 @@ function getMarkColor(mark?: number): string {
 }
 
 .mark {
-  /*  height: 30px;
-    aspect-ratio: 1;*/
   font-size: 20px;
   font-weight: bold;
   text-align: center;
-  /*  text-align: center;
-    line-height: 1;
-    border-radius: 50%;
-    padding: 5px;*/
+
 }
 
 .mark-bad {
   color: red;
-  /*  background-color: hsl(0, 100%, 90%);*/
 }
 
 .mark-okay {
   color: #ff8800;
-  /*  background-color: hsl(52, 100%, 80%);*/
 }
 
 .mark-good {
   color: #0ecc00;
-  /*  background-color: hsl(91, 100%, 80%);*/
 }
 
 .mark-great {
   color: green;
-  /*  background-color: hsl(120, 100%, 90%);*/
 }
 
 .button {
