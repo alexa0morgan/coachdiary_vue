@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch } from 'vue'
 
-const { title, data, isNormativeTypeSkills, isContentStaticText, hasActionButtons = true } = defineProps<{
+const { title, data, isNormativeTypeSkills, isContentStaticText, hasActionButtons = true} = defineProps<{
   title: string;
   data: {
     label: string;
@@ -18,7 +18,9 @@ const emit = defineEmits<{
   delete: [id: number, inAllLevels: boolean];
 }>()
 
-const selectedId = defineModel<number>({ required: true })
+//const selectedId = defineModel<number>({ required: true })
+
+const selectedId = defineModel<number>({ default: 1 })
 
 function onSelect(id: number): void {
   selectedId.value = id

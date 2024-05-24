@@ -11,36 +11,40 @@ const studentId = () => {
     return +urlParts[urlParts.length - 1] 
 }
 
-/*async function getNormativesById(normativeId:number){
+async function getNormativesById(normativeId:number){
     const response = await get(`/api/students/${normativeId}/standards/`)
     if(response.ok){
         response.json()
         .then(data => {
-        if (typeof data === 'object' && data !== null && 'name' in data && 'email' in data) {
-            currentName.value = data.name;
-            currentEmail.value = data.email;
-            name.value = currentName.value;
-            email.value = currentEmail.value;
-        }
+            /*if (typeof data === 'object' && data !== null ) {
+                
+            }*/
         })
     }
-}*/
+}
 interface Student {
+  id: number;
   fullName: string;
   class: Record<string, string | number>;
   birthday: string;
   gender: string
 }
+interface Standard {
+  id: number;
+  standard: Record<string, string | boolean>;
+  grade: number;
+  gender: number;
+}
 const studentInfo = ref<Student>()
 
 async function getStudentById(studentId : number){
-    const response = await get(`/api/students/${studentId}/`)
-    alert(studentId)
+    const response = await get(`/api/students/${studentId}`)
     if(response.ok){
         response.json()
         .then(data => {
-            if (typeof data === 'object' && data !== null && 'full_name' in data && 'student_class' in data && 'birthday' in data && 'gender' in data) {
+            if (typeof data === 'object' && data !== null) {
                 studentInfo.value = {
+                    id: data.id,
                     fullName : data.full_name,
                     class : data.student_class,
                     birthday : data.birthday, 
@@ -57,15 +61,15 @@ const labels = (info : Student | undefined) => {
     let infoLabels = []
     infoLabels.push({
         id: 0,
-        label: `Дата рождения: ${info?.birthday}`
+        label: `Дата рождения: ${info?.birthday ? info?.birthday : ''}`
     })
     infoLabels.push({
         id: 1,
-        label: `Класс ${info?.class.number} ${info?.class.class_name}`
+        label: `Класс: ${info?.class ? String(info?.class.number)+String(info?.class.class_name) : ''}`
     })
     infoLabels.push({
         id: 2,
-        label: `Пол: ${info?.gender === 'm' ? 'мальчик' : 'девочка'}`
+        label: `Пол: ${info?.gender ? info?.gender === 'm' ? 'мальчик' : 'девочка' : ''}`
     })
     return infoLabels
 }
@@ -113,11 +117,16 @@ getStudentById(studentId())
         <TopPanel class="top-panel">
             <div class="top-panel-title">{{ studentInfo?.fullName ? studentInfo?.fullName : 'студент не найден'}}</div>
         </TopPanel>
-        <LevelPanel :classNumber="11" class="level-panel"/>
+        <LevelPanel :classNumber="studentInfo?.class.number ? +studentInfo?.class.number : 0" class="level-panel"/>
         <div class="main">
             <DataTable class="table" :data="normatives"/>
             <DataTableSideNav
-            class="info-panel" :title="'Информация'" :data="labels(studentInfo)" :isContentStaticText="true" :pageType="'student'"/>
+                class="info-panel" 
+                :title="'Информация'" 
+                :data="labels(studentInfo)" 
+                :isContentStaticText="true" 
+                :pageType="'student'" 
+                :hasDeleteMenu="false" />
         </div>
 
     </div>
