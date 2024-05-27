@@ -118,6 +118,29 @@ function acceptFilters() {
     )
 }
 
+async function saveStudentsValue() {
+  try {
+        const request: StudentValueRequest[] = filteredData.value
+          .filter(v => v.value !== null)
+          .map(student => ({
+          student_id: student.id,
+          standard_id: selectedNormativeId.value,
+          value: student.value,
+        }))
+
+    const response = await post('/api/students/results/create_or_update/', request)
+
+    if (response.ok) {
+      await getStudentsData()
+    } else {
+      alert('Ошибка при отправке данных, попробуйте позже')
+    }
+
+  } catch {
+    alert('Ошибка сервера при отправке данных, попробуйте позже')
+  }
+}
+
 </script>
 
 <template>
@@ -153,7 +176,8 @@ function acceptFilters() {
 
     <FilterBlock v-model="filters" @accept="acceptFilters" />
 
-    <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType" />
+    <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType"
+                    @saveData="saveStudentsValue" />
 
     <DataTableSideNav v-model="selectedNormativeId" :data="normatives" title="Нормативы" class="data-table-side-nav"
                       :has-action-buttons="false" @update:model-value="getStudentsData" />
