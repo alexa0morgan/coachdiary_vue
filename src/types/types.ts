@@ -20,9 +20,9 @@ export type NormativeRequest = {
   has_numeric_value: boolean
   levels: {
     level_number: number,
-    low_level_value: number,
-    middle_level_value: number,
-    high_level_value: number,
+    low_level_value: number | null,
+    middle_level_value: number | null,
+    high_level_value: number | null,
     gender: Gender,
   }[]
 }
@@ -66,6 +66,12 @@ export type StudentsValueResponse = {
   gender: Gender,
   value: number | null,
   grade: number | null
+}
+
+export type StudentValueRequest = {
+  student_id: number,
+  standard_id: number,
+  value: number | null
 }
 
 export type FilterData = {

@@ -4,9 +4,13 @@ import type { VDataTable } from 'vuetify/components'
 import type { StudentsValueResponse } from '@/types/types'
 import { computed } from 'vue'
 
-const {standardType} = defineProps<{
+const { data, standardType } = defineProps<{
   data: StudentsValueResponse[]
   standardType: 'standard' | 'skill'
+}>()
+
+const emit = defineEmits<{
+  saveData: []
 }>()
 
 const headers = computed<VDataTable['$props']['headers']>(() => {
@@ -25,7 +29,7 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
       { title: 'Класс', value: 'class', width: 70 },
       { title: 'ФИО', value: 'full_name', sortable: true },
       { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
-      { title: 'Оценка', value: 'value', sortable: true, width: 120 },
+      { title: 'Оценка', value: 'value', sortable: true, width: 120 }
     ]
   }
 
@@ -57,7 +61,7 @@ function getMarkColor(mark?: number): string {
     :fixed-header="true"
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
     :show-current-page="true"
-    no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив слева"
+    no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив справа"
     item-key="name"
   >
     <template #item.class="{item}">
@@ -82,11 +86,11 @@ function getMarkColor(mark?: number): string {
     <template #item.value="{item}">
       <v-text-field v-model="item.value" class="result" />
     </template>
-    <template #item.grade="{item}">
+    <template #item.grade=" {item} ">
       <div :class="getMarkColor(item.grade ?? 0)" class="mark">{{ item.grade }}</div>
     </template>
     <template #footer.prepend>
-      <v-btn color="primary">Сохранить</v-btn>
+      <v-btn color="primary" @click="emit('saveData')">Сохранить</v-btn>
       <div class="space" />
     </template>
   </v-data-table>
