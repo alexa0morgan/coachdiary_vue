@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TopPanel from '@/components/TopPanel.vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref} from 'vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyClassesTable from '@/components/MyClassesTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
@@ -9,13 +9,16 @@ import type {
   ClassRequest,
   NormativeResponse,
   StudentsValueResponse,
-  FilterData
+  FilterData, StudentValueRequest
 } from '@/types/types'
-import { get } from '@/utils'
+import { get, post } from '@/utils'
 
 
 const activeLevelNumber = ref(-1)
 const className = ref('')
+const fullClassName = computed(() =>
+  className.value ? activeLevelNumber.value + className.value : activeLevelNumber.value
+)
 const selectedNormativeId = ref(-1)
 
 const selectedNormativeType = computed<'standard' | 'skill'>(() => {
@@ -29,6 +32,7 @@ const selectedNormativeType = computed<'standard' | 'skill'>(() => {
 const classesData = ref<ClassRequest[]>([])
 const normativesData = ref<NormativeResponse[]>([])
 const studentsValueData = ref<StudentsValueResponse[]>([])
+const filteredData = ref<StudentsValueResponse[]>([])
 
 onMounted(async () => {
   classesData.value = await get('/api/classes/').then(res => res.json())
@@ -68,7 +72,7 @@ async function getStudentsData() {
     .map(klass => klass.id.toString())
   try {
     const currentStudents: StudentResponse[] = await get('/api/students/', {
-      'student_class[]': currentClasses
+      'student_class': fullClassName.value
     }).then(res => res.json())
     const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/', {
       'class_id[]': currentClasses,
@@ -80,7 +84,7 @@ async function getStudentsData() {
       return result ?? {
         ...student,
         value: null,
-        grade: null //TODO спросить у робота насчет null
+        grade: null
       }
     })
     filteredData.value = studentsValueData.value
@@ -103,13 +107,12 @@ const filters = ref<FilterData>({
   birthYearUntil: null
 })
 
-const filteredData = ref<StudentsValueResponse[]>([])
 
 function acceptFilters() {
   filteredData.value = studentsValueData.value
     .filter(student =>
       (filters.value.gender ? student.gender === filters.value.gender : true)
-      && (filters.value.grades.length ? filters.value.grades.includes(student.grade)  : true)
+      && (filters.value.grades.length ? filters.value.grades.includes(student.grade) : true)
       && (filters.value.birthYearFrom ? +student.birthday.slice(0, 4) >= filters.value.birthYearFrom : true)
       && (filters.value.birthYearUntil ? +student.birthday.slice(0, 4) <= filters.value.birthYearUntil : true)
     )
