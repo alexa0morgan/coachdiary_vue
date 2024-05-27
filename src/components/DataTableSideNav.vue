@@ -18,13 +18,8 @@ const emit = defineEmits<{
   delete: [inAllLevels: boolean];
 }>()
 
-<<<<<<< HEAD
-//const selectedId = defineModel<number>({ required: true })
 
-const selectedId = defineModel<number>({ default: 1 })
-=======
 const selectedId = defineModel<number>({default: -1, required: false})
->>>>>>> master
 
 function onSelect(id: number): void {
   selectedId.value = id

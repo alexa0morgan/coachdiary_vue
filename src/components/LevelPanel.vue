@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-const activeLevelNumber = ref(1)
 const props = defineProps<{
   classNumber: number;
 }>()
-
+const activeLevel = defineModel<number>({default: -1, required: false})
+const emit = defineEmits<{
+  levelChanged: []
+}>()
 </script>
 
 <template>
@@ -13,8 +15,8 @@ const props = defineProps<{
         <div class="buttons-panel">
             <span class="header">уровни</span>
             <v-btn size="small" class="level-button button" v-for="n in classNumber" :text="n + ' уровень'" :key="n"
-                :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="black"
-                @click="activeLevelNumber = n" />
+                :variant="activeLevel === n ? 'flat' : 'outlined'" color="black"
+                @click="activeLevel = n, emit('levelChanged')" />
         </div>
     </div>
   </div>

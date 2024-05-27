@@ -1,132 +1,124 @@
 <script setup lang="ts">
-import {ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
 import DataTable from '@/components/DataTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
-import {get} from '@/utils'
+import {get, del, post} from '@/utils'
+import router from '@/router'
+import type { StudentResponse, StudentStandardResponse,StudentStandardRequest } from '@/types/types'
 
-const studentId = () => {
+
+const studentInfo = ref<StudentResponse>()
+const standardsInfo = ref<StudentStandardResponse[]>([])
+const activeLevelNumber = ref(-1)
+const changedData = ref<StudentStandardRequest>()
+
+onMounted(async()=>{
+    await getStudentById(studentId.value)
+    await getNormativesByStudentId(studentId.value)
+    setTimeout(() => {
+        activeLevelNumber.value = studentInfo?.value?.student_class.number ?? 0
+    }, 0);
+})
+
+const studentId = computed(() => {
     const urlParts = window.location.pathname.split('/');
     return +urlParts[urlParts.length - 1] 
-}
+})
 
-async function getNormativesById(normativeId:number){
-    const response = await get(`/api/students/${normativeId}/standards/`)
-    if(response.ok){
-        response.json()
-        .then(data => {
-            /*if (typeof data === 'object' && data !== null ) {
-                
-            }*/
-        })
-    }
+async function getNormativesByStudentId(studentId:number){
+    standardsInfo.value = await get(`/api/students/${studentId}/standards/`)
+    .then(res => res.json())
+    .catch(() => {
+        alert('Ошибка доступа к данным')
+    })
 }
-interface Student {
-  id: number;
-  fullName: string;
-  class: Record<string, string | number>;
-  birthday: string;
-  gender: string
-}
-interface Standard {
-  id: number;
-  standard: Record<string, string | boolean>;
-  grade: number;
-  gender: number;
-}
-const studentInfo = ref<Student>()
 
 async function getStudentById(studentId : number){
-    const response = await get(`/api/students/${studentId}`)
-    if(response.ok){
-        response.json()
-        .then(data => {
-            if (typeof data === 'object' && data !== null) {
-                studentInfo.value = {
-                    id: data.id,
-                    fullName : data.full_name,
-                    class : data.student_class,
-                    birthday : data.birthday, 
-                    gender : data.gender
-                }
-            }
-        })
-        .catch(() => {
-            alert('Ошибка доступа к данным')
-        })
-    }
+    studentInfo.value = await get(`/api/students/${studentId}`)
+    .then(res => res.json())
+    .catch(() => {
+        alert('Ошибка доступа к данным')
+    })
 }
-const labels = (info : Student | undefined) => {
+
+const labels = computed(() => {
     let infoLabels = []
     infoLabels.push({
         id: 0,
-        label: `Дата рождения: ${info?.birthday ? info?.birthday : ''}`
+        label: `Дата рождения: ${studentInfo.value?.birthday ??  ''}`
     })
     infoLabels.push({
         id: 1,
-        label: `Класс: ${info?.class ? String(info?.class.number)+String(info?.class.class_name) : ''}`
+        label: `Класс: ${studentInfo.value?.student_class ? String(studentInfo.value?.student_class.number) + String(studentInfo.value?.student_class.class_name) : ''}`
     })
     infoLabels.push({
         id: 2,
-        label: `Пол: ${info?.gender ? info?.gender === 'm' ? 'мальчик' : 'девочка' : ''}`
+        label: `Пол: ${studentInfo.value?.gender ? studentInfo.value?.gender === 'm' ? 'мальчик' : 'девочка' : ''}`
     })
     return infoLabels
+})
+
+const normatives = computed(() =>
+    Array.from(standardsInfo.value
+    .filter(standard => standard.Level_number === activeLevelNumber.value)
+    .map(standard => ({
+        student_id: studentId.value,
+        id: standard.Standard.Id,
+        has_numeric_value: standard.Standard.Has_numeric_value,
+        normative: standard.Standard.Name,
+        result: +standard.Value.toFixed(2),
+        rate: standard.Grade,
+        level_number: activeLevelNumber.value
+    }))
+))
+
+function editStudent(): void {
+    router.push({ name: 'update-student', params: { id: studentId.value } })
 }
-const normatives = [
-    { id: 0, number:1, normative: 'бег 100м', result: 15, rate: 5 },
-    { id: 1, number:2, normative: 'метание мяча', result: 60, rate: 5},
-    { id: 2, number:3, normative: 'прыжок в длину', result: 1.20, rate: 4 },
-    { id: 3, number:4, normative: 'бег 100м', result: 15, rate: 5 },
-    { id: 4, number:5, normative: 'метание мяча', result: 60, rate: 5},
-    { id: 5, number:6, normative: 'прыжок в длину', result: 1.20, rate: 4 },
-    { id: 6, number:7, normative: 'бег 100м', result: 15, rate: 5 },
-    { id: 7, number:8, normative: 'метание мяча', result: 60, rate: 5},
-    { id: 8, number:9, normative: 'прыжок в длину', result: 1.20, rate: 4 },
-    { id: 9, number:10, normative: 'бег 100м', result: 15, rate: 5 },
-    { id: 10, number:11, normative: 'метание мяча', result: 60, rate: 5},
-    { id: 11, number:12, normative: 'прыжок в длину', result: 1.20, rate: 4 },
-]
-
-
-
-function getClassNumber(cl:string){
-    if(cl.length >2){
-        return +cl.slice(0,2)
+async function deleteStudent() {
+    const response = await del('/api/students/' + studentId.value)
+    if (!response.ok) {
+        alert('Произошла ошибка при удалении, попробуйте снова')
+        return
     }
-    return +cl.slice(0,1)
+    router.push({name: 'my-classes'})
 }
-function dateBirth(date:Date){
-    let day = String(date.getDate())
-    let month = String(date.getMonth())
-    if(day.length==1){
-        day = 0+day 
+async function postData(){
+    const response = await post('/api/students/results/create_or_update/', (changedData.value))
+    if(response.ok){
+        alert('Данные успешно изменены')
+        await getNormativesByStudentId(studentId.value)
     }
-    if(month.length==1){
-        month = 0+month
-    }
-    return day + '.' + month + '.' + String(date.getFullYear())
+    
 }
-
-getStudentById(studentId())
-
 </script>
 
 <template>
     <div>
         <TopPanel class="top-panel">
-            <div class="top-panel-title">{{ studentInfo?.fullName ? studentInfo?.fullName : 'студент не найден'}}</div>
+            <div class="top-panel-title">{{ studentInfo?.full_name ? studentInfo?.full_name : 'студент не найден'}}</div>
         </TopPanel>
-        <LevelPanel :classNumber="studentInfo?.class.number ? +studentInfo?.class.number : 0" class="level-panel"/>
+        <LevelPanel  
+            v-model="activeLevelNumber" 
+            :classNumber="studentInfo?.student_class.number ?? 0" 
+            class="level-panel"/>
         <div class="main">
-            <DataTable class="table" :data="normatives"/>
+            <DataTable 
+                v-model="changedData"
+                class="table"
+                :data="normatives"
+                @dataChanged="postData"/>
             <DataTableSideNav
                 class="info-panel" 
                 :title="'Информация'" 
-                :data="labels(studentInfo)" 
+                :data="labels" 
                 :isContentStaticText="true" 
                 :pageType="'student'" 
-                :hasDeleteMenu="false" />
+                :hasDeleteMenu="false" 
+                @edit="editStudent"
+                @delete="deleteStudent"/>
         </div>
 
     </div>

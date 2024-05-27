@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import {get, patch, put } from '@/utils'
 
-
+onMounted(async()=>{
+  await getData()
+})
 const currentName = ref('')
 const currentEmail = ref('')
 const name = ref('')
@@ -29,7 +31,7 @@ async function patchData() {
     const requestData = currentEmail.value === email.value ?  {name: name.value } : {email: email.value, name: name.value }
     const response = await patch('/api/profile/', requestData)
     if (response.ok) {
-      getData()
+      await getData()
     } 
     else {
       return response.json()
@@ -67,7 +69,6 @@ const passwordConfirmation = ref('')
 const isSetPasswordButtonDisabled = computed(() => {
   return !(password.value?.trim().length && newPassword.value?.trim().length && newPassword.value?.trim() === passwordConfirmation.value?.trim())
 })
-getData()
 </script>
 
 <template>

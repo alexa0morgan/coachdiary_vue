@@ -31,7 +31,7 @@ export function get(url: string, data?: Record<string | number, unknown | unknow
   })
 }
 
-export function post(url: string, data?: Record<string | number, unknown>): Promise<Response> {
+export function post(url: string, data?: Record<string | number, unknown> | Array<Record<string | number, unknown>>): Promise<Response> {
   return fetch(import.meta.env.VITE_APP_API_BASE + url, {
     method: 'POST',
     headers: {
