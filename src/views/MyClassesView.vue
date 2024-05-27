@@ -144,18 +144,19 @@ async function saveStudentsValue() {
 </script>
 
 <template>
+  <div>
   <TopPanel>
     <div class="buttons-panel">
       <v-btn class="level-button top-button" v-for="n in 11" :key="n"
-             :disabled="!(n in classes)"
-             :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="rgb(var(--v-theme-secondary))">
+            :disabled="!(n in classes)"
+            :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="rgb(var(--v-theme-secondary))">
         {{ n }}{{ activeLevelNumber === n ? className : '' }}
         <v-menu activator="parent" location="bottom center" offset="5"
                 transition="slide-y-transition">
           <v-list density="compact" bg-color="rgb(var(--v-theme-primary))"
                   base-color="rgb(var(--v-theme-secondary))" elevation="0">
             <v-list-item v-for="letter in classes[n]" :key='n + letter' class="text-center"
-                         @click="activeLevelClick(n, letter)">
+                        @click="activeLevelClick(n, letter)">
               <v-list-item-title>{{ letter.toUpperCase() }}</v-list-item-title>
             </v-list-item>
             <v-list-item class="text-center" @click="activeLevelClick(n, '')">
@@ -167,8 +168,8 @@ async function saveStudentsValue() {
       </v-btn>
     </div>
     <template #right>
-      <v-btn icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
-             :to="{name: 'create-student'}" />
+      <v-btn class="add-button" icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
+            :to="{name: 'create-student'}" />
     </template>
   </TopPanel>
 
@@ -182,8 +183,7 @@ async function saveStudentsValue() {
     <DataTableSideNav v-model="selectedNormativeId" :data="normatives" title="Нормативы" class="data-table-side-nav"
                       :has-action-buttons="false" @update:model-value="getStudentsData" />
   </div>
-
-
+</div>
 </template>
 
 <style scoped>
@@ -219,5 +219,29 @@ async function saveStudentsValue() {
 .table {
   height: calc(100dvh - 180px);
 }
+
+@media (max-width: 1230px) {
+  a.add-button {
+    height: 1.7em;
+    width: 1.7em;
+  }  
+  button.top-button{
+    height: 1.7em;
+    width: 1.7em;
+  }
+  div.container{
+    width: 100%;
+  }
+}
+@media (max-width: 430px) {
+  button.top-button{
+    height: 1.3em;
+    width: 1.3em;
+  }
+  .v-main{
+    width: 100%;
+  }
+}
+
 
 </style>

@@ -139,13 +139,6 @@ async function postData(){
     height: calc(100dvh - 230px);
 }
 .info-panel{
-    /*display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: rgb(var(--v-theme-background));
-    border: 1px solid rgb(var(--v-theme-primary));
-    border-radius: var(--v-border-radius);
-    padding: 0 10px;*/
     height: calc(100dvh - 230px);
 }
 .info-title{

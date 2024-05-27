@@ -18,6 +18,7 @@
   background-color: rgb(var(--v-theme-primary));
   @media (max-width: 1230px) {
     height: 40px;
+    margin: 0;
   }
 }
 

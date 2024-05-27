@@ -95,5 +95,5 @@ export type StudentStandardRequest = {
   student_id: number,
   standard_id: number,
   value: number,
-  level_number: number,
+  level_number: number | null,
 }[]
