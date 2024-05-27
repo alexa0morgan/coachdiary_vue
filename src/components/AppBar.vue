@@ -54,7 +54,10 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
 
   <v-app-bar :elevation="2">
     <v-app-bar-title>
-      <router-link v-if="smAndUp" class="title" :to="logoLink">Дневник тренера</router-link>
+      <router-link v-if="smAndUp" class="title" :to="logoLink">
+        <img src="/whistle.svg" alt="logo" class="icon" />
+        <span class="text-title">Дневник тренера</span>
+      </router-link>
       <div v-else class="text-center mr-4 mobile-title">{{ mobileTitle }}</div>
     </v-app-bar-title>
 
@@ -96,6 +99,9 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
 .title {
   color: black;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .mobile-title {
@@ -107,4 +113,15 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
   display: flex;
   gap: 10px;
 }
+
+.icon {
+  height: 32px;
+}
+
+@media (max-width: 760px) {
+  .text-title{
+    display: none;
+  }
+}
+
 </style>
