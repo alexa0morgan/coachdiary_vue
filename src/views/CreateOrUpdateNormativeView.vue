@@ -16,6 +16,7 @@ const normativeType = ref<'standard' | 'skill' | null>(null)
 const currentLevel = ref(-1)
 const levelNumbers = ref<number[]>([])
 const levels = ref<Record<number, Level>>({})
+setLevelsWithZeroes()
 
 interface Level {
   girls: LevelValues;
@@ -23,22 +24,24 @@ interface Level {
 }
 
 interface LevelValues {
-  high: number;
-  middle: number;
-  low: number;
+  high: number | null;
+  middle: number | null;
+  low: number | null;
 }
 
-for (let i = 1; i <= 11; i++) {
-  levels.value[i] = {
-    girls: {
-      high: 0,
-      middle: 0,
-      low: 0
-    },
-    boys: {
-      high: 0,
-      middle: 0,
-      low: 0
+function setLevelsWithZeroes() {
+  for (let i = 1; i <= 11; i++) {
+    levels.value[i] = {
+      girls: {
+        high: null,
+        middle: null,
+        low: null
+      },
+      boys: {
+        high: null,
+        middle: null,
+        low: null
+      }
     }
   }
 }
@@ -107,22 +110,22 @@ async function createOrUpdateNormative() {
 
     const response = await currentMethod(`/api/standards/` + currentId, requestData)
 
-    if (response.ok && pageType.value==='create-normative') {
+    if (response.ok && pageType.value === 'create-normative') {
       alert('Норматив создан')
       normativeName.value = ''
       normativeType.value = null
       levelNumbers.value = []
-    } else if(response.ok && pageType.value === 'update-normative') {
+      setLevelsWithZeroes()
+    } else if (response.ok && pageType.value === 'update-normative') {
       alert('Данные о нормативе обновлены')
-    }
-    else {
+    } else {
       const data = await response.json()
       if (data?.status === 'error') {
         const errors = Object.values(data.details).flat().join('\n')
         alert(errors)
       }
     }
-  } catch (e) {
+  } catch {
     alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
@@ -136,12 +139,12 @@ const isSaveButtonDisabled = computed(() => {
         .entries(levels.value)
         .some(([key, value]) =>
             levelNumbers.value.includes(+key) && (
-              value.girls.high === 0
-              || value.girls.middle === 0
-              || value.girls.low === 0
-              || value.boys.low === 0
-              || value.boys.middle === 0
-              || value.boys.high === 0
+              !value.girls.high
+              || !value.girls.middle
+              || !value.girls.low
+              || !value.boys.low
+              || !value.boys.middle
+              || !value.boys.high
             )
         )
       && normativeType.value !== 'skill'
@@ -177,7 +180,7 @@ onMounted(async () => {
   <div class="grid" v-auto-animate>
 
     <FieldSet title="Тип">
-      <v-radio-group v-model="normativeType" :disabled="pageType === 'update-normative'" row>
+      <v-radio-group v-model="normativeType" :disabled="pageType === 'update-normative'" row @update:model-value="setLevelsWithZeroes">
         <v-radio label="Стандарт" value="standard" />
         <v-radio label="Умение" value="skill" />
       </v-radio-group>
