@@ -53,8 +53,6 @@ async function createOrUpdateStudent() {
       studentName.value = ''
       genderType.value = null
       birthdayDate.value = ''
-      classNumber.value = -1
-      className.value = ''
     } else if (response.ok && pageType.value=='update-student'){
       alert('Данные об ученике обновлены')
     } else {
