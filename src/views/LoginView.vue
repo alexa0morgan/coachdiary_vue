@@ -68,8 +68,7 @@ async function sendData() {
       response = await restore()
     }
     if (response?.status === 'error') {
-      const errors = Object.values(response.details).flat().join('\n')
-      alert(errors)
+      alert(response.details)
     }
   } catch {
     alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -115,7 +114,7 @@ async function signUp() {
 }
 
 async function restore() {
-  alert('К сожалению, данная функция еще не доступна, обратитесь по адресу почты поддержки: *адрес почты*')
+  alert('К сожалению, данная функция еще не доступна, обратитесь по адресу временной почты поддержки: dasha2510929@yandex.ru')
 }
 
 </script>
