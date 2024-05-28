@@ -85,6 +85,7 @@ function clearFilters(): void {
   overflow: hidden;
   @media (max-width: 600px){
     width: 100%;
+    height: 200px;
   }
 }
 

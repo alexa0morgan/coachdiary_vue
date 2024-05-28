@@ -174,7 +174,7 @@ async function saveStudentsValue() {
 
   <div class="grid">
 
-    <FilterBlock class="filters" v-model="filters" @accept="acceptFilters" />
+    <FilterBlock v-model="filters" @accept="acceptFilters" />
 
     <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType"
                     @saveData="saveStudentsValue" />
@@ -233,6 +233,7 @@ async function saveStudentsValue() {
     flex-direction: column;
     align-items: center;
     padding: 0 10px 10px;
+    margin: 5px 0;
   }
   .buttons-panel{
     gap: 5px;

@@ -182,7 +182,7 @@ async function postData(){
 .button.v-btn--active {
   background-color: rgb(var(--v-theme-surface));
 }
-@media (max-width: 1230px) {
+@media (max-width: 600px) {
     .top-panel-title{
         font-size: 14px;
     }

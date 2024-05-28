@@ -176,7 +176,7 @@ onMounted(async () => {
 
 <template>
 
-  <TopPanel>{{ pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива' }}</TopPanel>
+  <TopPanel class="top-panel">{{ pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива' }}</TopPanel>
   <div class="grid" v-auto-animate>
 
     <FieldSet title="Тип">
@@ -203,34 +203,34 @@ onMounted(async () => {
         <div class="standards-table">
           <div class="standards">
             <div class="standards-table-title">Девочки</div>
-            <v-text-field v-model.number="levels[currentLevel].girls.high" label="Повышенная ступень" type="number"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.high" label="Повышенная ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].girls.middle" label="Средняя ступень" type="number"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.middle" label="Средняя ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].girls.low" label="Низкая ступень" type="number" min="0"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.low" label="Низкая ступень" type="number" min="0"
                           density="comfortable" />
 
           </div>
           <div class="standards">
             <div class="standards-table-title">Мальчики</div>
-            <v-text-field v-model.number="levels[currentLevel].boys.high" label="Повышенная ступень" type="number"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.high" label="Повышенная ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].boys.middle" label="Средняя ступень" type="number"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.middle" label="Средняя ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].boys.low" label="Низкая ступень" type="number" min="0"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.low" label="Низкая ступень" type="number" min="0"
                           density="comfortable" />
           </div>
         </div>
 
         <div class="pagination">
-          <v-btn :disabled="isPreviousLevelButtonDisabled" text="Предыдущий уровень" variant="text"
+          <v-btn :disabled="isPreviousLevelButtonDisabled" text="" variant="text"
                  prepend-icon="mdi-arrow-left" @click="toPreviousLevel" />
           <div>{{ currentLevel }} ур</div>
-          <v-btn :disabled="isNextLevelButtonDisabled" text="Следующий уровень" variant="text"
+          <v-btn :disabled="isNextLevelButtonDisabled" text="" variant="text"
                  append-icon="mdi-arrow-right" @click="toNextLevel" />
         </div>
       </template>
@@ -312,4 +312,28 @@ onMounted(async () => {
   grid-column: span 2;
   justify-self: end;
 }
+
+@media (max-width: 600px) {
+  .top-panel{
+    display: none;
+  }
+  .grid{
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    padding: 5px 5px;
+    align-items: space-between;
+  }
+  .normative-name {
+    align-self: auto;
+  }
+  .standards-table{
+    display: flex;
+    flex-direction: column
+  }
+  .standard-input{
+    align-self: auto;
+  }
+}
+
 </style>
