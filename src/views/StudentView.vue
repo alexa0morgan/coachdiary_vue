@@ -7,9 +7,10 @@ import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import { get, del, post } from '@/utils'
 import type { StudentResponse, StudentStandardResponse, StudentStandardRequest } from '@/types/types'
 import { useRoute } from 'vue-router'
+import router from '@/router'
 
 const route = useRoute()
-const studentId = computed(() => route.params.id)
+const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
 const standardsInfo = ref<StudentStandardResponse[]>([])
 const activeLevelNumber = ref(-1)
@@ -64,8 +65,8 @@ const normatives = computed(() =>
       id: standard.Standard.Id,
       has_numeric_value: standard.Standard.Has_numeric_value,
       normative: standard.Standard.Name,
-      result: +standard.Value,
-      rate: standard.Grade,
+      result: standard.Value ?? 0,
+      rate: standard.Grade ?? 0,
       level_number: activeLevelNumber.value
     }))
 )
