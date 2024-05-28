@@ -30,8 +30,8 @@ interface Item {
     id: number;
     has_numeric_value: boolean,
     normative: string;
-    result: number;
-    rate: number;
+    result?: number;
+    rate?: number;
     level_number: number;
 }
 const totalRate = computed(()=>{
@@ -53,11 +53,14 @@ function onRateChange(item: Item) {
 
 function saveData(): void{
     changedData.value = removeDuplicatesAndKeepLast(tableData.value).map((item) => {
-        return {
-            student_id: item.student_id,
-            standard_id: item.id,
-            value: item.has_numeric_value ? +item.result : +item.rate,
-            level_number: item.level_number
+        const itemValue = item.has_numeric_value ? item.result : item.rate 
+        if(itemValue){
+            return {
+                student_id: item.student_id,
+                standard_id: item.id,
+                value: +itemValue,
+                level_number: item.level_number
+            }
         }
     }).filter((item) => item !== undefined) as StudentStandardRequest
     emit('dataChanged');

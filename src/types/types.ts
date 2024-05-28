@@ -87,13 +87,13 @@ export type StudentStandardResponse = {
     Name: string,
     Has_numeric_value: boolean
   },
-  Grade:	number,
-  Value:	number,
+  Grade:	number | null,
+  Value:	number | null,
   Level_number: number
 }
 export type StudentStandardRequest = {
   student_id: number,
   standard_id: number,
   value: number,
-  level_number: number | null,
+  level_number: number,
 }[]
