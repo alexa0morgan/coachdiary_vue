@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VDataTable } from 'vuetify/components'
-import {computed, onMounted, ref} from 'vue'
+import {computed, ref} from 'vue'
 import type { StudentStandardRequest } from '@/types/types'
 
 const emit = defineEmits<{

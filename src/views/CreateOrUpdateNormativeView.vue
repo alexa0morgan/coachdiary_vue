@@ -203,7 +203,7 @@ onMounted(async () => {
         <div class="standards-table">
           <div class="standards">
             <div class="standards-table-title">Девочки</div>
-            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.high" label="Повышенная ступень" type="number"
+            <v-text-field v-model.number="levels[currentLevel].girls.high" label="Повышенная ступень" type="number"
                           min="0"
                           density="comfortable" />
             <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.middle" label="Средняя ступень" type="number"
@@ -215,7 +215,7 @@ onMounted(async () => {
           </div>
           <div class="standards">
             <div class="standards-table-title">Мальчики</div>
-            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.high" label="Повышенная ступень" type="number"
+            <v-text-field v-model.number="levels[currentLevel].boys.high" label="Повышенная ступень" type="number"
                           min="0"
                           density="comfortable" />
             <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.middle" label="Средняя ступень" type="number"
