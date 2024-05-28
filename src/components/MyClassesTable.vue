@@ -61,15 +61,17 @@ function getMarkColor(mark?: number): string {
     :fixed-header="true"
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
     :show-current-page="true"
+    :mobile="null"
     no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив справа"
     item-key="name"
-    :mobile="true"
+    class="table"
   >
     <template #item.class="{item}">
       {{ item.student_class.number + item.student_class.class_name }}
     </template>
     <template #item.full_name="{item}">
-      <v-btn class="button" :to="{name: 'student', params: { id: item.id } }" variant="tonal">{{ item.full_name }}</v-btn>
+      <v-btn class="button" :to="{name: 'student', params: { id: item.id } }" variant="tonal">{{ item.full_name }}
+      </v-btn>
     </template>
     <template #item.gender="{item}">
       <div class="gender">
@@ -156,19 +158,14 @@ function getMarkColor(mark?: number): string {
   flex: 1;
 }
 
-@media(max-width: 1280px){
-  .table{
+@media (max-width: 850px) {
+  .table {
     font-weight: 400;
-    font-size: 8px;
   }
-  .table:deep(.v-data-table__td){
-    height: 40px !important;
-  }
-  .table:deep(td){
-    height: 40px !important;
-  }
-  .table:deep(tr.v-data-table__tr){
-    height: 40px !important;
+
+  .table :deep(th),
+  .table :deep(td) {
+    padding: 0 5px !important;
   }
 }
 </style>

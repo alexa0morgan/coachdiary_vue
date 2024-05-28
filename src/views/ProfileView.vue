@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import {get, patch, put } from '@/utils'
+import { get, patch, put } from '@/utils'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 
-onMounted(async()=>{
+onMounted(async () => {
   await getData()
 })
 const userStore = useUserStore()
@@ -13,55 +13,54 @@ const currentName = ref('')
 const currentEmail = ref('')
 const name = ref('')
 const email = ref('')
+
 async function getData() {
-  const response = await get('/api/profile/')
-  if (response.ok){
-    response.json()
-    .then(data => {
-      if (typeof data === 'object' && data !== null && 'name' in data && 'email' in data) {
-        currentName.value = data.name;
-        currentEmail.value = data.email;
-        name.value = currentName.value;
-        email.value = currentEmail.value;
-      }
-    })
-    .catch(() => {
-      alert('Ошибка доступа к данным')
-    })
+  try {
+    const response = await get('/api/profile/')
+    if (response.ok) {
+      const data = await response.json()
+
+      currentName.value = data.name
+      currentEmail.value = data.email
+      name.value = currentName.value
+      email.value = currentEmail.value
+
+    }
+  } catch {
+    alert('Ошибка доступа к данным')
   }
 }
+
 async function patchData() {
   try {
-    const requestData = currentEmail.value === email.value ?  {name: name.value } : {email: email.value, name: name.value }
+    const requestData = currentEmail.value === email.value ? { name: name.value } : {
+      email: email.value,
+      name: name.value
+    }
     const response = await patch('/api/profile/', requestData)
     if (response.ok) {
       await getData()
-    } 
-    else {
-      return response.json()
     }
-  } 
-  catch {
+  } catch {
     alert('Произошла ошибка, попробуйте еще раз')
   }
 }
+
 async function putPassword() {
   try {
-    const requestData = { new_password: newPassword.value, confirm_new_password: passwordConfirmation.value, current_password: password.value }
+    const requestData = {
+      new_password: newPassword.value,
+      confirm_new_password: passwordConfirmation.value,
+      current_password: password.value
+    }
     const response = await put('/api/profile/', requestData)
     if (response.ok) {
       password.value = ''
       newPassword.value = ''
       passwordConfirmation.value = ''
       alert('Пароль успешно обновлен')
-      await userStore.logout()
-      router.push({name: 'login'})
-    } 
-    else{
-      return response.json()
     }
-  } 
-  catch {
+  } catch {
     alert('Произошла ошибка обновления пароля, попробуйте позже')
   }
 }

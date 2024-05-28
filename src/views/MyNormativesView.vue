@@ -187,34 +187,38 @@ async function deleteNormative(): Promise<void> {
 .data-table-side-nav {
   height: calc(100vh - 220px);
 }
-@media (max-width: 600px){
+
+@media (max-width: 600px) {
   a.v-btn {
     display: none;
-  } 
-  button.v-btn{
+  }
+
+  button.v-btn {
     height: 1.5em;
   }
-  .grid{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+  .grid {
+    grid-template-columns: 1fr;
     padding: 0 10px 10px;
     margin: 5px 0;
   }
-  .buttons-panel{
+
+  .buttons-panel {
     gap: 5px;
   }
-  .data-table-side-nav{
-    order: 0;
+
+  .data-table-side-nav {
     height: 200px
   }
-  .standards-tables{
+
+  .standards-tables {
     order: 1;
   }
+
   @media (max-width: 430px) {
-    button.v-btn{
+    button.v-btn {
       height: 1.3em;
+    }
   }
-}
 }
 </style>

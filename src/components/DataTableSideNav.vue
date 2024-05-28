@@ -99,9 +99,6 @@ watch(() => data, () => {
   border-radius: var(--v-border-radius);
   padding: 12px;
   overflow: hidden;
-  @media (max-width: 600px){
-    width: 100%;
-  }
 }
 
 .title {
