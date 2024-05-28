@@ -144,7 +144,6 @@ async function saveStudentsValue() {
 </script>
 
 <template>
-  <div>
   <TopPanel>
     <div class="buttons-panel">
       <v-btn class="level-button top-button" v-for="n in 11" :key="n"
@@ -168,14 +167,14 @@ async function saveStudentsValue() {
       </v-btn>
     </div>
     <template #right>
-      <v-btn class="add-button" icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
+      <v-btn icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
             :to="{name: 'create-student'}" />
     </template>
   </TopPanel>
 
   <div class="grid">
 
-    <FilterBlock v-model="filters" @accept="acceptFilters" />
+    <FilterBlock class="filters" v-model="filters" @accept="acceptFilters" />
 
     <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType"
                     @saveData="saveStudentsValue" />
@@ -183,13 +182,13 @@ async function saveStudentsValue() {
     <DataTableSideNav v-model="selectedNormativeId" :data="normatives" title="Нормативы" class="data-table-side-nav"
                       :has-action-buttons="false" @update:model-value="getStudentsData" />
   </div>
-</div>
 </template>
 
 <style scoped>
 .buttons-panel {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .top-button {
@@ -219,27 +218,39 @@ async function saveStudentsValue() {
 .table {
   height: calc(100dvh - 180px);
 }
-
-@media (max-width: 1230px) {
-  a.add-button {
-    height: 1.7em;
-    width: 1.7em;
-  }  
-  button.top-button{
-    height: 1.7em;
-    width: 1.7em;
+/*button.v-btn{
+  height: 50px;
+}*/
+@media (max-width: 600px){
+  a.v-btn {
+    display: none;
+  } 
+  button.v-btn{
+    height: 1.5em;
   }
-  div.container{
-    width: 100%;
+  .grid{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px 10px;
+  }
+  .buttons-panel{
+    gap: 5px;
+  }
+  .filters{
+    order: 0
+  }
+  .data-table-side-nav{
+    order: 1;
+    height: 200px
+  }
+  .table{
+    order: 2;
   }
 }
 @media (max-width: 430px) {
-  button.top-button{
+  button.v-btn{
     height: 1.3em;
-    width: 1.3em;
-  }
-  .v-main{
-    width: 100%;
   }
 }
 

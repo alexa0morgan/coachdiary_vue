@@ -86,12 +86,17 @@ async function deleteStudent() {
     router.push({name: 'my-classes'})
 }
 async function postData(){
-    const response = await post('/api/students/results/create_or_update/', (changedData.value))
-    if(response.ok){
-        alert('Данные успешно изменены')
-        await getNormativesByStudentId(studentId.value)
+    try{
+        const response = await post('/api/students/results/create_or_update/', (changedData.value))
+        if(response.ok){
+            alert('Данные успешно изменены')
+            await getNormativesByStudentId(studentId.value)
+        }  else{
+            alert('Ошибка при отправке данных, попробуйте позже')
+        }
+    }catch{
+        alert('Ошибка при отправке данных, попробуйте позже')
     }
-    
 }
 </script>
 

@@ -63,12 +63,13 @@ function getMarkColor(mark?: number): string {
     :show-current-page="true"
     no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив справа"
     item-key="name"
+    :mobile="true"
   >
     <template #item.class="{item}">
       {{ item.student_class.number + item.student_class.class_name }}
     </template>
     <template #item.full_name="{item}">
-      <v-btn class="button" to="/app" variant="tonal">{{ item.full_name }}</v-btn>
+      <v-btn class="button" :to="{name: 'student', params: { id: item.id } }" variant="tonal">{{ item.full_name }}</v-btn>
     </template>
     <template #item.gender="{item}">
       <div class="gender">
@@ -153,5 +154,21 @@ function getMarkColor(mark?: number): string {
 
 .space {
   flex: 1;
+}
+
+@media(max-width: 1280px){
+  .table{
+    font-weight: 400;
+    font-size: 8px;
+  }
+  .table:deep(.v-data-table__td){
+    height: 40px !important;
+  }
+  .table:deep(td){
+    height: 40px !important;
+  }
+  .table:deep(tr.v-data-table__tr){
+    height: 40px !important;
+  }
 }
 </style>
