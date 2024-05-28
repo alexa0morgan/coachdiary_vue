@@ -6,8 +6,10 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { NormativeResponse, NormativeRequest } from '@/types/types'
 import { get, post, put } from '@/utils'
+import { useDisplay } from 'vuetify'
 
 const route = useRoute()
+const {mobile} = useDisplay()
 const pageType = ref(route.name as 'create-normative' | 'update-normative')
 
 const normativeName = ref('')
@@ -176,11 +178,13 @@ onMounted(async () => {
 
 <template>
 
-  <TopPanel>{{ pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива' }}</TopPanel>
+  <TopPanel class="top-panel">{{ pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива' }}
+  </TopPanel>
   <div class="grid" v-auto-animate>
 
     <FieldSet title="Тип">
-      <v-radio-group v-model="normativeType" :disabled="pageType === 'update-normative'" row @update:model-value="setLevelsWithZeroes">
+      <v-radio-group v-model="normativeType" :disabled="pageType === 'update-normative'" row
+                     @update:model-value="setLevelsWithZeroes">
         <v-radio label="Стандарт" value="standard" />
         <v-radio label="Умение" value="skill" />
       </v-radio-group>
@@ -206,10 +210,12 @@ onMounted(async () => {
             <v-text-field v-model.number="levels[currentLevel].girls.high" label="Высокая ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].girls.middle" label="Средняя ступень" type="number"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.middle"
+                          label="Средняя ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].girls.low" label="Низкая ступень" type="number" min="0"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.low" label="Низкая ступень"
+                          type="number" min="0"
                           density="comfortable" />
 
           </div>
@@ -218,19 +224,21 @@ onMounted(async () => {
             <v-text-field v-model.number="levels[currentLevel].boys.high" label="Высокая ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].boys.middle" label="Средняя ступень" type="number"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.middle"
+                          label="Средняя ступень" type="number"
                           min="0"
                           density="comfortable" />
-            <v-text-field v-model.number="levels[currentLevel].boys.low" label="Низкая ступень" type="number" min="0"
+            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.low" label="Низкая ступень"
+                          type="number" min="0"
                           density="comfortable" />
           </div>
         </div>
 
         <div class="pagination">
-          <v-btn :disabled="isPreviousLevelButtonDisabled" text="Предыдущий уровень" variant="text"
+          <v-btn :disabled="isPreviousLevelButtonDisabled" :text="mobile ? '' : 'Предыдущий уровень' " variant="text"
                  prepend-icon="mdi-arrow-left" @click="toPreviousLevel" />
           <div>{{ currentLevel }} ур</div>
-          <v-btn :disabled="isNextLevelButtonDisabled" text="Следующий уровень" variant="text"
+          <v-btn :disabled="isNextLevelButtonDisabled" :text="mobile ? '' : 'Следующий уровень'" variant="text"
                  append-icon="mdi-arrow-right" @click="toNextLevel" />
         </div>
       </template>
@@ -312,4 +320,27 @@ onMounted(async () => {
   grid-column: span 2;
   justify-self: end;
 }
+
+@media (max-width: 600px) {
+  .top-panel {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    overflow: scroll;
+    padding: 5px;
+    gap: 20px;
+  }
+
+  .button {
+    grid-column: 1;
+  }
+
+  .standards-table {
+    grid-template-columns: 1fr;
+  }
+
+}
+
 </style>

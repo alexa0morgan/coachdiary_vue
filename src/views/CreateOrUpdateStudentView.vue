@@ -48,12 +48,12 @@ async function createOrUpdateStudent() {
 
     const response = await currentMethod(`/api/students/` + currentId, requestData)
 
-    if (response.ok && pageType.value==='create-student') {
+    if (response.ok && pageType.value === 'create-student') {
       alert('Ученик создан')
       studentName.value = ''
       genderType.value = null
       birthdayDate.value = ''
-    } else if (response.ok && pageType.value=='update-student'){
+    } else if (response.ok && pageType.value == 'update-student') {
       alert('Данные об ученике обновлены')
     } else {
       const data = await response.json()
@@ -70,7 +70,7 @@ async function createOrUpdateStudent() {
 </script>
 
 <template>
-  <TopPanel>{{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}</TopPanel>
+  <TopPanel class="top-panel">{{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}</TopPanel>
   <div class="grid" v-auto-animate>
     <div class="left">
       <v-text-field v-model="studentName" class="text-field" label="ФИО" />
@@ -95,7 +95,7 @@ async function createOrUpdateStudent() {
         </v-radio-group>
       </div>
       <v-text-field :model-value="className" class="text-field class-name" label="Буква"
-                    @update:model-value="className=$event.toUpperCase()"/>
+                    @update:model-value="className=$event.toUpperCase()" />
     </FieldSet>
 
     <v-btn :disabled="isSaveButtonDisabled" text="Сохранить" color="primary" rounded class="button"
@@ -171,5 +171,23 @@ async function createOrUpdateStudent() {
 .button {
   grid-column: span 2;
   justify-self: end;
+}
+
+@media (max-width: 600px) {
+  .top-panel {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    overflow: scroll;
+    padding: 5px;
+    gap: 20px;
+  }
+
+  .button {
+    grid-column: 1;
+  }
+
 }
 </style>

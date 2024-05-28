@@ -20,9 +20,9 @@ const logoLink = computed(() => {
 
 const plusButtonLink = computed(() => {
   if (route.name === 'my-classes') {
-    return { name: 'home' }
+    return { name: 'create-student' }
   } else if (route.name === 'my-normatives') {
-    return { name: 'home' }
+    return { name: 'create-normative' }
   }
   return ''
 })

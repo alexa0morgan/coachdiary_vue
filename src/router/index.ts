@@ -6,6 +6,8 @@ import MyNormativesView from '@/views/MyNormativesView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import CreateOrUpdateNormativeView from '@/views/CreateOrUpdateNormativeView.vue'
 import CreateOrUpdateStudentView from '@/views/CreateOrUpdateStudentView.vue'
+import StudentView from '@/views/StudentView.vue'
+
 import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
@@ -79,7 +81,14 @@ const router = createRouter({
       component: ProfileView,
       meta: { mobileTitle: 'Профиль' },
       beforeEnter: isAuthenticated
-    }
+    },
+    {
+      path: '/app/my-classes/:id',
+      name: 'student',
+      component: StudentView,
+      meta:{ mobileTitle: 'Ученик'},
+      beforeEnter: isAuthenticated
+    },
   ]
 })
 

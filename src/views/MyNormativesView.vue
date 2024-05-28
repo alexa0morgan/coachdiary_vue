@@ -158,6 +158,7 @@ async function deleteNormative(): Promise<void> {
 .buttons-panel {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .button {
@@ -187,4 +188,37 @@ async function deleteNormative(): Promise<void> {
   height: calc(100vh - 220px);
 }
 
+@media (max-width: 600px) {
+  a.v-btn {
+    display: none;
+  }
+
+  button.v-btn {
+    height: 1.5em;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 0 10px 10px;
+    margin: 5px 0;
+  }
+
+  .buttons-panel {
+    gap: 5px;
+  }
+
+  .data-table-side-nav {
+    height: 200px
+  }
+
+  .standards-tables {
+    order: 1;
+  }
+
+  @media (max-width: 430px) {
+    button.v-btn {
+      height: 1.3em;
+    }
+  }
+}
 </style>

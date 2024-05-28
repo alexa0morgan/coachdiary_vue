@@ -16,6 +16,9 @@
   padding: 5px 0;
   height: 60px;
   background-color: rgb(var(--v-theme-primary));
+  @media (max-width: 760px) {
+    height: 70px;
+  }
 }
 
 .inner-container {
@@ -31,7 +34,7 @@
   font-weight: bold;
 
   @media (max-width: 1230px) {
-    padding-inline: 8px;
+    padding: 8px;
   }
 }
 

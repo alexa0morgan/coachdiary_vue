@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TopPanel from '@/components/TopPanel.vue'
-import { computed, onMounted, ref} from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyClassesTable from '@/components/MyClassesTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
@@ -120,13 +120,13 @@ function acceptFilters() {
 
 async function saveStudentsValue() {
   try {
-        const request: StudentValueRequest[] = filteredData.value
-          .filter(v => v.value !== null && v.value)
-          .map(student => ({
-          student_id: student.id,
-          standard_id: selectedNormativeId.value,
-          value: student.value,
-        }))
+    const request: StudentValueRequest[] = filteredData.value
+      .filter(v => v.value !== null && v.value)
+      .map(student => ({
+        student_id: student.id,
+        standard_id: selectedNormativeId.value,
+        value: student.value
+      }))
 
     const response = await post('/api/students/results/create_or_update/', request)
 
@@ -174,7 +174,7 @@ async function saveStudentsValue() {
 
   <div class="grid">
 
-    <FilterBlock v-model="filters" @accept="acceptFilters" />
+    <FilterBlock v-model="filters" class="filters-block" @accept="acceptFilters" />
 
     <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType"
                     @saveData="saveStudentsValue" />
@@ -182,14 +182,13 @@ async function saveStudentsValue() {
     <DataTableSideNav v-model="selectedNormativeId" :data="normatives" title="Нормативы" class="data-table-side-nav"
                       :has-action-buttons="false" @update:model-value="getStudentsData" />
   </div>
-
-
 </template>
 
 <style scoped>
 .buttons-panel {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .top-button {
@@ -218,6 +217,50 @@ async function saveStudentsValue() {
 
 .table {
   height: calc(100dvh - 180px);
+  max-width: calc(100dvw - 20px);
 }
+
+@media (max-width: 600px) {
+  a.v-btn {
+    display: none;
+  }
+
+  button.v-btn {
+    height: 1.5em;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 0 10px 10px;
+    margin: 5px 0;
+  }
+
+  .buttons-panel {
+    gap: 5px;
+  }
+
+  .filters-block {
+    @media (max-width: 600px) {
+      width: 100%;
+      height: 200px;
+    }
+  }
+
+  .data-table-side-nav {
+    order: 1;
+    height: 200px
+  }
+
+  .table {
+    order: 2;
+  }
+}
+
+@media (max-width: 430px) {
+  button.v-btn {
+    height: 1.3em;
+  }
+}
+
 
 </style>
