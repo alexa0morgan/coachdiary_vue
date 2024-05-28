@@ -84,10 +84,7 @@ function clearFilters(): void {
   padding: 12px;
   overflow: hidden;
   @media (max-width: 600px){
-    height: 200px;
     width: 100%;
-    display: flex;
-    flex-direction: row;
   }
 }
 
