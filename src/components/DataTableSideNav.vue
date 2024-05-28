@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { watch } from 'vue'
 
-const { title, data, isNormativeTypeSkills, isContentStaticText, hasActionButtons = true} = defineProps<{
+const { title, data, isNormativeTypeSkills, isContentStaticText, hasActionButtons = true } = defineProps<{
   title: string;
   data: {
     label: string;
@@ -19,7 +19,7 @@ const emit = defineEmits<{
 }>()
 
 
-const selectedId = defineModel<number>({default: -1, required: false})
+const selectedId = defineModel<number>({ default: -1, required: false })
 
 function onSelect(id: number): void {
   selectedId.value = id
@@ -33,20 +33,20 @@ watch(() => data, () => {
 <template>
   <div class="container">
     <div class="title">{{ title }}</div>
-    <div class="data" :class="{'grid': isNormativeTypeSkills}">
+    <div :class="{'grid': isNormativeTypeSkills}" class="data">
       <template v-if="!isContentStaticText">
-        <v-btn v-for="item in data" :key="item.id" class="button" :text="item.label" variant="outlined" size="small"
-               block @click="onSelect(item.id)" :active="selectedId === item.id" :ripple="false" />
+        <v-btn v-for="item in data" :key="item.id" :active="selectedId === item.id" :ripple="false" :text="item.label" block
+               class="button" size="small" variant="outlined" @click="onSelect(item.id)" />
       </template>
       <template v-else>
         <div v-for="item in data" :key="item.id" class="static-text">{{ item.label }}</div>
       </template>
     </div>
     <div v-if="hasActionButtons" class="action-buttons">
-      <v-btn text="Изменить" variant="outlined"
-             color="primary-darken-1" size="small"
-             class="button action-button" @click="emit('edit')" />
-      <v-btn v-if="hasDeleteMenu" variant="outlined" color="error" size="small" class="button action-button">
+      <v-btn class="button action-button" color="primary-darken-1"
+             size="small" text="Изменить"
+             variant="outlined" @click="emit('edit')" />
+      <v-btn v-if="hasDeleteMenu" class="button action-button" color="error" size="small" variant="outlined">
         Удалить
         <v-menu activator="parent">
           <v-list density="compact">
@@ -62,7 +62,7 @@ watch(() => data, () => {
           </v-list>
         </v-menu>
       </v-btn>
-      <v-btn v-else variant="outlined" color="error" size="small" class="button action-button">
+      <v-btn v-else class="button action-button" color="error" size="small" variant="outlined">
         Удалить
         <v-dialog activator="parent" max-width="340">
           <template v-slot:default="{ isActive }">

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 
 import { useDisplay } from 'vuetify'
 import { computed, ref } from 'vue'
@@ -29,7 +29,7 @@ const plusButtonLink = computed(() => {
 
 async function logout() {
   await userStore.logout()
-  router.push({name: 'login'})
+  router.push({ name: 'login' })
 }
 
 const mobileTitle = computed(() => route.meta.mobileTitle)
@@ -37,25 +37,25 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
 </script>
 
 <template>
-  <v-navigation-drawer v-model="isMenuOpen" v-if="!smAndUp">
-    <v-list-item title="Дневник Тренера" :to="logoLink" />
+  <v-navigation-drawer v-if="!smAndUp" v-model="isMenuOpen">
+    <v-list-item :to="logoLink" title="Дневник Тренера" />
     <v-divider />
     <template v-if="!isLoggedInView">
-      <v-list-item link href="/#AboutSite" title="О сайте" />
-      <v-list-item link href="/#Capabilities" title="Возможности" />
-      <v-list-item link href="/#AboutUs" title="О нас" />
+      <v-list-item href="/#AboutSite" link title="О сайте" />
+      <v-list-item href="/#Capabilities" link title="Возможности" />
+      <v-list-item href="/#AboutUs" link title="О нас" />
     </template>
     <template v-else>
-      <v-list-item link :to="{name: 'my-classes'}" title="Мои классы" />
-      <v-list-item link :to="{name: 'my-normatives'}" title="Мои нормативы" />
-      <v-list-item link :to="{name: 'profile'}" title="Профиль" />
+      <v-list-item :to="{name: 'my-classes'}" link title="Мои классы" />
+      <v-list-item :to="{name: 'my-normatives'}" link title="Мои нормативы" />
+      <v-list-item :to="{name: 'profile'}" link title="Профиль" />
     </template>
   </v-navigation-drawer>
 
   <v-app-bar :elevation="2">
     <v-app-bar-title>
-      <router-link v-if="smAndUp" class="title" :to="logoLink">
-        <img src="/whistle.svg" alt="logo" class="icon" />
+      <router-link v-if="smAndUp" :to="logoLink" class="title">
+        <img alt="logo" class="icon" src="/whistle.svg" />
         <span class="text-title">Дневник тренера</span>
       </router-link>
       <div v-else class="text-center mr-4 mobile-title">{{ mobileTitle }}</div>
@@ -71,23 +71,23 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
         <template v-if="!isLoggedInView">
 
           <template v-if="smAndUp">
-            <v-btn variant="text" href="/#AboutSite">О сайте</v-btn>
-            <v-btn variant="text" href="/#Capabilities">Возможности</v-btn>
-            <v-btn variant="text" href="/#AboutUs">О нас</v-btn>
+            <v-btn href="/#AboutSite" variant="text">О сайте</v-btn>
+            <v-btn href="/#Capabilities" variant="text">Возможности</v-btn>
+            <v-btn href="/#AboutUs" variant="text">О нас</v-btn>
           </template>
 
-          <v-btn v-if="!isLoginPage" variant="flat" :to="{name: 'login'}" rounded>Войти</v-btn>
+          <v-btn v-if="!isLoginPage" :to="{name: 'login'}" rounded variant="flat">Войти</v-btn>
         </template>
 
         <template v-else-if="smAndUp">
-          <v-btn variant="text" :to="{name: 'my-classes'}">Мои классы</v-btn>
-          <v-btn variant="text" :to="{name: 'my-normatives'}">Мои нормативы</v-btn>
-          <v-btn variant="text" :to="{name: 'profile'}">Профиль</v-btn>
-          <v-btn variant="flat" rounded @click="logout">Выйти</v-btn>
+          <v-btn :to="{name: 'my-classes'}" variant="text">Мои классы</v-btn>
+          <v-btn :to="{name: 'my-normatives'}" variant="text">Мои нормативы</v-btn>
+          <v-btn :to="{name: 'profile'}" variant="text">Профиль</v-btn>
+          <v-btn rounded variant="flat" @click="logout">Выйти</v-btn>
         </template>
 
         <template v-else-if="!smAndUp && plusButtonLink">
-          <v-btn variant="outlined" icon="mdi-plus" size="small" :to="plusButtonLink" />
+          <v-btn :to="plusButtonLink" icon="mdi-plus" size="small" variant="outlined" />
         </template>
       </div>
 
@@ -119,7 +119,7 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
 }
 
 @media (max-width: 760px) {
-  .text-title{
+  .text-title {
     display: none;
   }
 }

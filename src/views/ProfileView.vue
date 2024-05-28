@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+<script lang="ts" setup>
+import { computed, onMounted, ref } from 'vue'
 import { get, patch, put } from '@/utils'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
@@ -85,19 +85,19 @@ const isSetPasswordButtonDisabled = computed(() => {
       </div>
       <div class="text-fields">
         <v-text-field
+          v-model="name"
           clearable
-          label="Полное имя"
-          v-model="name" />
+          label="Полное имя" />
         <v-text-field
+          v-model="email"
           clearable
           label="Почта"
-          type="email"
-          v-model="email" />
+          type="email" />
         <v-btn
+          :disabled="isSendButtonDisabled"
+          class="button"
           rounded
           text="Сохранить"
-          class="button"
-          :disabled="isSendButtonDisabled"
           @click="patchData" />
       </div>
     </div>
@@ -105,25 +105,25 @@ const isSetPasswordButtonDisabled = computed(() => {
       <div class="text">Смена пароля</div>
       <div class="text-fields">
         <v-text-field
+          v-model="password"
           clearable
-          type="password"
           label="Старый пароль"
-          v-model="password" />
+          type="password" />
         <v-text-field
+          v-model="newPassword"
           clearable
           label="Новый пароль"
-          type="password"
-          v-model="newPassword" />
+          type="password" />
         <v-text-field
+          v-model="passwordConfirmation"
           clearable
           label="Проверка пароля"
-          type="password"
-          v-model="passwordConfirmation" />
+          type="password" />
         <v-btn
-          rounded
-          text="Установить"
           :disabled="isSetPasswordButtonDisabled"
           class="button"
+          rounded
+          text="Установить"
           @click="putPassword" />
       </div>
     </div>

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 defineProps<{
   icon: string;
   title: string;
@@ -7,8 +7,8 @@ defineProps<{
 
 <template>
   <div class="card rounded-lg">
-    <v-icon :icon size="48px"/>
-      <p class="title">{{ title }}</p>
+    <v-icon :icon size="48px" />
+    <p class="title">{{ title }}</p>
     <p class="description">
       <slot />
     </p>
@@ -24,7 +24,7 @@ defineProps<{
   text-align: center;
   align-items: stretch;
   color: rgb(var(--v-theme-primary));
-  padding: 20px 20px 30px 20px ;
+  padding: 20px 20px 30px 20px;
   background: rgb(var(--v-theme-surface));
   border: 1px solid rgb(var(--v-another-surface));
   font-size: 20px;
@@ -38,7 +38,7 @@ defineProps<{
 }
 
 .description {
-  grid-column: 1/span 2 ;
+  grid-column: 1/span 2;
   color: black;
 }
 

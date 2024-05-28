@@ -1,17 +1,17 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import AboutSiteCart from '@/components/AboutSiteCard.vue'
 import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 </script>
 
 <template>
-  <v-img class="main-img" src="/luthfi-alfarizi-8i_KGxVeLtQ-unsplash.jpg" cover>
+  <v-img class="main-img" cover src="/luthfi-alfarizi-8i_KGxVeLtQ-unsplash.jpg">
     <div class="main-img-overlay">
       <h1 class="main-text main-header">Дневник Тренера</h1>
       <p class="main-text describe">Универсальное приложение для тренеров спортивных секций и учителей физической
         культуры</p>
     </div>
   </v-img>
-  <section class="anchor-scroll" id="AboutSite">
+  <section id="AboutSite" class="anchor-scroll">
     <h2 class="header">Почему "CoachDiary"?</h2>
 
     <AboutSiteCart src="/картинка.jpg">Добро пожаловать в “Coachdiary” – ваш надежный
@@ -19,7 +19,7 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
       в управлении и контроле успеваемости учеников спортивных секций! Он создан специально для тренеров и учителей
       физкультуры. “CoachDiary” - уникальный сервис для эффективного отслеживания и анализа прогресса каждого ученика.
     </AboutSiteCart>
-    <AboutSiteCart src="/jesse-orrico-mse1vdzZXjA-unsplash.jpg" mirrored>В мире, где спорт играет ключевую роль в
+    <AboutSiteCart mirrored src="/jesse-orrico-mse1vdzZXjA-unsplash.jpg">В мире, где спорт играет ключевую роль в
       физическом и
       психологическом развитии молодежи, важность четкого и организованного подхода к тренировочному процессу не может
       быть переоценена. “Coachdiary” призван стать инструментом в руках тренеров, предлагая комплексное решение для
@@ -34,10 +34,10 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
     <p class="text">Присоединяйтесь к “Coachdiary” сегодня и начните новую эру в управлении спортивным
       обучением!</p>
     <div class="text">
-      <v-btn class="join-btn" variant="flat" rounded size="x-large" :to="{name: 'login'}">Зарегистрироваться</v-btn>
+      <v-btn :to="{name: 'login'}" class="join-btn" rounded size="x-large" variant="flat">Зарегистрироваться</v-btn>
     </div>
   </section>
-  <section class="anchor-scroll" id="Capabilities">
+  <section id="Capabilities" class="anchor-scroll">
     <h2 class="header">Возможности сервиса</h2>
     <div class="cap-container">
       <CapabilitiesCard icon="mdi-arrow-up-thin-circle-outline" title="Вход и создание аккаунта">Пользователи могут
@@ -67,7 +67,7 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
       развитию и достижению лучших результатов.</p>
   </section>
 
-  <section class="anchor-scroll" id="AboutUs">
+  <section id="AboutUs" class="anchor-scroll">
     <h2 class="header">О нас</h2>
     <p class="text" style="text-align: left">Мы — группа студентов, увлеченных идеей создания эффективных решений для
       тренеров и учителей физкультуры. Веря в силу спорта как средства для развития и самосовершенствования, мы решили

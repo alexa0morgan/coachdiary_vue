@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { VDataTable } from 'vuetify/components'
 import { computed, ref } from 'vue'
 import type { StudentStandardRequest } from '@/types/types'
@@ -84,16 +84,16 @@ function getMarkColor(mark?: number): string {
 </script>
 <template>
   <v-data-table
+    :fixed-header="true"
     :headers="headers"
     :items="data"
-    :sort-by="[{ key: 'number', order: 'asc' }]"
-    :fixed-header="true"
     :itemsPerPageOptions="[10, 20, { title: 'Все', value: -1 }]"
+    :mobile="true"
     :show-current-page="true"
-    item-key="id"
-    no-data-text="Нет данных о нормативах на данном уровне"
+    :sort-by="[{ key: 'number', order: 'asc' }]"
     class="table"
-    :mobile="true">
+    item-key="id"
+    no-data-text="Нет данных о нормативах на данном уровне">
     <template #item.result="{item}">
       <v-text-field
         v-if="item.has_numeric_value"
@@ -103,7 +103,7 @@ function getMarkColor(mark?: number): string {
       <span v-else> нет</span>
     </template>
     <template #item.rate="{item}">
-      <span :class="getMarkColor(item.rate ?? 0)" class="mark" v-if="item.has_numeric_value"> {{ item.rate }}</span>
+      <span v-if="item.has_numeric_value" :class="getMarkColor(item.rate ?? 0)" class="mark"> {{ item.rate }}</span>
       <v-text-field
         v-else
         v-model="item.rate"
@@ -118,7 +118,7 @@ function getMarkColor(mark?: number): string {
       </tr>
     </template>
     <template #footer.prepend>
-      <v-btn @click="saveData" class="button" color="primary">Сохранить</v-btn>
+      <v-btn class="button" color="primary" @click="saveData">Сохранить</v-btn>
       <div class="space" />
     </template>
   </v-data-table>

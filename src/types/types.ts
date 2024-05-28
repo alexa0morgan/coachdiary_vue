@@ -76,7 +76,7 @@ export type StudentValueRequest = {
 
 export type FilterData = {
   gender: GenderNullable,
-  grades: (number| null)[],
+  grades: (number | null)[],
   birthYearFrom: number | null,
   birthYearUntil: number | null
 }
@@ -87,8 +87,8 @@ export type StudentStandardResponse = {
     Name: string,
     Has_numeric_value: boolean
   },
-  Grade:	number | null,
-  Value:	number | null,
+  Grade: number | null,
+  Value: number | null,
   Level_number: number
 }
 export type StudentStandardRequest = {

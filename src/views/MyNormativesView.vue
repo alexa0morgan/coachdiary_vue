@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 
 import StandardsTable from '@/components/StandardsTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
@@ -76,21 +76,21 @@ async function deleteNormative(): Promise<void> {
     <div class="buttons-panel">
       <v-btn
         v-for="n in 11"
-        :text="n + ' УР'"
         :key="n"
-        :variant="activeLevelNumber === n ? 'flat' : 'outlined'"
         :disabled="!levels.includes(n)"
+        :text="n + ' УР'"
+        :variant="activeLevelNumber === n ? 'flat' : 'outlined'"
         class="level-button button"
         color="rgb(var(--v-theme-secondary))"
         @click="setFirst(n)" />
     </div>
     <template #right>
-      <v-btn icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
-             :to="{name: 'create-normative'}" />
+      <v-btn :to="{name: 'create-normative'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
+             variant="outlined" />
     </template>
   </TopPanel>
 
-  <div class="grid" :class="{'skills-grid': pageType === 'skills'}" v-auto-animate>
+  <div v-auto-animate :class="{'skills-grid': pageType === 'skills'}" class="grid">
     <div v-if="pageType === 'standards'" class="standards-tables">
       <template v-if="currentStandardLevels">
         <StandardsTable
@@ -98,8 +98,8 @@ async function deleteNormative(): Promise<void> {
           :key="level.id"
           :gender="level.gender"
           :high="level.high_level_value"
-          :middle="level.middle_level_value"
-          :low="level.low_level_value" />
+          :low="level.low_level_value"
+          :middle="level.middle_level_value" />
       </template>
     </div>
 
@@ -107,28 +107,28 @@ async function deleteNormative(): Promise<void> {
     <div>
       <div class="side-nav-buttons">
         <v-btn
-          text="Стандарты"
-          class="button side-nav-button"
-          variant="outlined"
-          size="small"
           :active="pageType==='standards'"
+          class="button side-nav-button"
+          size="small"
+          text="Стандарты"
+          variant="outlined"
           @click="pageType = 'standards'; setFirst()" />
         <v-btn
-          text="Умения"
-          variant="outlined"
+          :active="pageType==='skills'"
           class="button side-nav-button"
           size="small"
-          :active="pageType==='skills'"
+          text="Умения"
+          variant="outlined"
           @click="pageType = 'skills'; setFirst()" />
       </div>
       <DataTableSideNav
         v-model="selectedId"
         :data="simplifiedNormatives"
-        :title="pageType==='standards' ? 'Стандарты' : 'Умения'"
         :is-page-type-skills="pageType==='skills'"
+        :title="pageType==='standards' ? 'Стандарты' : 'Умения'"
         class="data-table-side-nav"
-        @edit="editNormative"
         @delete="deleteNormative"
+        @edit="editNormative"
       />
     </div>
   </div>

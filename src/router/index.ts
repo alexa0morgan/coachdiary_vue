@@ -86,9 +86,9 @@ const router = createRouter({
       path: '/app/my-classes/:id',
       name: 'student',
       component: StudentView,
-      meta:{ mobileTitle: 'Ученик'},
+      meta: { mobileTitle: 'Ученик' },
       beforeEnter: isAuthenticated
-    },
+    }
   ]
 })
 

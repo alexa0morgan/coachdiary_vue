@@ -1,9 +1,9 @@
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts" setup>
+
 const props = defineProps<{
   classNumber: number;
 }>()
-const activeLevel = defineModel<number>({default: -1, required: false})
+const activeLevel = defineModel<number>({ default: -1, required: false })
 const emit = defineEmits<{
   levelChanged: []
 }>()
@@ -12,12 +12,12 @@ const emit = defineEmits<{
 <template>
   <div class="container">
     <div class="inner-container">
-        <div class="buttons-panel">
-            <span class="header">уровни</span>
-            <v-btn size="small" class="level-button button" v-for="n in classNumber" :text="n + ' уровень'" :key="n"
-                :variant="activeLevel === n ? 'flat' : 'outlined'" color="black"
-                @click="activeLevel = n, emit('levelChanged')" />
-        </div>
+      <div class="buttons-panel">
+        <span class="header">уровни</span>
+        <v-btn v-for="n in classNumber" :key="n" :text="n + ' уровень'" :variant="activeLevel === n ? 'flat' : 'outlined'" class="level-button button"
+               color="black" size="small"
+               @click="activeLevel = n, emit('levelChanged')" />
+      </div>
     </div>
   </div>
 </template>
@@ -27,6 +27,7 @@ const emit = defineEmits<{
   padding: 5px 0;
   height: 60px;
 }
+
 .inner-container {
   display: flex;
   margin: 0 auto;
@@ -41,12 +42,14 @@ const emit = defineEmits<{
     padding-inline: 10px;
   }
 }
+
 .header {
   font-weight: 700;
   @media (max-width: 1230px) {
     font-size: 15px;
   }
 }
+
 .buttons-panel {
   display: flex;
   gap: 5px;
@@ -56,6 +59,7 @@ const emit = defineEmits<{
     padding: 10px
   }
 }
+
 .button {
   border-radius: var(--v-border-button-radius);
   text-transform: uppercase;
@@ -65,6 +69,7 @@ const emit = defineEmits<{
     height: 20px !important;
   }
 }
+
 .level-button.v-btn--variant-flat {
   border: 3px solid rgb(var(--v-theme-primary)) !important;
   background: rgb(var(--v-theme-surface)) !important;

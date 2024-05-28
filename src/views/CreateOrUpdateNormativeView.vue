@@ -1,15 +1,15 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 
 import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { NormativeResponse, NormativeRequest } from '@/types/types'
+import type { NormativeRequest, NormativeResponse } from '@/types/types'
 import { get, post, put } from '@/utils'
 import { useDisplay } from 'vuetify'
 
 const route = useRoute()
-const {mobile} = useDisplay()
+const { mobile } = useDisplay()
 const pageType = ref(route.name as 'create-normative' | 'update-normative')
 
 const normativeName = ref('')
@@ -180,7 +180,7 @@ onMounted(async () => {
 
   <TopPanel class="top-panel">{{ pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива' }}
   </TopPanel>
-  <div class="grid" v-auto-animate>
+  <div v-auto-animate class="grid">
 
     <FieldSet title="Тип">
       <v-radio-group v-model="normativeType" :disabled="pageType === 'update-normative'" row
@@ -190,7 +190,7 @@ onMounted(async () => {
       </v-radio-group>
     </FieldSet>
 
-    <v-text-field v-model="normativeName" label="Название" class="normative-name" />
+    <v-text-field v-model="normativeName" class="normative-name" label="Название" />
 
 
     <FieldSet title="Уровни">
@@ -207,44 +207,44 @@ onMounted(async () => {
         <div class="standards-table">
           <div class="standards">
             <div class="standards-table-title">Девочки</div>
-            <v-text-field v-model.number="levels[currentLevel].girls.high" label="Высокая ступень" type="number"
+            <v-text-field v-model.number="levels[currentLevel].girls.high" density="comfortable" label="Высокая ступень"
                           min="0"
-                          density="comfortable" />
-            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.middle"
-                          label="Средняя ступень" type="number"
+                          type="number" />
+            <v-text-field v-model.number="levels[currentLevel].girls.middle" class="standard-input"
+                          density="comfortable" label="Средняя ступень"
                           min="0"
-                          density="comfortable" />
-            <v-text-field class="standard-input" v-model.number="levels[currentLevel].girls.low" label="Низкая ступень"
-                          type="number" min="0"
-                          density="comfortable" />
+                          type="number" />
+            <v-text-field v-model.number="levels[currentLevel].girls.low" class="standard-input" density="comfortable"
+                          label="Низкая ступень" min="0"
+                          type="number" />
 
           </div>
           <div class="standards">
             <div class="standards-table-title">Мальчики</div>
-            <v-text-field v-model.number="levels[currentLevel].boys.high" label="Высокая ступень" type="number"
+            <v-text-field v-model.number="levels[currentLevel].boys.high" density="comfortable" label="Высокая ступень"
                           min="0"
-                          density="comfortable" />
-            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.middle"
-                          label="Средняя ступень" type="number"
+                          type="number" />
+            <v-text-field v-model.number="levels[currentLevel].boys.middle" class="standard-input"
+                          density="comfortable" label="Средняя ступень"
                           min="0"
-                          density="comfortable" />
-            <v-text-field class="standard-input" v-model.number="levels[currentLevel].boys.low" label="Низкая ступень"
-                          type="number" min="0"
-                          density="comfortable" />
+                          type="number" />
+            <v-text-field v-model.number="levels[currentLevel].boys.low" class="standard-input" density="comfortable"
+                          label="Низкая ступень" min="0"
+                          type="number" />
           </div>
         </div>
 
         <div class="pagination">
-          <v-btn :disabled="isPreviousLevelButtonDisabled" :text="mobile ? '' : 'Предыдущий уровень' " variant="text"
-                 prepend-icon="mdi-arrow-left" @click="toPreviousLevel" />
+          <v-btn :disabled="isPreviousLevelButtonDisabled" :text="mobile ? '' : 'Предыдущий уровень' " prepend-icon="mdi-arrow-left"
+                 variant="text" @click="toPreviousLevel" />
           <div>{{ currentLevel }} ур</div>
-          <v-btn :disabled="isNextLevelButtonDisabled" :text="mobile ? '' : 'Следующий уровень'" variant="text"
-                 append-icon="mdi-arrow-right" @click="toNextLevel" />
+          <v-btn :disabled="isNextLevelButtonDisabled" :text="mobile ? '' : 'Следующий уровень'" append-icon="mdi-arrow-right"
+                 variant="text" @click="toNextLevel" />
         </div>
       </template>
 
     </FieldSet>
-    <v-btn :disabled="isSaveButtonDisabled" text="Сохранить" color="primary" rounded class="button"
+    <v-btn :disabled="isSaveButtonDisabled" class="button" color="primary" rounded text="Сохранить"
            @click="createOrUpdateNormative" />
   </div>
 

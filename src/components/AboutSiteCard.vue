@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 defineProps<{
   src: string;
   mirrored?: boolean;
@@ -6,9 +6,9 @@ defineProps<{
 </script>
 
 <template>
-  <div class="container" :class="{mirrored}">
+  <div :class="{mirrored}" class="container">
     <div class=" img-border rounded-xl">
-      <v-img class="img rounded-xl" :src alt="" cover />
+      <v-img :src alt="" class="img rounded-xl" cover />
     </div>
     <p class="text">
       <slot />
@@ -84,8 +84,9 @@ defineProps<{
   .text {
     font-size: 16px;
   }
+
   .container {
-    gap:20px
+    gap: 20px
   }
 }
 

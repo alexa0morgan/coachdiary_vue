@@ -1,15 +1,16 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import TopPanel from '@/components/TopPanel.vue'
 import { computed, onMounted, ref } from 'vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyClassesTable from '@/components/MyClassesTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
 import type {
-  StudentResponse,
   ClassRequest,
+  FilterData,
   NormativeResponse,
+  StudentResponse,
   StudentsValueResponse,
-  FilterData, StudentValueRequest
+  StudentValueRequest
 } from '@/types/types'
 import { get, post } from '@/utils'
 
@@ -146,14 +147,14 @@ async function saveStudentsValue() {
 <template>
   <TopPanel>
     <div class="buttons-panel">
-      <v-btn class="level-button top-button" v-for="n in 11" :key="n"
-             :disabled="!(n in classes)"
-             :variant="activeLevelNumber === n ? 'flat' : 'outlined'" color="rgb(var(--v-theme-secondary))">
+      <v-btn v-for="n in 11" :key="n" :disabled="!(n in classes)"
+             :variant="activeLevelNumber === n ? 'flat' : 'outlined'"
+             class="level-button top-button" color="rgb(var(--v-theme-secondary))">
         {{ n }}{{ activeLevelNumber === n ? className : '' }}
         <v-menu activator="parent" location="bottom center" offset="5"
                 transition="slide-y-transition">
-          <v-list density="compact" bg-color="rgb(var(--v-theme-primary))"
-                  base-color="rgb(var(--v-theme-secondary))" elevation="0">
+          <v-list base-color="rgb(var(--v-theme-secondary))" bg-color="rgb(var(--v-theme-primary))"
+                  density="compact" elevation="0">
             <v-list-item v-for="letter in classes[n]" :key='n + letter' class="text-center"
                          @click="activeLevelClick(n, letter)">
               <v-list-item-title>{{ letter.toUpperCase() }}</v-list-item-title>
@@ -167,8 +168,8 @@ async function saveStudentsValue() {
       </v-btn>
     </div>
     <template #right>
-      <v-btn icon="mdi-plus" variant="outlined" color="rgb(var(--v-theme-secondary))"
-             :to="{name: 'create-student'}" />
+      <v-btn :to="{name: 'create-student'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
+             variant="outlined" />
     </template>
   </TopPanel>
 
@@ -176,11 +177,11 @@ async function saveStudentsValue() {
 
     <FilterBlock v-model="filters" class="filters-block" @accept="acceptFilters" />
 
-    <MyClassesTable class="table" :data="filteredData" :standard-type="selectedNormativeType"
+    <MyClassesTable :data="filteredData" :standard-type="selectedNormativeType" class="table"
                     @saveData="saveStudentsValue" />
 
-    <DataTableSideNav v-model="selectedNormativeId" :data="normatives" title="Нормативы" class="data-table-side-nav"
-                      :has-action-buttons="false" @update:model-value="getStudentsData" />
+    <DataTableSideNav v-model="selectedNormativeId" :data="normatives" :has-action-buttons="false" class="data-table-side-nav"
+                      title="Нормативы" @update:model-value="getStudentsData" />
   </div>
 </template>
 

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 
 import type { VDataTable } from 'vuetify/components'
 import type { StudentsValueResponse } from '@/types/types'
@@ -55,22 +55,22 @@ function getMarkColor(mark?: number): string {
 
 <template>
   <v-data-table
+    :fixed-header="true"
     :headers="headers"
     :items="data"
-    :sort-by="[{ key: 'name', order: 'asc' }]"
-    :fixed-header="true"
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
-    :show-current-page="true"
     :mobile="null"
-    no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив справа"
-    item-key="name"
+    :show-current-page="true"
+    :sort-by="[{ key: 'name', order: 'asc' }]"
     class="table"
+    item-key="name"
+    no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив справа"
   >
     <template #item.class="{item}">
       {{ item.student_class.number + item.student_class.class_name }}
     </template>
     <template #item.full_name="{item}">
-      <v-btn class="button" :to="{name: 'student', params: { id: item.id } }" variant="tonal">{{ item.full_name }}
+      <v-btn :to="{name: 'student', params: { id: item.id } }" class="button" variant="tonal">{{ item.full_name }}
       </v-btn>
     </template>
     <template #item.gender="{item}">

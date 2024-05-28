@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
 import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
 import DataTable from '@/components/DataTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
-import { get, del, post } from '@/utils'
-import type { StudentResponse, StudentStandardResponse, StudentStandardRequest } from '@/types/types'
+import { del, get, post } from '@/utils'
+import type { StudentResponse, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 
@@ -111,18 +111,18 @@ async function postData() {
     <div class="main">
       <DataTable
         v-model="changedData"
-        class="table"
         :data="normatives"
+        class="table"
         @dataChanged="postData" />
       <DataTableSideNav
-        class="info-panel"
-        :title="'Информация'"
         :data="labels"
+        :hasDeleteMenu="false"
         :isContentStaticText="true"
         :pageType="'student'"
-        :hasDeleteMenu="false"
-        @edit="editStudent"
-        @delete="deleteStudent" />
+        :title="'Информация'"
+        class="info-panel"
+        @delete="deleteStudent"
+        @edit="editStudent" />
     </div>
 
   </div>

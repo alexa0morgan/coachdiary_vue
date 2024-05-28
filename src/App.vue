@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { RouterView } from 'vue-router'
 import AppBar from '@/components/AppBar.vue'
 import { useUserStore } from '@/stores/user'

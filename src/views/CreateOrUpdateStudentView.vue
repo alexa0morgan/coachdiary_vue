@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 
 import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
 import { useRoute } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import { get, post, put } from '@/utils'
-import type { Gender, GenderNullable, StudentResponse, StudentRequest } from '@/types/types'
+import type { Gender, GenderNullable, StudentRequest, StudentResponse } from '@/types/types'
 
 const route = useRoute()
 const pageType = ref(route.name as 'create-student' | 'update-student')
@@ -71,7 +71,7 @@ async function createOrUpdateStudent() {
 
 <template>
   <TopPanel class="top-panel">{{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}</TopPanel>
-  <div class="grid" v-auto-animate>
+  <div v-auto-animate class="grid">
     <div class="left">
       <v-text-field v-model="studentName" class="text-field" label="ФИО" />
 
@@ -98,7 +98,7 @@ async function createOrUpdateStudent() {
                     @update:model-value="className=$event.toUpperCase()" />
     </FieldSet>
 
-    <v-btn :disabled="isSaveButtonDisabled" text="Сохранить" color="primary" rounded class="button"
+    <v-btn :disabled="isSaveButtonDisabled" class="button" color="primary" rounded text="Сохранить"
            @click="createOrUpdateStudent" />
   </div>
 </template>

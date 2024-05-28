@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -128,54 +128,54 @@ async function restore() {
           v-if="pageType === 'signUp'"
           v-model="name"
           :disabled="isLoading"
-          variant="outlined"
-          label="Имя"
-          placeholder="ФИО"
           clearable
+          label="Имя"
           persistent-clear
+          placeholder="ФИО"
+          variant="outlined"
         />
         <v-text-field
           v-model="email"
           :disabled="isLoading"
-          variant="outlined"
-          label="Почта"
-          placeholder="example@example.com"
           clearable
+          label="Почта"
           persistent-clear
+          placeholder="example@example.com"
+          variant="outlined"
         />
         <v-text-field
           v-if="pageType !== 'restore'"
           v-model="password"
+          :append-inner-icon="password ? 'mdi-eye' : undefined"
           :disabled="isLoading"
           :type="passwordType"
-          variant="outlined"
-          label="Пароль"
           clearable
+          label="Пароль"
           persistent-clear
-          :append-inner-icon="password ? 'mdi-eye' : undefined"
+          variant="outlined"
           @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
         />
         <v-text-field
           v-if="pageType === 'signUp'"
           v-model="passwordConfirmation"
+          :append-inner-icon="password ? 'mdi-eye' : undefined"
           :disabled="isLoading"
           :type="passwordType"
-          variant="outlined"
-          label="Повторите пароль"
           clearable
+          label="Повторите пароль"
           persistent-clear
-          :append-inner-icon="password ? 'mdi-eye' : undefined"
+          variant="outlined"
           @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
         />
-        <v-btn :text="buttonText" :disabled="isSendButtonDisabled || isLoading" class="button" rounded
+        <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
                @click="sendData" />
       </div>
       <div v-if="pageType==='signIn'">
-        <v-btn :disabled="isLoading" text="Регистрация" variant="text" size="small" @click="pageType = 'signUp'" />
-        <v-btn :disabled="isLoading" text="Восстановление пароля" variant="text" size="small" @click="pageType =
+        <v-btn :disabled="isLoading" size="small" text="Регистрация" variant="text" @click="pageType = 'signUp'" />
+        <v-btn :disabled="isLoading" size="small" text="Восстановление пароля" variant="text" @click="pageType =
         'restore'" />
       </div>
-      <v-btn v-else :disabled="isLoading" text="Вернуться на страницу входа" variant="text" size="small"
+      <v-btn v-else :disabled="isLoading" size="small" text="Вернуться на страницу входа" variant="text"
              @click="pageType = 'signIn'" />
     </div>
   </div>
