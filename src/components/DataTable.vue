@@ -62,6 +62,20 @@ function saveData(): void{
     }).filter((item) => item !== undefined) as StudentStandardRequest
     emit('dataChanged');
 }
+function getMarkColor(mark?: number): string {
+  switch (mark) {
+    case 2:
+      return 'mark-bad'
+    case 3:
+      return 'mark-okay'
+    case 4:
+      return 'mark-good'
+    case 5:
+      return 'mark-great'
+    default:
+      return ''
+  }
+}
 </script>
 <template>
     <v-data-table
@@ -84,12 +98,12 @@ function saveData(): void{
                 @update:modelValue="onRateChange(item)"/>
             <span v-else> нет</span>
         </template>
-        <template #item.rate ="{item}" >
-            <span v-if="item.has_numeric_value"> {{ item.rate }}</span>
+        <template  #item.rate ="{item}" >
+            <span :class="getMarkColor(item.rate ?? 0)" class="mark" v-if="item.has_numeric_value"> {{ item.rate }}</span>
             <v-text-field 
                 v-else 
                 v-model="item.rate" 
-                class="changeable-fields" 
+                :class="getMarkColor(item.rate?? 0)" class="mark changeable-fields"
                 @update:modelValue="onRateChange(item)"/>
         </template>
         <template #body.append>
@@ -147,6 +161,28 @@ function saveData(): void{
 .table:deep(.v-data-table__tr):nth-child(odd) {
     background: rgb(var(--v-theme-background));
 }
+.mark {
+  font-weight: bold;
+  text-align: center;
+
+}
+
+.mark-bad {
+  color: red;
+}
+
+.mark-okay {
+  color: #ff8800;
+}
+
+.mark-good {
+  color: #0ecc00;
+}
+
+.mark-great {
+  color: green;
+}
+
 @media(max-width: 1280px){
     .table{
         font-weight: 400;

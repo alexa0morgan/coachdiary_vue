@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import {get, patch, put } from '@/utils'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
 onMounted(async()=>{
   await getData()
 })
+const userStore = useUserStore()
+const router = useRouter()
 const currentName = ref('')
 const currentEmail = ref('')
 const name = ref('')
@@ -50,6 +54,8 @@ async function putPassword() {
       newPassword.value = ''
       passwordConfirmation.value = ''
       alert('Пароль успешно обновлен')
+      await userStore.logout()
+      router.push({name: 'login'})
     } 
     else{
       return response.json()

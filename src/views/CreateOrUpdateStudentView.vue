@@ -70,7 +70,7 @@ async function createOrUpdateStudent() {
 </script>
 
 <template>
-  <TopPanel>{{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}</TopPanel>
+  <TopPanel class="top-panel">{{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}</TopPanel>
   <div class="grid" v-auto-animate>
     <div class="left">
       <v-text-field v-model="studentName" class="text-field" label="ФИО" />
@@ -171,5 +171,16 @@ async function createOrUpdateStudent() {
 .button {
   grid-column: span 2;
   justify-self: end;
+}
+@media (max-width: 600px) {
+  .top-panel{
+    display: none;
+  }
+  .grid{
+    display: flex;
+    flex-direction: column;
+    padding: 5px 5px;
+    align-items: space-between;
+  }
 }
 </style>
