@@ -69,23 +69,31 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 
   <section id="AboutUs" class="anchor-scroll">
     <h2 class="header">О нас</h2>
-    <p class="text" style="text-align: left">Мы — группа студентов, увлеченных идеей создания эффективных решений для
-      тренеров и учителей физкультуры. Веря в силу спорта как средства для развития и самосовершенствования, мы решили
+    <AboutSiteCart class="team-img" src="/team_photo.jpg">Мы — группа студентов, увлеченных идеей создания эффективных
+      решений для тренеров и учителей физкультуры. Веря в силу спорта как средства для развития и самосовершенствования, мы решили
       применить наши знания и навыки в программировании для создания Coachdiary.
-      <br>
-      <br>
+    </AboutSiteCart>
+    <p class="text" style="text-align: left">
       В процессе разработки Coachdiary, мы не только применили наши академические знания, но и учились на реальных
       задачах и вызовах. Каждый из нас внес уникальный вклад в проект, сочетая в себе разнообразные навыки и интересы
       — от веб-дизайна до программирования и анализа данных. Работая над Coachdiary, мы стремились создать инструмент,
       который был бы не только функциональным и удобным в использовании, но и вдохновлял пользователей на постоянное
       улучшение и достижение целей.
-      <br>
-      <br>
+    </p>
+    <div class="team_photos">
+      <img alt="Dasha" class="Dasha-img" src="/Dasha.jpg">
+    </div>
+    <p class="text" style="text-align: left">
       Наша миссия превышает рамки создания просто еще одного веб-сервиса. Мы хотим вдохновить спортивное сообщество на
       использование цифровых технологий как средства для улучшения тренировочного процесса, повышения мотивации и, в
       конечном итоге, достижения лучших результатов. Мы верим, что Coachdiary может стать мостом между традиционными
       методами тренировок и современными технологическими решениями, делая спорт более доступным и эффективным для
-      всех.</p>
+      всех.
+    </p>
+    <div class="team_photos">
+      <img alt="Vika" src="/Vika.jpg">
+      <img alt="Matvey" src="/Matvey.jpg">
+    </div>
   </section>
 
   <v-footer class="bg-grey-lighten-1 pt-7 text-center d-block">
@@ -151,7 +159,6 @@ section {
 
 .text {
   text-align: center;
-  padding: 0 10px;
   margin: 30px auto 0;
   max-width: 1200px;
 }
@@ -164,6 +171,28 @@ section {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+}
+
+.team-img :deep(.img-border) {
+  aspect-ratio: 1;
+}
+
+.team_photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 30px auto 0;
+  gap: 30px;
+  max-width: 1000px;
+}
+
+.team_photos > img {
+  width: 100%;
+}
+
+img.Dasha-img {
+  grid-column: span 2;
+  width: 50%;
+  justify-self: center;
 }
 
 @media (max-width: 800px) {
@@ -185,7 +214,7 @@ section {
 
   section {
     padding-top: 30px;
-    margin: 0 10px 30px;
+    margin: 0 20px 30px;
   }
 
   .text {
@@ -194,6 +223,19 @@ section {
 
   .join-btn {
     font-size: 16px;
+  }
+
+  .team-img :deep(.img-border) {
+    aspect-ratio: 1;
+    height: 100%;
+  }
+
+  .team_photos {
+    grid-template-columns: 1fr;
+  }
+
+  img.Dasha-img {
+    width: 100%;
   }
 }
 </style>
