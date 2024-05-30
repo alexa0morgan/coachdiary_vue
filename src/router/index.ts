@@ -104,7 +104,7 @@ function isAuthenticated(): RouteLocationRaw | undefined {
 function isNotAuthenticated(): RouteLocationRaw | undefined {
   if (useUserStore().isLoggedIn) {
     return {
-      name: 'app'
+      name: 'my-classes'
     }
   }
 }

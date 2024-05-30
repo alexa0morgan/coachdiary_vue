@@ -14,9 +14,9 @@ const emit = defineEmits<{
     <div class="inner-container">
       <div class="buttons-panel">
         <span class="header">уровни</span>
-        <v-btn v-for="n in classNumber" :key="n" :text="n + ' уровень'" :variant="activeLevel === n ? 'flat' : 'outlined'" class="level-button button"
-               color="black" size="small"
-               @click="activeLevel = n, emit('levelChanged')" />
+        <v-btn v-for="n in classNumber" :key="n" :text="n + ' уровень'"
+               :variant="activeLevel === n ? 'flat' : 'outlined'" class="level-button button"
+               color="black" size="small" @click="activeLevel = n; emit('levelChanged')" />
       </div>
     </div>
   </div>

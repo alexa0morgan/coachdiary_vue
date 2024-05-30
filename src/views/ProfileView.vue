@@ -74,6 +74,11 @@ const passwordConfirmation = ref('')
 const isSetPasswordButtonDisabled = computed(() => {
   return !(password.value?.trim().length && newPassword.value?.trim().length && newPassword.value?.trim() === passwordConfirmation.value?.trim())
 })
+
+const passwordType = ref<'password' | 'text'>('password')
+const newPasswordType = ref<'password' | 'text'>('password')
+const passwordConfirmationType = ref<'password' | 'text'>('password')
+
 </script>
 
 <template>
@@ -106,19 +111,32 @@ const isSetPasswordButtonDisabled = computed(() => {
       <div class="text-fields">
         <v-text-field
           v-model="password"
+          :append-inner-icon="password ? 'mdi-eye' : undefined"
+          :type="passwordType"
           clearable
           label="Старый пароль"
-          type="password" />
+          persistent-clear
+          @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
+        />
+
         <v-text-field
           v-model="newPassword"
+          :append-inner-icon="newPassword ? 'mdi-eye' : undefined"
+          :type="newPasswordType"
           clearable
           label="Новый пароль"
-          type="password" />
+          persistent-clear
+          @click:append-inner="newPasswordType = newPasswordType === 'password' ? 'text' : 'password'"
+        />
         <v-text-field
           v-model="passwordConfirmation"
+          :append-inner-icon="passwordConfirmation ? 'mdi-eye' : undefined"
+          :type="passwordConfirmationType"
           clearable
           label="Проверка пароля"
-          type="password" />
+          persistent-clear
+          @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
+        />
         <v-btn
           :disabled="isSetPasswordButtonDisabled"
           class="button"

@@ -235,11 +235,11 @@ onMounted(async () => {
         </div>
 
         <div class="pagination">
-          <v-btn :disabled="isPreviousLevelButtonDisabled" :text="mobile ? '' : 'Предыдущий уровень' " prepend-icon="mdi-arrow-left"
-                 variant="text" @click="toPreviousLevel" />
+          <v-btn :disabled="isPreviousLevelButtonDisabled" :text="mobile ? '' : 'Предыдущий уровень' "
+                 prepend-icon="mdi-arrow-left" variant="text" @click="toPreviousLevel" />
           <div>{{ currentLevel }} ур</div>
-          <v-btn :disabled="isNextLevelButtonDisabled" :text="mobile ? '' : 'Следующий уровень'" append-icon="mdi-arrow-right"
-                 variant="text" @click="toNextLevel" />
+          <v-btn :disabled="isNextLevelButtonDisabled" :text="mobile ? '' : 'Следующий уровень'"
+                 append-icon="mdi-arrow-right" variant="text" @click="toNextLevel" />
         </div>
       </template>
 

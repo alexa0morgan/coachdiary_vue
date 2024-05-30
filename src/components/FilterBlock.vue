@@ -35,8 +35,8 @@ function clearFilters(): void {
       <div>
         <div class="title">Пол</div>
         <div class="filter-gender">
-          <v-btn :active="filterData.gender
-            === 'f'" :ripple="false" class="button" size="small" text="Ж" variant="outlined" @click="selectGender('f')" />
+          <v-btn :active="filterData.gender === 'f'" :ripple="false" class="button" size="small"
+                 text="Ж" variant="outlined" @click="selectGender('f')" />
           <v-btn :active="filterData.gender==='m'" :ripple="false" class="button" size="small" text="М"
                  variant="outlined"
                  @click="selectGender('m')" />
@@ -55,10 +55,10 @@ function clearFilters(): void {
       <div>
         <div class="title title-year">Год рождения</div>
         <div class="filter-year">
-          <v-text-field v-model.number="filterData.birthYearFrom" :max="currentYear - 5" density="compact" label="От" min="1900"
-                        type="number" />
-          <v-text-field v-model.number="filterData.birthYearUntil" :max="currentYear - 5" density="compact" label="До" min="1900"
-                        type="number" />
+          <v-text-field v-model.number="filterData.birthYearFrom" :max="currentYear - 5" density="compact" label="От"
+                        min="1900" type="number" />
+          <v-text-field v-model.number="filterData.birthYearUntil" :max="currentYear - 5" density="compact" label="До"
+                        min="1900" type="number" />
         </div>
       </div>
     </div>

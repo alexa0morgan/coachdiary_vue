@@ -180,7 +180,8 @@ async function saveStudentsValue() {
     <MyClassesTable :data="filteredData" :standard-type="selectedNormativeType" class="table"
                     @saveData="saveStudentsValue" />
 
-    <DataTableSideNav v-model="selectedNormativeId" :data="normatives" :has-action-buttons="false" class="data-table-side-nav"
+    <DataTableSideNav v-model="selectedNormativeId" :data="normatives"
+                      :has-action-buttons="false" class="data-table-side-nav"
                       title="Нормативы" @update:model-value="getStudentsData" />
   </div>
 </template>

@@ -35,8 +35,8 @@ watch(() => data, () => {
     <div class="title">{{ title }}</div>
     <div :class="{'grid': isNormativeTypeSkills}" class="data">
       <template v-if="!isContentStaticText">
-        <v-btn v-for="item in data" :key="item.id" :active="selectedId === item.id" :ripple="false" :text="item.label" block
-               class="button" size="small" variant="outlined" @click="onSelect(item.id)" />
+        <v-btn v-for="item in data" :key="item.id" :active="selectedId === item.id" :ripple="false" :text="item.label"
+               block class="button" size="small" variant="outlined" @click="onSelect(item.id)" />
       </template>
       <template v-else>
         <div v-for="item in data" :key="item.id" class="static-text">{{ item.label }}</div>

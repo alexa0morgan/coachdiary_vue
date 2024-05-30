@@ -15,6 +15,7 @@ const password = ref('')
 const passwordConfirmation = ref('')
 
 const passwordType = ref<'password' | 'text'>('password')
+const passwordConfirmationType = ref<'password' | 'text'>('password')
 
 const isSendButtonDisabled = computed(() => {
   if (!/.@./.test(email.value)) {
@@ -158,14 +159,15 @@ async function restore() {
         <v-text-field
           v-if="pageType === 'signUp'"
           v-model="passwordConfirmation"
-          :append-inner-icon="password ? 'mdi-eye' : undefined"
+          :append-inner-icon="passwordConfirmation ? 'mdi-eye' : undefined"
           :disabled="isLoading"
-          :type="passwordType"
+          :type="passwordConfirmationType"
           clearable
           label="Повторите пароль"
           persistent-clear
+          persistent-crear
           variant="outlined"
-          @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
+          @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
         />
         <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
                @click="sendData" />
