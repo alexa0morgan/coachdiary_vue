@@ -10,11 +10,13 @@ const { smAndUp } = useDisplay()
 const isMenuOpen = ref(false)
 const route = useRoute()
 const router = useRouter()
+
 const isLoginPage = computed(() => route.name === 'login')
 
 const isLoggedInView = computed(() => route.path.startsWith('/app'))
+
 const logoLink = computed(() => {
-  if (isLoggedInView.value) return { name: 'my-classes' }
+  if (route.path.startsWith('/app')) return { name: 'my-classes' }
   return { name: 'home' }
 })
 
@@ -38,8 +40,8 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
 
 <template>
   <v-navigation-drawer v-if="!smAndUp" v-model="isMenuOpen">
-    <v-list-item :to="logoLink" title="Дневник Тренера" />
-    <v-divider />
+    <v-list-item :key="logoLink.name" :to="logoLink" title="Дневник Тренера" />
+    <v-divider class="mb-2" color="rgb(var(--v-theme-primary-darken-1))" />
     <template v-if="!isLoggedInView">
       <v-list-item href="/#AboutSite" link title="О сайте" />
       <v-list-item href="/#Capabilities" link title="Возможности" />
@@ -49,6 +51,8 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
       <v-list-item :to="{name: 'my-classes'}" link title="Мои классы" />
       <v-list-item :to="{name: 'my-normatives'}" link title="Мои нормативы" />
       <v-list-item :to="{name: 'profile'}" link title="Профиль" />
+      <v-divider class="mb-2 mt-2" color="rgb(var(--v-theme-primary-darken-1))" />
+      <v-list-item link title="Выход" @click="logout" />
     </template>
   </v-navigation-drawer>
 
