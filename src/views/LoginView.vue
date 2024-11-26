@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { post } from '@/utils'
+import VKIDLogin from '@/components/VKIDLogin.vue'
 
 const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
 const router = useRouter()
@@ -171,6 +172,8 @@ async function restore() {
         />
         <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
                @click="sendData" />
+        <div style="font-size: 12px">или войти с помощью</div>
+        <VKIDLogin/>
       </div>
       <div v-if="pageType==='signIn'">
         <v-btn :disabled="isLoading" size="small" text="Регистрация" variant="text" @click="pageType = 'signUp'" />
@@ -181,6 +184,8 @@ async function restore() {
              @click="pageType = 'signIn'" />
     </div>
   </div>
+
+
 </template>
 
 <style scoped>

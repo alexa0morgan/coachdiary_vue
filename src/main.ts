@@ -16,6 +16,8 @@ import { ru } from 'vuetify/locale'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+import "https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"
+
 const myCustomLightTheme = {
   dark: false,
   colors: {
