@@ -3,7 +3,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { post } from '@/utils'
+import { get, post } from '@/utils'
 import VKIDLogin from '@/components/VKIDLogin.vue'
 
 const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
@@ -119,6 +119,17 @@ async function restore() {
   alert('К сожалению, данная функция еще не доступна, обратитесь по адресу временной почты поддержки: dasha2510929@yandex.ru')
 }
 
+async function vklogin() {
+  const response = await get('/api/pkce/').then(res => res.json())
+
+  if (response.ok) {
+        userStore.login()
+        await router.push({ name: 'app' })
+      } else {
+        alert(response.json())
+      }
+}
+
 </script>
 
 <template>
@@ -173,7 +184,8 @@ async function restore() {
         <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
                @click="sendData" />
         <div style="font-size: 12px">или войти с помощью</div>
-        <VKIDLogin/>
+        <v-btn text="VK" rounded @click="vklogin"/>
+<!--        <VKIDLogin/>-->
       </div>
       <div v-if="pageType==='signIn'">
         <v-btn :disabled="isLoading" size="small" text="Регистрация" variant="text" @click="pageType = 'signUp'" />
