@@ -5,29 +5,29 @@ import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import TopPanel from '@/components/TopPanel.vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { del, get } from '@/utils'
-import type { NormativeResponse } from '@/types/types'
+import type { StandardResponse } from '@/types/types'
 import router from '@/router'
 
 const activeLevelNumber = ref(-1)
-const pageType = ref<'standards' | 'skills'>('standards')
+const pageType = ref<'standards' | 'technical'>('standards')
 
 const selectedId = ref(-1)
-const normatives = ref<NormativeResponse[]>([])
+const standards = ref<StandardResponse[]>([])
 
 onMounted(async () => {
-  normatives.value = await get('/api/standards/').then(res => res.json())
+  standards.value = await get('/api/standards/').then(res => res.json())
   await setFirst()
 })
 
 async function setFirst(levelNumber?: number): Promise<void> {
   activeLevelNumber.value = levelNumber ?? levels.value[0] ?? -1
   await nextTick()
-  selectedId.value = simplifiedNormatives.value[0]?.id ?? -1
+  selectedId.value = simplifiedStandards.value[0]?.id ?? -1
 }
 
 const levels = computed(() =>
-  Array.from(normatives.value
-    .filter(normative => normative.has_numeric_value === (pageType.value === 'standards'))
+  Array.from(standards.value
+    .filter(standard => standard.has_numeric_value === (pageType.value === 'standards'))
     .reduce((acc, v) => {
       for (const level of v.levels) {
         acc.add(level.level_number)
@@ -36,36 +36,36 @@ const levels = computed(() =>
     }, new Set<number>))
 )
 
-const simplifiedNormatives = computed(() =>
-  normatives.value
-    .filter(normative => normative.has_numeric_value === (pageType.value === 'standards'))
-    .filter(normative => normative.levels.some(level => level.level_number === activeLevelNumber.value))
+const simplifiedStandards = computed(() =>
+  standards.value
+    .filter(standard => standard.has_numeric_value === (pageType.value === 'standards'))
+    .filter(standard => standard.levels.some(level => level.level_number === activeLevelNumber.value))
     .toSorted((a, b) => a.name.localeCompare(b.name))
 
-    .map(normative => ({
-      id: normative.id,
-      label: normative.name
+    .map(standard => ({
+      id: standard.id,
+      label: standard.name
     }))
 )
 
 const currentStandardLevels = computed(() =>
-  normatives.value
-    .find(normative => normative.id === selectedId.value)
+  standards.value
+    .find(standard => standard.id === selectedId.value)
     ?.levels.toSorted((a, b) => a.gender.localeCompare(b.gender))
     .filter(level => level.level_number === activeLevelNumber.value)
 )
 
-function editNormative(): void {
-  router.push({ name: 'update-normative', params: { id: selectedId.value } })
+function editStandard(): void {
+  router.push({ name: 'update-standard', params: { id: selectedId.value } })
 }
 
-async function deleteNormative(): Promise<void> {
+async function deleteStandard(): Promise<void> {
   const response = await del('/api/standards/' + selectedId.value)
   if (!response.ok) {
     alert('Произошла ошибка при удалении, попробуйте снова')
     return
   }
-  normatives.value = normatives.value.filter(normative => normative.id !== selectedId.value)
+  standards.value = standards.value.filter(standard => standard.id !== selectedId.value)
   await setFirst()
 }
 
@@ -85,12 +85,12 @@ async function deleteNormative(): Promise<void> {
         @click="setFirst(n)" />
     </div>
     <template #right>
-      <v-btn :to="{name: 'create-normative'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
+      <v-btn :to="{name: 'create-standard'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
              variant="outlined" />
     </template>
   </TopPanel>
 
-  <div v-auto-animate :class="{'skills-grid': pageType === 'skills'}" class="grid">
+  <div v-auto-animate :class="{'technical-grid': pageType === 'technical'}" class="grid">
     <div v-if="pageType === 'standards'" class="standards-tables">
       <template v-if="currentStandardLevels">
         <StandardsTable
@@ -110,25 +110,25 @@ async function deleteNormative(): Promise<void> {
           :active="pageType==='standards'"
           class="button side-nav-button"
           size="small"
-          text="Стандарты"
+          text="Физические"
           variant="outlined"
           @click="pageType = 'standards'; setFirst()" />
         <v-btn
-          :active="pageType==='skills'"
+          :active="pageType==='technical'"
           class="button side-nav-button"
           size="small"
-          text="Умения"
+          text="Технические"
           variant="outlined"
-          @click="pageType = 'skills'; setFirst()" />
+          @click="pageType = 'technical'; setFirst()" />
       </div>
       <DataTableSideNav
         v-model="selectedId"
-        :data="simplifiedNormatives"
-        :is-page-type-skills="pageType==='skills'"
-        :title="pageType==='standards' ? 'Стандарты' : 'Умения'"
+        :data="simplifiedStandards"
+        :is-standard-type-technical="pageType==='technical'"
+        :title="pageType==='standards' ? 'Физические' : 'Технические'"
         class="data-table-side-nav"
-        @delete="deleteNormative"
-        @edit="editNormative"
+        @delete="deleteStandard"
+        @edit="editStandard"
       />
     </div>
   </div>
@@ -144,7 +144,7 @@ async function deleteNormative(): Promise<void> {
   margin: 40px auto 0;
 }
 
-.skills-grid {
+.technical-grid {
   grid-template-columns: 1fr;
 }
 

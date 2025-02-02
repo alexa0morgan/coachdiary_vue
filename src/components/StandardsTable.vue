@@ -3,9 +3,9 @@ import type { Gender } from '@/types/types'
 
 defineProps<{
   gender: Gender;
-  high: number;
-  middle: number;
-  low: number;
+  high: number | null;
+  middle: number | null;
+  low: number | null;
 }>()
 </script>
 

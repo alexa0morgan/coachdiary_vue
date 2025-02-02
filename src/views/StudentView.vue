@@ -18,12 +18,12 @@ const changedData = ref<StudentStandardRequest>()
 
 onMounted(async () => {
   await getStudentById(studentId.value)
-  await getNormativesByStudentId(studentId.value)
+  await getStandardsByStudentId(studentId.value)
   await nextTick()
   activeLevelNumber.value = studentInfo?.value?.student_class.number ?? 0
 })
 
-async function getNormativesByStudentId(studentId: number) {
+async function getStandardsByStudentId(studentId: number) {
   standardsInfo.value = await get(`/api/students/${studentId}/standards/`)
     .then(res => res.json())
     .catch(() => {
@@ -57,14 +57,14 @@ const labels = computed(() => {
   ]
 })
 
-const normatives = computed(() =>
+const standards = computed(() =>
   standardsInfo.value
     .filter(standard => standard.Level_number === activeLevelNumber.value)
     .map(standard => ({
       student_id: studentId.value,
       id: standard.Standard.Id,
       has_numeric_value: standard.Standard.Has_numeric_value,
-      normative: standard.Standard.Name,
+      standard: standard.Standard.Name,
       result: standard.Value ?? 0,
       rate: standard.Grade ?? 0,
       level_number: activeLevelNumber.value
@@ -81,14 +81,14 @@ async function deleteStudent() {
     alert('Произошла ошибка при удалении, попробуйте снова')
     return
   }
-  router.push({ name: 'my-classes' })
+  router.push({ name: 'my-diary' })
 }
 
 async function postData() {
   try {
     const response = await post('/api/students/results/create_or_update/', changedData.value)
     if (response.ok) {
-      await getNormativesByStudentId(studentId.value)
+      await getStandardsByStudentId(studentId.value)
       alert('Данные успешно изменены')
     } else {
       alert('Ошибка при отправке данных, попробуйте позже')
@@ -111,7 +111,7 @@ async function postData() {
     <div class="main">
       <DataTable
         v-model="changedData"
-        :data="normatives"
+        :data="standards"
         class="table"
         @dataChanged="postData" />
       <DataTableSideNav

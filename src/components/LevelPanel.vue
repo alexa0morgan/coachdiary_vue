@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 
-const props = defineProps<{
+defineProps<{
   classNumber: number;
-}>()
-const activeLevel = defineModel<number>({ default: -1, required: false })
-const emit = defineEmits<{
-  levelChanged: []
-}>()
+}>();
+const activeLevel = defineModel<number>({ default: -1, required: false });
+defineEmits<{
+  levelChanged: [];
+}>();
 </script>
 
 <template>
@@ -16,7 +16,7 @@ const emit = defineEmits<{
         <span class="header">уровни</span>
         <v-btn v-for="n in classNumber" :key="n" :text="n + ' уровень'"
                :variant="activeLevel === n ? 'flat' : 'outlined'" class="level-button button"
-               color="black" size="small" @click="activeLevel = n; emit('levelChanged')" />
+               color="black" size="small" @click="activeLevel = n; $emit('levelChanged')" />
       </div>
     </div>
   </div>

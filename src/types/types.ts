@@ -1,7 +1,7 @@
 export type GenderNullable = Gender | null
 export type Gender = 'f' | 'm'
 
-export type NormativeResponse = {
+export type StandardResponse = {
   id: number,
   name: string,
   has_numeric_value: boolean
@@ -15,7 +15,7 @@ export type NormativeResponse = {
   }[]
 }
 
-export type NormativeRequest = {
+export type StandardRequest = {
   name: string,
   has_numeric_value: boolean
   levels: {

@@ -7,7 +7,7 @@ import FilterBlock from '@/components/FilterBlock.vue'
 import type {
   ClassRequest,
   FilterData,
-  NormativeResponse,
+  StandardResponse,
   StudentResponse,
   StudentsValueResponse,
   StudentValueRequest
@@ -20,24 +20,24 @@ const className = ref('')
 const fullClassName = computed(() =>
   className.value ? activeLevelNumber.value + className.value : activeLevelNumber.value
 )
-const selectedNormativeId = ref(-1)
+const selectedStandardId = ref(-1)
 
-const selectedNormativeType = computed<'standard' | 'skill'>(() => {
-  if (normativesData.value.find(v => v.id === selectedNormativeId.value)?.has_numeric_value) {
-    return 'standard'
+const selectedStandardType = computed<'physical' | 'technical'>(() => {
+  if (standardsData.value.find(v => v.id === selectedStandardId.value)?.has_numeric_value) {
+    return 'physical'
   } else {
-    return 'skill'
+    return 'technical'
   }
 })
 
 const classesData = ref<ClassRequest[]>([])
-const normativesData = ref<NormativeResponse[]>([])
+const standardsData = ref<StandardResponse[]>([])
 const studentsValueData = ref<StudentsValueResponse[]>([])
 const filteredData = ref<StudentsValueResponse[]>([])
 
 onMounted(async () => {
   classesData.value = await get('/api/classes/').then(res => res.json())
-  normativesData.value = await get('/api/standards/').then(res => res.json())
+  standardsData.value = await get('/api/standards/').then(res => res.json())
 })
 
 const classes = computed(() =>
@@ -51,19 +51,19 @@ const classes = computed(() =>
     }, {} as Record<number, string[]>)
 )
 
-const normatives = computed(() =>
-  normativesData.value
-    .filter(normative => normative.levels.some(level => level.level_number === activeLevelNumber.value))
+const standards = computed(() =>
+  standardsData.value
+    .filter(standard => standard.levels.some(level => level.level_number === activeLevelNumber.value))
     .toSorted((a, b) => a.name.localeCompare(b.name))
 
-    .map(normative => ({
-      id: normative.id,
-      label: normative.name
+    .map(standard => ({
+      id: standard.id,
+      label: standard.name
     }))
 )
 
 async function getStudentsData() {
-  if (selectedNormativeId.value === -1) return
+  if (selectedStandardId.value === -1) return
 
   const currentClasses = classesData.value
     .filter(klass =>
@@ -77,7 +77,7 @@ async function getStudentsData() {
     }).then(res => res.json())
     const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/', {
       'class_id[]': currentClasses,
-      standard_id: selectedNormativeId.value
+      standard_id: selectedStandardId.value
     }).then(res => res.json())
 
     studentsValueData.value = currentStudents.map(student => {
@@ -98,7 +98,7 @@ function activeLevelClick(classNumber: number, letter: string) {
   activeLevelNumber.value = classNumber
   className.value = letter
   filteredData.value = []
-  selectedNormativeId.value = -1
+  selectedStandardId.value = -1
 }
 
 const filters = ref<FilterData>({
@@ -125,7 +125,7 @@ async function saveStudentsValue() {
       .filter(v => v.value !== null && v.value)
       .map(student => ({
         student_id: student.id,
-        standard_id: selectedNormativeId.value,
+        standard_id: selectedStandardId.value,
         value: student.value
       }))
 
@@ -177,10 +177,10 @@ async function saveStudentsValue() {
 
     <FilterBlock v-model="filters" class="filters-block" @accept="acceptFilters" />
 
-    <MyClassesTable :data="filteredData" :standard-type="selectedNormativeType" class="table"
+    <MyClassesTable :data="filteredData" :standard-type="selectedStandardType" class="table"
                     @saveData="saveStudentsValue" />
 
-    <DataTableSideNav v-model="selectedNormativeId" :data="normatives"
+    <DataTableSideNav v-model="selectedStandardId" :data="standards"
                       :has-action-buttons="false" class="data-table-side-nav"
                       title="Нормативы" @update:model-value="getStudentsData" />
   </div>

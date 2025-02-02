@@ -29,7 +29,7 @@ interface Item {
   student_id: number,
   id: number;
   has_numeric_value: boolean,
-  normative: string;
+  standard: string;
   result?: number;
   rate?: number;
   level_number: number;
@@ -41,7 +41,7 @@ const totalRate = computed(() => {
 })
 
 const headers = [
-  { title: 'норматив', value: 'normative', sortable: true },
+  { title: 'норматив', value: 'standard', sortable: true },
   { title: 'результат', value: 'result', sortable: true, width: 120 },
   { title: 'оценка', value: 'rate', sortable: true, width: 120 }
 ]
@@ -145,7 +145,7 @@ function getMarkColor(mark?: number): string {
   color: rgb(var(--v-theme-secondary));
   text-transform: uppercase;
   position: sticky;
-  bottom: 0px;
+  bottom: 0;
 }
 
 .space {
@@ -154,7 +154,7 @@ function getMarkColor(mark?: number): string {
 
 .table:deep(.v-table__wrapper) {
   border: 1px solid rgb(var(--v-theme-surface));
-  border-radius: 0px;
+  border-radius: 0;
 }
 
 .table:deep(.v-data-table-header__content) {
