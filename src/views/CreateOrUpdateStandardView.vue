@@ -4,16 +4,16 @@ import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { NormativeRequest, NormativeResponse } from '@/types/types'
+import type { StandardRequest, StandardResponse } from '@/types/types'
 import { get, post, put } from '@/utils'
 import { useDisplay } from 'vuetify'
 
 const route = useRoute()
 const { mobile } = useDisplay()
-const pageType = ref(route.name as 'create-normative' | 'update-normative')
+const pageType = ref(route.name as 'create-standard' | 'update-standard')
 
-const normativeName = ref('')
-const normativeType = ref<'standard' | 'skill' | null>(null)
+const standardName = ref('')
+const standardType = ref<'physical' | 'technical' | null>(null)
 
 const currentLevel = ref(-1)
 const levelNumbers = ref<number[]>([])
@@ -80,11 +80,11 @@ function toPreviousLevel() {
   }
 }
 
-async function createOrUpdateNormative() {
+async function createOrUpdateStandard() {
   try {
-    const requestData: NormativeRequest = {
-      name: normativeName.value,
-      has_numeric_value: normativeType.value === 'standard',
+    const requestData: StandardRequest = {
+      name: standardName.value,
+      has_numeric_value: standardType.value === 'physical',
       levels: Object
         .entries(levels.value)
         .filter(([key]) => levelNumbers.value.includes(+key))
@@ -107,18 +107,18 @@ async function createOrUpdateNormative() {
         .flat()
     }
 
-    const currentId = pageType.value === 'update-normative' ? `${route.params.id}/` : ''
-    const currentMethod = pageType.value === 'update-normative' ? put : post
+    const currentId = pageType.value === 'update-standard' ? `${route.params.id}/` : ''
+    const currentMethod = pageType.value === 'update-standard' ? put : post
 
     const response = await currentMethod(`/api/standards/` + currentId, requestData)
 
-    if (response.ok && pageType.value === 'create-normative') {
+    if (response.ok && pageType.value === 'create-standard') {
       alert('Норматив создан')
-      normativeName.value = ''
-      normativeType.value = null
+      standardName.value = ''
+      standardType.value = null
       levelNumbers.value = []
       setLevelsWithZeroes()
-    } else if (response.ok && pageType.value === 'update-normative') {
+    } else if (response.ok && pageType.value === 'update-standard') {
       alert('Данные о нормативе обновлены')
     } else {
       const data = await response.json()
@@ -133,8 +133,8 @@ async function createOrUpdateNormative() {
 }
 
 const isSaveButtonDisabled = computed(() => {
-  return !normativeName.value
-    || !normativeType.value
+  return !standardName.value
+    || !standardType.value
     || levelNumbers.value.length === 0
     || (
       Object
@@ -149,15 +149,15 @@ const isSaveButtonDisabled = computed(() => {
               || !value.boys.high
             )
         )
-      && normativeType.value !== 'skill'
+      && standardType.value !== 'technical'
     )
 })
 
 onMounted(async () => {
-  if (pageType.value === 'update-normative') {
-    const data: NormativeResponse = await get(`/api/standards/${route.params.id}/`).then(res => res.json())
-    normativeName.value = data.name
-    normativeType.value = data.has_numeric_value ? 'standard' : 'skill'
+  if (pageType.value === 'update-standard') {
+    const data: StandardResponse = await get(`/api/standards/${route.params.id}/`).then(res => res.json())
+    standardName.value = data.name
+    standardType.value = data.has_numeric_value ? 'physical' : 'technical'
 
     for (const level of data.levels) {
       const key = level.gender === 'f' ? 'girls' : 'boys'
@@ -178,19 +178,19 @@ onMounted(async () => {
 
 <template>
 
-  <TopPanel class="top-panel">{{ pageType === 'create-normative' ? 'Создание норматива' : 'Обновление норматива' }}
+  <TopPanel class="top-panel">{{ pageType === 'create-standard' ? 'Создание норматива' : 'Обновление норматива' }}
   </TopPanel>
   <div v-auto-animate class="grid">
 
     <FieldSet title="Тип">
-      <v-radio-group v-model="normativeType" :disabled="pageType === 'update-normative'" row
+      <v-radio-group v-model="standardType" :disabled="pageType === 'update-standard'" row
                      @update:model-value="setLevelsWithZeroes">
-        <v-radio label="Стандарт" value="standard" />
-        <v-radio label="Умение" value="skill" />
+        <v-radio label="Физический" value="physical" />
+        <v-radio label="Технический" value="technical" />
       </v-radio-group>
     </FieldSet>
 
-    <v-text-field v-model="normativeName" class="normative-name" label="Название" />
+    <v-text-field v-model="standardName" class="standard-name" label="Название" />
 
 
     <FieldSet title="Уровни">
@@ -202,7 +202,7 @@ onMounted(async () => {
       </div>
     </FieldSet>
 
-    <FieldSet v-if="normativeType==='standard'" title="Нормы">
+    <FieldSet v-if="standardType==='physical'" title="Нормы">
       <template v-if="levelNumbers.length && currentLevel !== -1">
         <div class="standards-table">
           <div class="standards">
@@ -245,7 +245,7 @@ onMounted(async () => {
 
     </FieldSet>
     <v-btn :disabled="isSaveButtonDisabled" class="button" color="primary" rounded text="Сохранить"
-           @click="createOrUpdateNormative" />
+           @click="createOrUpdateStandard" />
   </div>
 
 
@@ -288,7 +288,7 @@ onMounted(async () => {
   opacity: var(--v-medium-emphasis-opacity);
 }
 
-.normative-name {
+.standard-name {
   align-self: center;
 }
 

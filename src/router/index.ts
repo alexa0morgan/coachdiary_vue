@@ -1,14 +1,16 @@
 import { createRouter, createWebHistory, type RouteLocationRaw } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
-import MyClassesView from '@/views/MyClassesView.vue'
-import MyNormativesView from '@/views/MyNormativesView.vue'
+import MyDiaryView from '@/views/MyDiaryView.vue'
+import MyStandardsView from '@/views/MyStandardsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import CreateOrUpdateNormativeView from '@/views/CreateOrUpdateNormativeView.vue'
+import CreateOrUpdateStandardView from '@/views/CreateOrUpdateStandardView.vue'
 import CreateOrUpdateStudentView from '@/views/CreateOrUpdateStudentView.vue'
 import StudentView from '@/views/StudentView.vue'
 
 import { useUserStore } from '@/stores/user'
+import AboutSiteView from '@/views/AboutSiteView.vue'
+import AboutUsView from '@/views/AboutUsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +22,18 @@ const router = createRouter({
       meta: { mobileTitle: 'Дневник тренера' }
     },
     {
+      path: '/about-site',
+      name: 'about-site',
+      component: AboutSiteView,
+      meta: { mobileTitle: 'О сайте' }
+    },
+    {
+      path: '/about-us',
+      name: 'about-us',
+      component: AboutUsView,
+      meta: { mobileTitle: 'О нас' }
+    },
+    {
       path: '/login',
       name: 'login',
       component: LoginView,
@@ -29,15 +43,15 @@ const router = createRouter({
       path: '/app',
       name: 'app',
       /*component: AppView,*/
-      redirect: { name: 'my-classes' },
+      redirect: { name: 'my-diary' },
       meta: { mobileTitle: 'Дневник тренера' },
       beforeEnter: isAuthenticated
     },
     {
-      path: '/app/my-classes',
-      name: 'my-classes',
-      component: MyClassesView,
-      meta: { mobileTitle: 'Мои классы' },
+      path: '/app/my-diary',
+      name: 'my-diary',
+      component: MyDiaryView,
+      meta: { mobileTitle: 'Дневник' },
       beforeEnter: isAuthenticated
     },
     {
@@ -55,23 +69,23 @@ const router = createRouter({
       beforeEnter: isAuthenticated
     },
     {
-      path: '/app/my-normatives',
-      name: 'my-normatives',
-      component: MyNormativesView,
+      path: '/app/my-standards',
+      name: 'my-standards',
+      component: MyStandardsView,
       meta: { mobileTitle: 'Мои нормативы' },
       beforeEnter: isAuthenticated
     },
     {
-      path: '/app/my-normatives/create',
-      name: 'create-normative',
-      component: CreateOrUpdateNormativeView,
+      path: '/app/my-standards/create',
+      name: 'create-standard',
+      component: CreateOrUpdateStandardView,
       meta: { mobileTitle: 'Создание норматива' },
       beforeEnter: isAuthenticated
     },
     {
-      path: '/app/my-normatives/update/:id',
-      name: 'update-normative',
-      component: CreateOrUpdateNormativeView,
+      path: '/app/my-standards/update/:id',
+      name: 'update-standard',
+      component: CreateOrUpdateStandardView,
       meta: { mobileTitle: 'Обновление норматива' },
       beforeEnter: isAuthenticated
     },
@@ -89,7 +103,13 @@ const router = createRouter({
       meta: { mobileTitle: 'Ученик' },
       beforeEnter: isAuthenticated
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    return { top: 0 }
+  }
 })
 
 
@@ -104,7 +124,7 @@ function isAuthenticated(): RouteLocationRaw | undefined {
 function isNotAuthenticated(): RouteLocationRaw | undefined {
   if (useUserStore().isLoggedIn) {
     return {
-      name: 'my-classes'
+      name: 'my-diary'
     }
   }
 }

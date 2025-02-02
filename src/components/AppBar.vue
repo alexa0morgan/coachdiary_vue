@@ -16,15 +16,15 @@ const isLoginPage = computed(() => route.name === 'login')
 const isLoggedInView = computed(() => route.path.startsWith('/app'))
 
 const logoLink = computed(() => {
-  if (route.path.startsWith('/app')) return { name: 'my-classes' }
+  if (route.path.startsWith('/app')) return { name: 'my-diary' }
   return { name: 'home' }
 })
 
 const plusButtonLink = computed(() => {
-  if (route.name === 'my-classes') {
+  if (route.name === 'my-diary') {
     return { name: 'create-student' }
-  } else if (route.name === 'my-normatives') {
-    return { name: 'create-normative' }
+  } else if (route.name === 'my-standards') {
+    return { name: 'create-standard' }
   }
   return ''
 })
@@ -43,13 +43,13 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
     <v-list-item :key="logoLink.name" :to="logoLink" title="Дневник Тренера" />
     <v-divider class="mb-2" color="rgb(var(--v-theme-primary-darken-1))" />
     <template v-if="!isLoggedInView">
-      <v-list-item href="/#AboutSite" link title="О сайте" />
       <v-list-item href="/#Capabilities" link title="Возможности" />
-      <v-list-item href="/#AboutUs" link title="О нас" />
+      <v-list-item :to="{name: 'about-site'}" link title="О сайте" />
+      <v-list-item :to="{name: 'about-us'}" link title="О нас" />
     </template>
     <template v-else>
-      <v-list-item :to="{name: 'my-classes'}" link title="Мои классы" />
-      <v-list-item :to="{name: 'my-normatives'}" link title="Мои нормативы" />
+      <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
+      <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
       <v-list-item :to="{name: 'profile'}" link title="Профиль" />
       <v-divider class="mb-2 mt-2" color="rgb(var(--v-theme-primary-darken-1))" />
       <v-list-item link title="Выход" @click="logout" />
@@ -75,17 +75,17 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
         <template v-if="!isLoggedInView">
 
           <template v-if="smAndUp">
-            <v-btn href="/#AboutSite" variant="text">О сайте</v-btn>
             <v-btn href="/#Capabilities" variant="text">Возможности</v-btn>
-            <v-btn href="/#AboutUs" variant="text">О нас</v-btn>
+            <v-btn :to="{name: 'about-site'}" variant="text">О сайте</v-btn>
+            <v-btn :to="{name: 'about-us'}" variant="text">О нас</v-btn>
           </template>
 
           <v-btn v-if="!isLoginPage" :to="{name: 'login'}" rounded variant="flat">Войти</v-btn>
         </template>
 
         <template v-else-if="smAndUp">
-          <v-btn :to="{name: 'my-classes'}" variant="text">Мои классы</v-btn>
-          <v-btn :to="{name: 'my-normatives'}" variant="text">Мои нормативы</v-btn>
+          <v-btn :to="{name: 'my-diary'}" variant="text">Дневник</v-btn>
+          <v-btn :to="{name: 'my-standards'}" variant="text">Мои нормативы</v-btn>
           <v-btn :to="{name: 'profile'}" variant="text">Профиль</v-btn>
           <v-btn rounded variant="flat" @click="logout">Выйти</v-btn>
         </template>

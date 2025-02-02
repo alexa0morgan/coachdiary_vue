@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { watch } from 'vue'
 
-const { title, data, isNormativeTypeSkills, isContentStaticText, hasActionButtons = true } = defineProps<{
+const { title, data, isStandardTypeTechnical, isContentStaticText, hasActionButtons = true } = defineProps<{
   title: string;
   data: {
     label: string;
     id: number;
   }[];
-  isNormativeTypeSkills?: boolean;
+  isStandardTypeTechnical?: boolean;
   isContentStaticText?: boolean;
   hasActionButtons?: boolean;
   hasDeleteMenu?: boolean;
@@ -33,7 +33,7 @@ watch(() => data, () => {
 <template>
   <div class="container">
     <div class="title">{{ title }}</div>
-    <div :class="{'grid': isNormativeTypeSkills}" class="data">
+    <div :class="{grid: isStandardTypeTechnical}" class="data">
       <template v-if="!isContentStaticText">
         <v-btn v-for="item in data" :key="item.id" :active="selectedId === item.id" :ripple="false" :text="item.label"
                block class="button" size="small" variant="outlined" @click="onSelect(item.id)" />

@@ -6,7 +6,7 @@ import { computed } from 'vue'
 
 const { data, standardType } = defineProps<{
   data: StudentsValueResponse[]
-  standardType: 'standard' | 'skill'
+  standardType: 'physical' | 'technical'
 }>()
 
 const emit = defineEmits<{
@@ -14,7 +14,7 @@ const emit = defineEmits<{
 }>()
 
 const headers = computed<VDataTable['$props']['headers']>(() => {
-  if (standardType === 'standard') {
+  if (standardType === 'physical') {
     return [
       { title: 'ID', value: 'id', width: 50 },
       { title: 'Класс', value: 'class', width: 70 },
