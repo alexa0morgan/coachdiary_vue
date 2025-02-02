@@ -43,9 +43,9 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
     <v-list-item :key="logoLink.name" :to="logoLink" title="Дневник Тренера" />
     <v-divider class="mb-2" color="rgb(var(--v-theme-primary-darken-1))" />
     <template v-if="!isLoggedInView">
-      <v-list-item href="/#AboutSite" link title="О сайте" />
       <v-list-item href="/#Capabilities" link title="Возможности" />
-      <v-list-item href="/#AboutUs" link title="О нас" />
+      <v-list-item :to="{name: 'about-site'}" link title="О сайте" />
+      <v-list-item :to="{name: 'about-us'}" link title="О нас" />
     </template>
     <template v-else>
       <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
@@ -75,9 +75,9 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
         <template v-if="!isLoggedInView">
 
           <template v-if="smAndUp">
-            <v-btn href="/#AboutSite" variant="text">О сайте</v-btn>
             <v-btn href="/#Capabilities" variant="text">Возможности</v-btn>
-            <v-btn href="/#AboutUs" variant="text">О нас</v-btn>
+            <v-btn :to="{name: 'about-site'}" variant="text">О сайте</v-btn>
+            <v-btn :to="{name: 'about-us'}" variant="text">О нас</v-btn>
           </template>
 
           <v-btn v-if="!isLoginPage" :to="{name: 'login'}" rounded variant="flat">Войти</v-btn>

@@ -1,105 +1,87 @@
 <script lang="ts" setup>
-import AboutSiteCart from '@/components/AboutSiteCard.vue'
 import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
+import PageFooter from '@/components/PageFooter.vue'
+import { useDisplay } from 'vuetify'
+
+const { smAndDown } = useDisplay()
 </script>
 
 <template>
   <v-img class="main-img" cover src="/luthfi-alfarizi-8i_KGxVeLtQ-unsplash.webp">
     <div class="main-img-overlay">
       <h1 class="main-text main-header">Дневник Тренера</h1>
-      <p class="main-text describe">Универсальное приложение для тренеров спортивных секций и учителей физической
-        культуры</p>
+      <p class="main-text describe">Универсальное приложение для тренеров спортивных секций</p>
+      <div class="text">
+        <v-btn :to="{name: 'login'}" class="sigh-up-btn" rounded size="x-large" variant="flat">Зарегистрироваться
+        </v-btn>
+      </div>
     </div>
   </v-img>
-  <section id="AboutSite" class="anchor-scroll">
-    <h2 class="header">Почему "CoachDiary"?</h2>
 
-    <AboutSiteCart src="/main-page-girl.jpg">Добро пожаловать в “Coachdiary” – ваш надежный
-      помощник
-      в управлении и контроле успеваемости учеников спортивных секций! Он создан специально для тренеров и учителей
-      физкультуры. “CoachDiary” - уникальный сервис для эффективного отслеживания и анализа прогресса каждого ученика.
-    </AboutSiteCart>
-    <AboutSiteCart mirrored src="/jesse-orrico-mse1vdzZXjA-unsplash.webp">В мире, где спорт играет ключевую роль в
-      физическом и
-      психологическом развитии молодежи, важность четкого и организованного подхода к тренировочному процессу не может
-      быть переоценена. “Coachdiary” призван стать инструментом в руках тренеров, предлагая комплексное решение для
-      управления успеваемостью и прогрессом учеников спортивных секций.
-    </AboutSiteCart>
-    <AboutSiteCart src="/main-page-people.jpg">Разработанный с учетом реальных потребностей и задач
-      спортивного сообщества, “Coachdiary” объединяет в себе функциональность и удобство, делая процесс управления
-      спортивным обучением более эффективным и результативным. С его помощью вы сможете не только следить за
-      индивидуальным прогрессом каждого ученика, но и визуализировать успеваемость группы в целом, что позволит более
-      целенаправленно подходить к планированию тренировок и обучения.
-    </AboutSiteCart>
-    <p class="text">Присоединяйтесь к “Coachdiary” сегодня и начните новую эру в управлении спортивным
-      обучением!</p>
-    <div class="text">
-      <v-btn :to="{name: 'login'}" class="join-btn" rounded size="x-large" variant="flat">Зарегистрироваться</v-btn>
-    </div>
-  </section>
   <section id="Capabilities" class="anchor-scroll">
     <h2 class="header">Возможности сервиса</h2>
-    <div class="cap-container">
+
+    <v-carousel
+      v-if="smAndDown"
+      height="230"
+      cycle
+      hide-delimiters
+    >
+      <v-carousel-item content-class="carousel-item">
+        <CapabilitiesCard icon="mdi-arrow-up-thin-circle-outline" title="Вход и создание аккаунта">Пользователи могут
+          создать собственный аккаунт “Дневника тренера”. Это обеспечивает безопасность данных, и позволяет каждому
+          тренеру персонализировать свой опыт использования платформы.
+        </CapabilitiesCard>
+      </v-carousel-item>
+      <v-carousel-item content-class="carousel-item">
+        <CapabilitiesCard icon="mdi-filter-cog-outline" title="Фильтрация для эффективного поиска в базе учеников">Наш
+          сервис позволяет тренерам быстро находить нужную информацию о учениках, фильтруя данные по дисциплинам,
+          классам
+          или результатам.
+          Такая функция облегчит планирование тренировок и отслеживание прогресса учеников.
+        </CapabilitiesCard>
+      </v-carousel-item>
+      <v-carousel-item content-class="carousel-item">
+        <CapabilitiesCard icon="mdi-database-outline" title="Управление базой нормативов">Пользователь может создавать
+          таблицы нормативов, представленные спортивными федерациями или собственными тренировочными программами.
+          Нормативы возможно просматривать и обновлять в любое время!
+        </CapabilitiesCard>
+      </v-carousel-item>
+      <v-carousel-item content-class="carousel-item">
+        <CapabilitiesCard icon="mdi-information-slab-circle-outline" title="Работа с информацией об учениках">Функционал
+          “Дневника тренера” позволяет удобно управлять информацией об учениках, включая их личные данные, спортивный
+          класс, достигнутые результаты и прогресс по нормативам.
+        </CapabilitiesCard>
+      </v-carousel-item>
+    </v-carousel>
+
+
+    <div v-else class="cap-container">
       <CapabilitiesCard icon="mdi-arrow-up-thin-circle-outline" title="Вход и создание аккаунта">Пользователи могут
-        создать собственный аккаунт на “Coachdiary”. Это обеспечит безопасность данных, и позволит каждому тренеру
-        персонализировать свой опыт использования платформы.
+        создать собственный аккаунт “Дневника тренера”. Это обеспечивает безопасность данных, и позволяет каждому
+        тренеру персонализировать свой опыт использования платформы.
       </CapabilitiesCard>
       <CapabilitiesCard icon="mdi-filter-cog-outline" title="Фильтрация для эффективного поиска в базе учеников">Наш
-        инструмент позволит тренерам быстро находить нужную информацию о учениках, фильтруя данные по дисциплинам,
-        классам или результатам.
-        Такая функция облегчит планирование тренировок и отслеживание прогресса учеников!
+        сервис позволяет тренерам быстро находить нужную информацию о учениках, фильтруя данные по дисциплинам, классам
+        или результатам.
+        Такая функция облегчит планирование тренировок и отслеживание прогресса учеников.
       </CapabilitiesCard>
       <CapabilitiesCard icon="mdi-database-outline" title="Управление базой нормативов">Пользователь может создавать
         таблицы нормативов, представленные спортивными федерациями или собственными тренировочными программами.
         Нормативы возможно просматривать и обновлять в любое время!
       </CapabilitiesCard>
       <CapabilitiesCard icon="mdi-information-slab-circle-outline" title="Работа с информацией об учениках">Функционал
-        “CouchDiary” позволит удобно управлять информацией об учениках, включая их личные данные, спортивный класс,
-        достигнутые результаты и прогресс по нормативам.
+        “Дневника тренера” позволяет удобно управлять информацией об учениках, включая их личные данные, спортивный
+        класс, достигнутые результаты и прогресс по нормативам.
       </CapabilitiesCard>
     </div>
-    <p class="text">Каждая из возможностей разработана с учетом потребностей тренеров и спортивных секций, поэтому
-      они
-      максимально
-      облегчают управление тренировочным процессом и отслеживанием успеваемости учеников.<br><br>
-
-      “Coachdiary” стремится предоставить инструменты для создания оптимальной тренировочной среды, способствующей
+    <p class="text">Каждая из возможностей разработана с учетом потребностей тренеров и учителей физкультуры, поэтому
+      наш сервис максимально облегчает управление тренировочным процессом и отслеживанием успеваемости учеников.
+      “Дневник тренера” стремится предоставить инструменты для создания оптимальной тренировочной среды, способствующей
       развитию и достижению лучших результатов.</p>
   </section>
 
-  <section id="AboutUs" class="anchor-scroll">
-    <h2 class="header">О нас</h2>
-    <AboutSiteCart class="team-img" src="/team_photo.webp">Мы — группа студентов, увлеченных идеей создания эффективных
-      решений для тренеров и учителей физкультуры. Веря в силу спорта как средства для развития и самосовершенствования,
-      мы решили
-      применить наши знания и навыки в программировании для создания Coachdiary.
-    </AboutSiteCart>
-    <p class="text" style="text-align: left">
-      В процессе разработки Coachdiary, мы не только применили наши академические знания, но и учились на реальных
-      задачах и вызовах. Каждый из нас внес уникальный вклад в проект, сочетая в себе разнообразные навыки и интересы
-      — от веб-дизайна до программирования и анализа данных. Работая над Coachdiary, мы стремились создать инструмент,
-      который был бы не только функциональным и удобным в использовании, но и вдохновлял пользователей на постоянное
-      улучшение и достижение целей.
-    </p>
-    <div class="team_photos">
-      <img alt="Dasha" class="Dasha-img" src="/Dasha.webp">
-    </div>
-    <p class="text" style="text-align: left">
-      Наша миссия превышает рамки создания просто еще одного веб-сервиса. Мы хотим вдохновить спортивное сообщество на
-      использование цифровых технологий как средства для улучшения тренировочного процесса, повышения мотивации и, в
-      конечном итоге, достижения лучших результатов. Мы верим, что Coachdiary может стать мостом между традиционными
-      методами тренировок и современными технологическими решениями, делая спорт более доступным и эффективным для
-      всех.
-    </p>
-    <div class="team_photos">
-      <img alt="Vika" src="/Vika.webp">
-      <img alt="Matvey" src="/Matvey.webp">
-    </div>
-  </section>
-
-  <v-footer class="bg-grey-lighten-1 pt-7 text-center d-block">
-    2024 — <strong>CoachDiary</strong>
-  </v-footer>
+  <PageFooter />
 
 </template>
 
@@ -140,7 +122,7 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 
 .describe {
   --border-size: 2px;
-  font-size: 28px;
+  font-size: 25px;
   width: 700px;
   max-width: 100%;
 }
@@ -164,7 +146,7 @@ section {
   max-width: 1200px;
 }
 
-.join-btn {
+.sigh-up-btn {
   font-size: 22px;
 }
 
@@ -174,27 +156,10 @@ section {
   gap: 20px;
 }
 
-.team-img :deep(.img-border) {
-  aspect-ratio: 1;
+:deep(.carousel-item) {
+  padding: 0 80px;
 }
 
-.team_photos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin: 30px auto 0;
-  gap: 30px;
-  max-width: 1000px;
-}
-
-.team_photos > img {
-  width: 100%;
-}
-
-img.Dasha-img {
-  grid-column: span 2;
-  width: 50%;
-  justify-self: center;
-}
 
 @media (max-width: 800px) {
   .main-header {
@@ -220,23 +185,6 @@ img.Dasha-img {
 
   .text {
     font-size: 16px;
-  }
-
-  .join-btn {
-    font-size: 16px;
-  }
-
-  .team-img :deep(.img-border) {
-    aspect-ratio: 1;
-    height: 100%;
-  }
-
-  .team_photos {
-    grid-template-columns: 1fr;
-  }
-
-  img.Dasha-img {
-    width: 100%;
   }
 }
 </style>

@@ -9,6 +9,8 @@ import CreateOrUpdateStudentView from '@/views/CreateOrUpdateStudentView.vue'
 import StudentView from '@/views/StudentView.vue'
 
 import { useUserStore } from '@/stores/user'
+import AboutSiteView from '@/views/AboutSiteView.vue'
+import AboutUsView from '@/views/AboutUsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +20,18 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
       meta: { mobileTitle: 'Дневник тренера' }
+    },
+    {
+      path: '/about-site',
+      name: 'about-site',
+      component: AboutSiteView,
+      meta: { mobileTitle: 'О сайте' }
+    },
+    {
+      path: '/about-us',
+      name: 'about-us',
+      component: AboutUsView,
+      meta: { mobileTitle: 'О нас' }
     },
     {
       path: '/login',
@@ -89,7 +103,13 @@ const router = createRouter({
       meta: { mobileTitle: 'Ученик' },
       beforeEnter: isAuthenticated
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    return { top: 0 }
+  }
 })
 
 
