@@ -4,7 +4,7 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 </script>
 
 <template>
-  <v-img class="main-img" cover src="/luthfi-alfarizi-8i_KGxVeLtQ-unsplash.jpg">
+  <v-img class="main-img" cover src="/luthfi-alfarizi-8i_KGxVeLtQ-unsplash.webp">
     <div class="main-img-overlay">
       <h1 class="main-text main-header">Дневник Тренера</h1>
       <p class="main-text describe">Универсальное приложение для тренеров спортивных секций и учителей физической
@@ -14,18 +14,18 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
   <section id="AboutSite" class="anchor-scroll">
     <h2 class="header">Почему "CoachDiary"?</h2>
 
-    <AboutSiteCart src="/картинка.jpg">Добро пожаловать в “Coachdiary” – ваш надежный
+    <AboutSiteCart src="/main-page-girl.jpg">Добро пожаловать в “Coachdiary” – ваш надежный
       помощник
       в управлении и контроле успеваемости учеников спортивных секций! Он создан специально для тренеров и учителей
       физкультуры. “CoachDiary” - уникальный сервис для эффективного отслеживания и анализа прогресса каждого ученика.
     </AboutSiteCart>
-    <AboutSiteCart mirrored src="/jesse-orrico-mse1vdzZXjA-unsplash.jpg">В мире, где спорт играет ключевую роль в
+    <AboutSiteCart mirrored src="/jesse-orrico-mse1vdzZXjA-unsplash.webp">В мире, где спорт играет ключевую роль в
       физическом и
       психологическом развитии молодежи, важность четкого и организованного подхода к тренировочному процессу не может
       быть переоценена. “Coachdiary” призван стать инструментом в руках тренеров, предлагая комплексное решение для
       управления успеваемостью и прогрессом учеников спортивных секций.
     </AboutSiteCart>
-    <AboutSiteCart src="/картинка2.jpg">Разработанный с учетом реальных потребностей и задач
+    <AboutSiteCart src="/main-page-people.jpg">Разработанный с учетом реальных потребностей и задач
       спортивного сообщества, “Coachdiary” объединяет в себе функциональность и удобство, делая процесс управления
       спортивным обучением более эффективным и результативным. С его помощью вы сможете не только следить за
       индивидуальным прогрессом каждого ученика, но и визуализировать успеваемость группы в целом, что позволит более
@@ -69,8 +69,9 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
 
   <section id="AboutUs" class="anchor-scroll">
     <h2 class="header">О нас</h2>
-    <AboutSiteCart class="team-img" src="/team_photo.jpg">Мы — группа студентов, увлеченных идеей создания эффективных
-      решений для тренеров и учителей физкультуры. Веря в силу спорта как средства для развития и самосовершенствования, мы решили
+    <AboutSiteCart class="team-img" src="/team_photo.webp">Мы — группа студентов, увлеченных идеей создания эффективных
+      решений для тренеров и учителей физкультуры. Веря в силу спорта как средства для развития и самосовершенствования,
+      мы решили
       применить наши знания и навыки в программировании для создания Coachdiary.
     </AboutSiteCart>
     <p class="text" style="text-align: left">
@@ -81,7 +82,7 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
       улучшение и достижение целей.
     </p>
     <div class="team_photos">
-      <img alt="Dasha" class="Dasha-img" src="/Dasha.jpg">
+      <img alt="Dasha" class="Dasha-img" src="/Dasha.webp">
     </div>
     <p class="text" style="text-align: left">
       Наша миссия превышает рамки создания просто еще одного веб-сервиса. Мы хотим вдохновить спортивное сообщество на
@@ -91,8 +92,8 @@ import CapabilitiesCard from '@/components/CapabilitiesCard.vue'
       всех.
     </p>
     <div class="team_photos">
-      <img alt="Vika" src="/Vika.jpg">
-      <img alt="Matvey" src="/Matvey.jpg">
+      <img alt="Vika" src="/Vika.webp">
+      <img alt="Matvey" src="/Matvey.webp">
     </div>
   </section>
 
