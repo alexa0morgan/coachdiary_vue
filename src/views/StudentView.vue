@@ -52,7 +52,7 @@ const labels = computed(() => {
     },
     {
       id: 2,
-      label: `Пол: ${studentInfo.value.gender === 'm' ? 'мальчик' : 'девочка'}`
+      label: `Пол: ${studentInfo.value.gender === 'm' ? 'муж' : 'жен'}`
     }
   ]
 })

@@ -69,9 +69,7 @@ const standards = computed(() =>
     }))
 )
 
-
-
-async function getStudentsData() {
+function setQuery() {
   router.replace({
     query: {
       classNumber: activeLevelNumber.value,
@@ -79,6 +77,11 @@ async function getStudentsData() {
       standard: selectedStandardId.value
     }
   })
+}
+
+
+async function getStudentsData() {
+  setQuery()
   if (selectedStandardId.value === -1) return
 
 
@@ -91,7 +94,9 @@ async function getStudentsData() {
   try {
     const currentStudents: StudentResponse[] = await get('/api/students/', {
       'student_class': fullClassName.value
-    }).then(res => res.json())
+    })
+      .then(res => res.json() as Promise<StudentResponse[]>)
+
     const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/', {
       'class_id[]': currentClasses,
       standard_id: selectedStandardId.value
@@ -115,8 +120,10 @@ function activeLevelClick(classNumber: number, letter: string) {
   activeLevelNumber.value = classNumber
   className.value = letter
   filteredData.value = []
-  selectedStandardId.value = -1
-  router.replace({ query: { classNumber, letter } })
+  if (!standards.value.some(v => v.id === selectedStandardId.value))
+    selectedStandardId.value = -1
+
+  getStudentsData()
 }
 
 const filters = ref<FilterData>({

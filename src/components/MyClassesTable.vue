@@ -17,7 +17,7 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
   if (standardType === 'physical') {
     return [
       { title: 'ID', value: 'id', width: 50 },
-      { title: 'Класс', value: 'class', width: 70 },
+      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: true },
       { title: 'ФИО', value: 'full_name', sortable: true },
       { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
       { title: 'Результат', value: 'value', sortable: true, width: 120 },
@@ -26,7 +26,7 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
   } else {
     return [
       { title: 'ID', value: 'id', width: 50 },
-      { title: 'Класс', value: 'class', width: 70 },
+      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: true },
       { title: 'ФИО', value: 'full_name', sortable: true },
       { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
       { title: 'Оценка', value: 'value', sortable: true, width: 120 }
@@ -61,12 +61,13 @@ function getMarkColor(mark?: number): string {
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
     :mobile="null"
     :show-current-page="true"
-    :sort-by="[{ key: 'name', order: 'asc' }]"
+    :sort-by="[{key: 'student_class.class_name', order: 'asc'}, { key: 'full_name', order: 'asc' },]"
+    multi-sort
     class="table"
     item-key="name"
     no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив справа"
   >
-    <template #item.class="{item}">
+    <template #item.student_class.class_name="{item}">
       {{ item.student_class.number + item.student_class.class_name }}
     </template>
     <template #item.full_name="{item}">

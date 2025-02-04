@@ -25,14 +25,7 @@ function onSelect(id: number): void {
   selectedId.value = id
 }
 
-let firstRender = true
-watch(() => data, () => {
-  if (firstRender) {
-    firstRender = false
-    return
-  }
-  selectedId.value = -1
-})
+
 </script>
 
 <template>

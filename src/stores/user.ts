@@ -21,7 +21,7 @@ export const useUserStore = defineStore('user', () => {
 
   async function fetchProfile() {
     try {
-      const response = await get('/api/classes/')
+      const response = await get('/api/profile/')
       if (!response.ok) {
         isLoggedIn.value = false
         localStorage.removeItem('isLoggedIn')
