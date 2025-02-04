@@ -25,7 +25,12 @@ function onSelect(id: number): void {
   selectedId.value = id
 }
 
+let firstRender = true
 watch(() => data, () => {
+  if (firstRender) {
+    firstRender = false
+    return
+  }
   selectedId.value = -1
 })
 </script>
@@ -71,14 +76,14 @@ watch(() => data, () => {
               title="Внимание"
             >
               <template v-slot:actions>
-                <v-spacer></v-spacer>
+                <v-spacer />
 
                 <v-btn color="success" @click="isActive.value = false">
-                  Disagree
+                  Нет
                 </v-btn>
 
                 <v-btn color="error" @click="isActive.value = false; emit('delete', false)">
-                  Agree
+                  Да
                 </v-btn>
               </template>
             </v-card>
