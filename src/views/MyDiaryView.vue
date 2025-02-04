@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import TopPanel from '@/components/TopPanel.vue'
 import { computed, onMounted, ref } from 'vue'
+import { get, post } from '@/utils'
+import { useRoute, useRouter } from 'vue-router'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyClassesTable from '@/components/MyClassesTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
@@ -12,15 +14,17 @@ import type {
   StudentsValueResponse,
   StudentValueRequest
 } from '@/types/types'
-import { get, post } from '@/utils'
 
 
-const activeLevelNumber = ref(-1)
-const className = ref('')
+const router = useRouter()
+const route = useRoute()
+
+const activeLevelNumber = ref(+route.query.classNumber! || -1)
+const className = ref(route.query.letter as string || '')
 const fullClassName = computed(() =>
   className.value ? activeLevelNumber.value + className.value : activeLevelNumber.value
 )
-const selectedStandardId = ref(-1)
+const selectedStandardId = ref(+route.query.standard! || -1)
 
 const selectedStandardType = computed<'physical' | 'technical'>(() => {
   if (standardsData.value.find(v => v.id === selectedStandardId.value)?.has_numeric_value) {
@@ -38,6 +42,9 @@ const filteredData = ref<StudentsValueResponse[]>([])
 onMounted(async () => {
   classesData.value = await get('/api/classes/').then(res => res.json())
   standardsData.value = await get('/api/standards/').then(res => res.json())
+  if (activeLevelNumber.value !== -1 && selectedStandardId.value !== -1) {
+    await getStudentsData()
+  }
 })
 
 const classes = computed(() =>
@@ -62,8 +69,21 @@ const standards = computed(() =>
     }))
 )
 
+function setQuery() {
+  router.replace({
+    query: {
+      classNumber: activeLevelNumber.value,
+      letter: className.value,
+      standard: selectedStandardId.value
+    }
+  })
+}
+
+
 async function getStudentsData() {
+  setQuery()
   if (selectedStandardId.value === -1) return
+
 
   const currentClasses = classesData.value
     .filter(klass =>
@@ -74,7 +94,9 @@ async function getStudentsData() {
   try {
     const currentStudents: StudentResponse[] = await get('/api/students/', {
       'student_class': fullClassName.value
-    }).then(res => res.json())
+    })
+      .then(res => res.json() as Promise<StudentResponse[]>)
+
     const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/', {
       'class_id[]': currentClasses,
       standard_id: selectedStandardId.value
@@ -98,7 +120,10 @@ function activeLevelClick(classNumber: number, letter: string) {
   activeLevelNumber.value = classNumber
   className.value = letter
   filteredData.value = []
-  selectedStandardId.value = -1
+  if (!standards.value.some(v => v.id === selectedStandardId.value))
+    selectedStandardId.value = -1
+
+  getStudentsData()
 }
 
 const filters = ref<FilterData>({

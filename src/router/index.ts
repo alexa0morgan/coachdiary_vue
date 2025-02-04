@@ -62,6 +62,13 @@ const router = createRouter({
       beforeEnter: isAuthenticated
     },
     {
+      path: '/app/my-classes/:id',
+      name: 'student',
+      component: StudentView,
+      meta: { mobileTitle: 'Ученик' },
+      beforeEnter: isAuthenticated
+    },
+    {
       path: '/app/my-classes/update/:id',
       name: 'update-student',
       component: CreateOrUpdateStudentView,
@@ -95,14 +102,8 @@ const router = createRouter({
       component: ProfileView,
       meta: { mobileTitle: 'Профиль' },
       beforeEnter: isAuthenticated
-    },
-    {
-      path: '/app/my-classes/:id',
-      name: 'student',
-      component: StudentView,
-      meta: { mobileTitle: 'Ученик' },
-      beforeEnter: isAuthenticated
     }
+
   ],
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {

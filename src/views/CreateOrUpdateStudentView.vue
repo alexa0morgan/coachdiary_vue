@@ -2,12 +2,13 @@
 
 import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import { get, post, put } from '@/utils'
 import type { Gender, GenderNullable, StudentRequest, StudentResponse } from '@/types/types'
 
 const route = useRoute()
+const router = useRouter()
 const pageType = ref(route.name as 'create-student' | 'update-student')
 
 const studentName = ref('')
@@ -55,6 +56,7 @@ async function createOrUpdateStudent() {
       birthdayDate.value = ''
     } else if (response.ok && pageType.value == 'update-student') {
       alert('Данные об ученике обновлены')
+      router.push({ name: 'student', params: { id: route.params.id } })
     } else {
       const data = await response.json()
       if (data?.status === 'error') {
