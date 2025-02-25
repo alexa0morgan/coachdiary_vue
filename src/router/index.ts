@@ -11,6 +11,7 @@ import StudentView from '@/views/StudentView.vue'
 import { useUserStore } from '@/stores/user'
 import AboutSiteView from '@/views/AboutSiteView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
+import MyClassesView from '@/views/MyClassesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,6 +53,13 @@ const router = createRouter({
       name: 'my-diary',
       component: MyDiaryView,
       meta: { mobileTitle: 'Дневник' },
+      beforeEnter: isAuthenticated
+    },
+    {
+      path: '/app/my-classes',
+      name: 'my-classes',
+      component: MyClassesView,
+      meta: { mobileTitle: 'Мои ученики' },
       beforeEnter: isAuthenticated
     },
     {

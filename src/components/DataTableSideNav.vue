@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { watch } from 'vue'
 
 const { title, data, isStandardTypeTechnical, isContentStaticText, hasActionButtons = true } = defineProps<{
   title: string;

@@ -48,6 +48,7 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
       <v-list-item :to="{name: 'about-us'}" link title="О нас" />
     </template>
     <template v-else>
+      <v-list-item :to="{name: 'my-classes'}" link title="Мои ученики" />
       <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
       <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
       <v-list-item :to="{name: 'profile'}" link title="Профиль" />
@@ -84,8 +85,10 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
         </template>
 
         <template v-else-if="smAndUp">
+          <v-btn :to="{name: 'my-classes'}" variant="text">Мои ученики</v-btn>
           <v-btn :to="{name: 'my-diary'}" variant="text">Дневник</v-btn>
           <v-btn :to="{name: 'my-standards'}" variant="text">Мои нормативы</v-btn>
+          <v-divider class="divider mb-2 mt-2" color="rgb(var(--v-theme-primary-darken-1))" vertical/>
           <v-btn :to="{name: 'profile'}" variant="text">Профиль</v-btn>
           <v-btn rounded variant="flat" @click="logout">Выйти</v-btn>
         </template>
@@ -116,13 +119,19 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
 .container {
   display: flex;
   gap: 10px;
+  align-items: center;
+  height: 100%
 }
 
 .icon {
   height: 32px;
 }
 
-@media (max-width: 760px) {
+.divider{
+  height: calc(100% - 15px);
+}
+
+@media (max-width: 900px) {
   .text-title {
     display: none;
   }

@@ -14,6 +14,7 @@ defineProps<{
 const emit = defineEmits<{
     studentsData: [students: StudentResponse[], classNumber: number, letter: string];
     classesData: [classes: ClassRequest[]];
+    buttonClick: [];
 }>()
 
 
@@ -38,7 +39,7 @@ const classes = computed(() =>
     }, {} as Record<number, string[]>)
 )
 
-async function getStudentsData(classNumber: number, letter: string) {
+async function getStudentsData(classNumber: number, letter: string, emitButtonClick = false) {
   activeLevelNumber.value = classNumber
   className.value = letter
   await router.replace({
@@ -48,6 +49,10 @@ async function getStudentsData(classNumber: number, letter: string) {
       letter: letter
     }
   })
+
+  if (emitButtonClick) {
+    emit('buttonClick')
+  }
 
   try {
     const currentStudents = await get('/api/students/', {
@@ -80,7 +85,7 @@ onMounted(async () => {
       :variant="activeLevelNumber === n ? 'flat' : 'outlined'"
       class="level-button top-button"
       color="rgb(var(--v-theme-secondary))"
-      @click="!menu ? getStudentsData(n, '') : ''">
+      @click="!menu ? getStudentsData(n, '', true) : ''">
 
       {{ n }}{{ activeLevelNumber === n ? className : '' }}
       <v-menu v-if="menu" activator="parent" location="bottom center" offset="5"
@@ -88,10 +93,10 @@ onMounted(async () => {
         <v-list base-color="rgb(var(--v-theme-secondary))" bg-color="rgb(var(--v-theme-primary))"
                 density="compact" elevation="0">
           <v-list-item v-for="letter in classes[n]" :key='n + letter' class="text-center"
-                       @click="getStudentsData(n, letter)">
+                       @click="getStudentsData(n, letter, true)">
             <v-list-item-title>{{ letter.toUpperCase() }}</v-list-item-title>
           </v-list-item>
-          <v-list-item class="text-center" @click="getStudentsData(n, '')">
+          <v-list-item class="text-center" @click="getStudentsData(n, '', true)">
             <v-list-item-title>Параллель</v-list-item-title>
           </v-list-item>
         </v-list>
