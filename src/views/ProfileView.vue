@@ -1,14 +1,10 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { get, patch, put } from '@/utils'
-import { useUserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
 
 onMounted(async () => {
   await getData()
 })
-const userStore = useUserStore()
-const router = useRouter()
 const currentName = ref('')
 const currentEmail = ref('')
 const name = ref('')
@@ -24,7 +20,6 @@ async function getData() {
       currentEmail.value = data.email
       name.value = currentName.value
       email.value = currentEmail.value
-
     }
   } catch {
     alert('Ошибка доступа к данным')
@@ -32,6 +27,10 @@ async function getData() {
 }
 
 async function patchData() {
+  if (isSendButtonDisabled.value) {
+    return
+  }
+
   try {
     const requestData = currentEmail.value === email.value ? { name: name.value } : {
       email: email.value,
@@ -47,6 +46,10 @@ async function patchData() {
 }
 
 async function putPassword() {
+  if (isSetPasswordButtonDisabled.value) {
+    return
+  }
+
   try {
     const requestData = {
       new_password: newPassword.value,
@@ -66,7 +69,8 @@ async function putPassword() {
 }
 
 const isSendButtonDisabled = computed(() => {
-  return (name.value?.trim() === currentName.value && email.value?.trim() === currentEmail.value) || name.value?.trim().length == 0 || email.value?.trim().length == 0
+  return (name.value?.trim() === currentName.value && email.value?.trim() === currentEmail.value) ||
+    name.value?.trim().length === 0 || email.value?.trim().length === 0 || !name.value
 })
 const password = ref('')
 const newPassword = ref('')
@@ -88,14 +92,16 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
         Имя: <span class="non-bold-text">{{ currentName }} </span> <br />
         Почта: <span class="non-bold-text">{{ currentEmail }}</span>
       </div>
-      <div class="text-fields">
+      <form class="text-fields" @submit.prevent="patchData">
         <v-text-field
           v-model="name"
           clearable
+          persistent-clear
           label="Полное имя" />
         <v-text-field
           v-model="email"
           clearable
+          persistent-clear
           label="Почта"
           type="email" />
         <v-btn
@@ -103,12 +109,12 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
           class="button"
           rounded
           text="Сохранить"
-          @click="patchData" />
-      </div>
+          type="submit" />
+      </form>
     </div>
     <div class="container rounded-lg">
       <div class="text">Смена пароля</div>
-      <div class="text-fields">
+      <form class="text-fields" @submit.prevent="putPassword">
         <v-text-field
           v-model="password"
           :append-inner-icon="password ? 'mdi-eye' : undefined"
@@ -142,8 +148,8 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
           class="button"
           rounded
           text="Установить"
-          @click="putPassword" />
-      </div>
+          type="submit" />
+      </form>
     </div>
   </div>
 </template>

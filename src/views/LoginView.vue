@@ -58,6 +58,10 @@ const buttonText = computed(() => {
 const isLoading = ref(false)
 
 async function sendData() {
+  if (isSendButtonDisabled.value || isLoading.value) {
+    return
+  }
+
   isLoading.value = true
   try {
     let response
@@ -124,7 +128,7 @@ async function restore() {
   <div class="page">
     <div class="container rounded-lg">
       <div class="text">{{ title }}</div>
-      <div class="border-container">
+      <form class="border-container" @submit.prevent="sendData">
         <v-text-field
           v-if="pageType === 'signUp'"
           v-model="name"
@@ -170,8 +174,8 @@ async function restore() {
           @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
         />
         <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
-               @click="sendData" />
-      </div>
+               type="submit" />
+      </form>
       <div v-if="pageType==='signIn'">
         <v-btn :disabled="isLoading" size="small" text="Регистрация" variant="text" @click="pageType = 'signUp'" />
         <v-btn :disabled="isLoading" size="small" text="Восстановление пароля" variant="text" @click="pageType =
