@@ -26,17 +26,13 @@ async function getData() {
   }
 }
 
-async function patchData() {
-  if (isSendButtonDisabled.value) {
+async function patchName() {
+  if (isSetNameButtonDisabled.value) {
     return
   }
 
   try {
-    const requestData = currentEmail.value === email.value ? { name: name.value } : {
-      email: email.value,
-      name: name.value
-    }
-    const response = await patch('/api/profile/', requestData)
+    const response = await patch('/api/profile/', { name: name.value })
     if (response.ok) {
       await getData()
     }
@@ -44,6 +40,22 @@ async function patchData() {
     alert('Произошла ошибка, попробуйте еще раз')
   }
 }
+
+async function patchEmail() {
+  if (isSetEmailButtonDisabled.value) {
+    return
+  }
+
+  try {
+    const response = await patch('/api/profile/', { email: email.value })
+    if (response.ok) {
+      await getData()
+    }
+  } catch {
+    alert('Произошла ошибка, попробуйте еще раз')
+  }
+}
+
 
 async function putPassword() {
   if (isSetPasswordButtonDisabled.value) {
@@ -68,9 +80,11 @@ async function putPassword() {
   }
 }
 
-const isSendButtonDisabled = computed(() => {
-  return (name.value?.trim() === currentName.value && email.value?.trim() === currentEmail.value) ||
-    name.value?.trim().length === 0 || email.value?.trim().length === 0 || !name.value
+const isSetNameButtonDisabled = computed(() => {
+  return name.value?.trim() === currentName.value || name.value?.trim().length === 0 || !name.value
+})
+const isSetEmailButtonDisabled = computed(() => {
+  return email.value?.trim() === currentEmail.value || email.value?.trim().length === 0
 })
 const password = ref('')
 const newPassword = ref('')
@@ -89,15 +103,22 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
   <div class="main">
     <div class="container rounded-lg">
       <div class="text">
-        Имя: <span class="non-bold-text">{{ currentName }} </span> <br />
-        Почта: <span class="non-bold-text">{{ currentEmail }}</span>
+        Смена имени и почты
       </div>
-      <form class="text-fields" @submit.prevent="patchData">
+      <form class="text-field mb-4" @submit.prevent="patchName">
         <v-text-field
           v-model="name"
           clearable
           persistent-clear
           label="Полное имя" />
+        <v-btn
+          :disabled="isSetNameButtonDisabled"
+          class="button"
+          rounded
+          text="Изменить"
+          type="submit" />
+      </form>
+      <form class="text-field" @submit.prevent="patchEmail">
         <v-text-field
           v-model="email"
           clearable
@@ -105,16 +126,16 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
           label="Почта"
           type="email" />
         <v-btn
-          :disabled="isSendButtonDisabled"
+          :disabled="isSetEmailButtonDisabled"
           class="button"
           rounded
-          text="Сохранить"
+          text="Изменить"
           type="submit" />
       </form>
     </div>
     <div class="container rounded-lg">
       <div class="text">Смена пароля</div>
-      <form class="text-fields" @submit.prevent="putPassword">
+      <form class="text-field" @submit.prevent="putPassword">
         <v-text-field
           v-model="password"
           :append-inner-icon="password ? 'mdi-eye' : undefined"
@@ -147,7 +168,7 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
           :disabled="isSetPasswordButtonDisabled"
           class="button"
           rounded
-          text="Установить"
+          text="Изменить"
           type="submit" />
       </form>
     </div>
@@ -156,11 +177,11 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
 
 <style scoped>
 .main {
-  margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-items: center;
+  margin: 20px 0;
 }
 
 .container {
@@ -171,10 +192,11 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
   text-align: center;
 }
 
-.text-fields {
+.text-field {
   display: grid;
-  gap: 20px;
+  gap: 10px;
 }
+
 
 .text {
   font-size: 24px;
@@ -184,15 +206,15 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
   margin-bottom: 24px;
 }
 
-.non-bold-text {
-  font-weight: 400;
-}
-
 .button {
-  justify-self: end;
+  justify-self: flex-end;
 }
 
 @media (max-width: 800px) {
+  .main {
+    margin-top: 0;
+  }
+
   .container {
     background: transparent;
     padding: 20px;
