@@ -4,7 +4,8 @@ import TopPanel from '@/components/TopPanel.vue'
 import ClassesPanel from '@/components/ClassesPanel.vue'
 import { computed, ref } from 'vue'
 import type { StudentResponse } from '@/types/types'
-import {useMyClassesStore} from '@/stores/myClasses'
+import { useMyClassesStore } from '@/stores/myClasses'
+import { useDisplay } from 'vuetify'
 
 let timer: number | null = null
 
@@ -17,6 +18,7 @@ function search() {
   }, 300)
 }
 
+const { smAndUp } = useDisplay()
 const myClassesStore = useMyClassesStore()
 const activeLevelNumber = ref(-1)
 const studentsData = ref<StudentResponse[]>([])
@@ -59,14 +61,15 @@ function updateStudentsData(data: StudentResponse[], classNumber: number, letter
       hide-details
       @update:search="search"
     />
-    <template #right>
+    <template #right v-if="smAndUp">
       <v-btn :to="{name: 'create-student'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
              variant="outlined" />
     </template>
   </TopPanel>
 
   <div class="classes-panel">
-    <classes-panel direction-column @studentsData="updateStudentsData" @buttonClick="myClassesStore.activeClasses = []" />
+    <classes-panel direction-column @studentsData="updateStudentsData"
+                   @buttonClick="myClassesStore.activeClasses = []" />
   </div>
 
   <div class="grid">
@@ -101,10 +104,7 @@ function updateStudentsData(data: StudentResponse[], classNumber: number, letter
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
-
     </div>
-
-
   </div>
 
 </template>
