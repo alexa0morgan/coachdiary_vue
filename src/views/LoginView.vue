@@ -3,7 +3,8 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { post } from '@/utils'
+import { getErrorMessage, post } from '@/utils'
+import { toast } from 'vue-sonner'
 
 const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
 const router = useRouter()
@@ -73,10 +74,10 @@ async function sendData() {
       response = await restore()
     }
     if (response?.status === 'error') {
-      alert(response.details)
+      toast.error(getErrorMessage(response.details))
     }
   } catch {
-    alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   } finally {
     isLoading.value = false
   }
@@ -111,7 +112,7 @@ async function signUp() {
     password.value = ''
     name.value = ''
     passwordConfirmation.value = ''
-    alert('Пользователь успешно создан')
+    toast.success('Пользователь успешно создан')
   } else {
     return response.json()
   }

@@ -5,6 +5,7 @@ import { useUserStore } from '@/stores/user'
 import BottomAppBar from '@/components/BottomAppBar.vue'
 import { useDisplay } from 'vuetify'
 import { computed } from 'vue'
+import { Toaster } from 'vue-sonner'
 
 useUserStore().fetchProfile()
 
@@ -14,6 +15,7 @@ const isLoggedInView = computed(() => route.path.startsWith('/app'))
 </script>
 
 <template>
+  <Toaster rich-colors expand close-button visible-toasts="3"/>
   <v-app>
     <AppBar />
     <v-main>

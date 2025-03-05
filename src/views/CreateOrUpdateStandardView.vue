@@ -5,8 +5,9 @@ import FieldSet from '@/components/FieldSet.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { StandardRequest, StandardResponse } from '@/types/types'
-import { get, post, put } from '@/utils'
+import { get, getErrorMessage, post, put } from '@/utils'
 import { useDisplay } from 'vuetify'
+import { toast } from 'vue-sonner'
 
 const route = useRoute()
 const { mobile } = useDisplay()
@@ -113,22 +114,18 @@ async function createOrUpdateStandard() {
     const response = await currentMethod(`/api/standards/` + currentId, requestData)
 
     if (response.ok && pageType.value === 'create-standard') {
-      alert('Норматив создан')
+      toast.success('Норматив успешно создан')
       standardName.value = ''
       standardType.value = null
       levelNumbers.value = []
       setLevelsWithZeroes()
     } else if (response.ok && pageType.value === 'update-standard') {
-      alert('Данные о нормативе обновлены')
+      toast.success('Данные о нормативе успешно обновлены')
     } else {
-      const data = await response.json()
-      if (data?.status === 'error') {
-        const errors = Object.values(data.details).flat().join('\n')
-        alert(errors)
-      }
+      toast.error(getErrorMessage((await response.json()).details))
     }
   } catch {
-    alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
 
@@ -320,6 +317,14 @@ onMounted(async () => {
   grid-column: span 2;
   justify-self: end;
 }
+
+@media (max-width: 1000px) {
+  .grid {
+    background: transparent;
+  }
+
+}
+
 
 @media (max-width: 600px) {
   .top-panel {

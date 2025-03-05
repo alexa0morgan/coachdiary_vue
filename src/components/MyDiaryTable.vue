@@ -59,7 +59,7 @@ function getMarkColor(mark?: number): string {
     :headers="headers"
     :items="data"
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
-    :mobile="null"
+    :mobile="false"
     :show-current-page="true"
     :sort-by="[{key: 'student_class.class_name', order: 'asc'}, { key: 'full_name', order: 'asc' },]"
     multi-sort

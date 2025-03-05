@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { get, patch, put } from '@/utils'
+import { get, getErrorMessage, patch, put } from '@/utils'
+import { toast } from 'vue-sonner'
 
 onMounted(async () => {
   await getData()
@@ -20,9 +21,11 @@ async function getData() {
       currentEmail.value = data.email
       name.value = currentName.value
       email.value = currentEmail.value
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
     }
   } catch {
-    alert('Ошибка доступа к данным')
+    toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
   }
 }
 
@@ -35,9 +38,12 @@ async function patchName() {
     const response = await patch('/api/profile/', { name: name.value })
     if (response.ok) {
       await getData()
+      toast.success('Имя успешно изменено')
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
     }
   } catch {
-    alert('Произошла ошибка, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
 
@@ -50,9 +56,12 @@ async function patchEmail() {
     const response = await patch('/api/profile/', { email: email.value })
     if (response.ok) {
       await getData()
+      toast.success('Почта успешно изменена')
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
     }
   } catch {
-    alert('Произошла ошибка, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
 
@@ -73,10 +82,12 @@ async function putPassword() {
       password.value = ''
       newPassword.value = ''
       passwordConfirmation.value = ''
-      alert('Пароль успешно обновлен')
+      toast.success('Пароль успешно изменен')
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
     }
   } catch {
-    alert('Произошла ошибка обновления пароля, попробуйте позже')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
 

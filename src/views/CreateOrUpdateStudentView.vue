@@ -4,8 +4,9 @@ import TopPanel from '@/components/TopPanel.vue'
 import FieldSet from '@/components/FieldSet.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
-import { get, post, put } from '@/utils'
+import { get, getErrorMessage, post, put } from '@/utils'
 import type { Gender, GenderNullable, StudentRequest, StudentResponse } from '@/types/types'
+import { toast } from 'vue-sonner'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,23 +51,19 @@ async function createOrUpdateStudent() {
     const response = await currentMethod(`/api/students/` + currentId, requestData)
 
     if (response.ok && pageType.value === 'create-student') {
-      alert('Ученик создан')
+      toast.success('Ученик успешно создан')
       studentName.value = ''
       genderType.value = null
       birthdayDate.value = ''
     } else if (response.ok && pageType.value == 'update-student') {
-      alert('Данные об ученике обновлены')
+      toast.success('Данные о ученике успешно обновлены')
       router.push({ name: 'student', params: { id: route.params.id } })
     } else {
-      const data = await response.json()
-      if (data?.status === 'error') {
-        const errors = Object.values(data.details).flat().join('\n')
-        alert(errors)
-      }
+      toast.error(getErrorMessage((await response.json()).details))
     }
 
   } catch (e) {
-    alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
 </script>

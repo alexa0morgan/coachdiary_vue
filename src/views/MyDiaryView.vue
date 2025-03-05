@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import TopPanel from '@/components/TopPanel.vue'
 import { computed, onMounted, ref } from 'vue'
-import { get, post } from '@/utils'
+import { get, getErrorMessage, post } from '@/utils'
 import { useRoute, useRouter } from 'vue-router'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
-import MyClassesTable from '@/components/MyClassesTable.vue'
+import MyDiaryTable from '@/components/MyDiaryTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
 import type {
   ClassRequest,
@@ -15,6 +15,7 @@ import type {
   StudentValueRequest
 } from '@/types/types'
 import ClassesPanel from '@/components/ClassesPanel.vue'
+import { toast } from 'vue-sonner'
 
 
 const router = useRouter()
@@ -110,7 +111,7 @@ async function getStudentsData() {
     })
     filteredData.value = studentsValueData.value
   } catch {
-    alert('Ошибка при получении данных, попробуйте позже')
+    toast.error('Ошибка при получении данных, попробуйте позже')
   }
 }
 
@@ -146,11 +147,10 @@ async function saveStudentsValue() {
     if (response.ok) {
       await getStudentsData()
     } else {
-      alert('Ошибка при отправке данных, попробуйте позже')
+      toast.error(getErrorMessage((await response.json()).errors))
     }
-
   } catch {
-    alert('Ошибка сервера при отправке данных, попробуйте позже')
+    toast.error('Ошибка при сохранении данных, попробуйте позже')
   }
 }
 
@@ -165,7 +165,7 @@ async function saveStudentsValue() {
 
     <FilterBlock v-model="filters" class="filters-block" @accept="acceptFilters" />
 
-    <MyClassesTable :data="filteredData" :standard-type="selectedStandardType" class="table"
+    <MyDiaryTable :data="filteredData" :standard-type="selectedStandardType" class="table"
                     @saveData="saveStudentsValue" />
 
     <DataTableSideNav v-model="selectedStandardId" :data="standards"

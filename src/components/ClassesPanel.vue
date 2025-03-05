@@ -4,7 +4,8 @@
 import { computed, onMounted, ref } from 'vue'
 import type { ClassRequest, StudentResponse } from '@/types/types'
 import { useRoute, useRouter } from 'vue-router'
-import { get } from '@/utils'
+import { get, getErrorMessage } from '@/utils'
+import { toast } from 'vue-sonner'
 
 defineProps<{
   directionColumn?: boolean;
@@ -12,9 +13,9 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-    studentsData: [students: StudentResponse[], classNumber: number, letter: string];
-    classesData: [classes: ClassRequest[]];
-    buttonClick: [];
+  studentsData: [students: StudentResponse[], classNumber: number, letter: string];
+  classesData: [classes: ClassRequest[]];
+  buttonClick: [];
 }>()
 
 
@@ -55,13 +56,17 @@ async function getStudentsData(classNumber: number, letter: string, emitButtonCl
   }
 
   try {
-    const currentStudents = await get('/api/students/', {
+    const response = await get(`/api/students/`, {
       'student_class': fullClassName.value
     })
-      .then(res => res.json() as Promise<StudentResponse[]>)
-    emit('studentsData', currentStudents, classNumber, letter);
+    if (response.ok) {
+      const currentStudents = await response.json() as StudentResponse[]
+      emit('studentsData', currentStudents, classNumber, letter)
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
+    }
   } catch {
-    alert('Ошибка при получении данных, попробуйте позже')
+    toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
   }
 }
 

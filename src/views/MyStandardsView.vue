@@ -4,9 +4,10 @@ import StandardsTable from '@/components/StandardsTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import TopPanel from '@/components/TopPanel.vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { del, get } from '@/utils'
+import { del, get, getErrorMessage} from '@/utils'
 import type { StandardResponse } from '@/types/types'
 import router from '@/router'
+import { toast } from 'vue-sonner'
 
 const activeLevelNumber = ref(-1)
 const pageType = ref<'standards' | 'technical'>('standards')
@@ -67,6 +68,19 @@ async function deleteStandard(): Promise<void> {
   }
   standards.value = standards.value.filter(standard => standard.id !== selectedId.value)
   await setFirst()
+
+  try {
+    const response = await del('/api/standards/' + selectedId.value)
+    if (response.ok) {
+      standards.value = standards.value.filter(standard => standard.id !== selectedId.value)
+      await setFirst()
+      toast.success('Норматив был успешно удален')
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
+    }
+  } catch {
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+  }
 }
 
 </script>
