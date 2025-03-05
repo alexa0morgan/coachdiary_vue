@@ -4,7 +4,7 @@ import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
 import DataTable from '@/components/DataTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
-import { del, get, getErrorMessage, post } from '@/utils'
+import { del, get, getErrorMessage, post, showConfirmDialog } from '@/utils'
 import type { StudentResponse, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
 import { useRoute } from 'vue-router'
 import router from '@/router'
@@ -92,10 +92,15 @@ function editStudent(): void {
 
 async function deleteStudent() {
 
+  await showConfirmDialog({
+    title: 'Удаление ученика',
+    text: 'Вы уверены, что хотите удалить этого ученика?'
+  })
+
   try {
     const response = await del('/api/students/' + studentId.value)
     if (response.ok) {
-      router.push({ name: 'my-diary' })
+      await router.push({ name: 'my-diary' })
       toast.success('Ученик успешно удален')
     } else {
       toast.error(getErrorMessage((await response.json()).details))

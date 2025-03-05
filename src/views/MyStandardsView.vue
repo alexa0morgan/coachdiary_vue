@@ -4,7 +4,7 @@ import StandardsTable from '@/components/StandardsTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import TopPanel from '@/components/TopPanel.vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { del, get, getErrorMessage} from '@/utils'
+import { del, get, getErrorMessage, showConfirmDialog } from '@/utils'
 import type { StandardResponse } from '@/types/types'
 import router from '@/router'
 import { toast } from 'vue-sonner'
@@ -61,13 +61,10 @@ function editStandard(): void {
 }
 
 async function deleteStandard(): Promise<void> {
-  const response = await del('/api/standards/' + selectedId.value)
-  if (!response.ok) {
-    alert('Произошла ошибка при удалении, попробуйте снова')
-    return
-  }
-  standards.value = standards.value.filter(standard => standard.id !== selectedId.value)
-  await setFirst()
+  await showConfirmDialog({
+    title: 'Удаление норматива',
+    text: 'Вы уверены, что хотите удалить этот норматив?'
+  })
 
   try {
     const response = await del('/api/standards/' + selectedId.value)

@@ -6,6 +6,7 @@ import BottomAppBar from '@/components/BottomAppBar.vue'
 import { useDisplay } from 'vuetify'
 import { computed } from 'vue'
 import { Toaster } from 'vue-sonner'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 useUserStore().fetchProfile()
 
@@ -22,6 +23,7 @@ const isLoggedInView = computed(() => route.path.startsWith('/app'))
       <RouterView />
     </v-main>
     <BottomAppBar v-if="!smAndUp && isLoggedInView" />
+    <ConfirmDialog/>
   </v-app>
 </template>
 

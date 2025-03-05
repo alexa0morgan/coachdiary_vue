@@ -59,28 +59,8 @@ function onSelect(id: number): void {
           </v-list>
         </v-menu>
       </v-btn>
-      <v-btn v-else class="button action-button" color="error" size="small" variant="outlined">
+      <v-btn v-else class="button action-button" color="error" size="small" variant="outlined" @click="emit('delete', false)">
         Удалить
-        <v-dialog activator="parent" max-width="340">
-          <template v-slot:default="{ isActive }">
-            <v-card
-              text="Вы уверены, что хотите удалить этот элемент?"
-              title="Внимание"
-            >
-              <template v-slot:actions>
-                <v-spacer />
-
-                <v-btn color="success" @click="isActive.value = false">
-                  Нет
-                </v-btn>
-
-                <v-btn color="error" @click="isActive.value = false; emit('delete', false)">
-                  Да
-                </v-btn>
-              </template>
-            </v-card>
-          </template>
-        </v-dialog>
       </v-btn>
 
     </div>

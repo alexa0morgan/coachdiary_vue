@@ -6,6 +6,7 @@ import { computed, ref } from 'vue'
 import type { StudentResponse } from '@/types/types'
 import { useMyClassesStore } from '@/stores/myClasses'
 import { useDisplay } from 'vuetify'
+import { showConfirmDialog } from '@/utils'
 
 let timer: number | null = null
 
@@ -38,7 +39,14 @@ const studentsClasses = computed(() =>
 function updateStudentsData(data: StudentResponse[], classNumber: number, letter: string) {
   studentsData.value = data.sort((a, b) => a.full_name.localeCompare(b.full_name))
   activeLevelNumber.value = classNumber
+}
 
+async function deleteClass() {
+  //TODO создать функционал удаления классов
+  await showConfirmDialog({
+    title: 'Удаление класса',
+    text: 'Вы уверены, что хотите удалить класс?',
+  })
 }
 
 </script>
@@ -96,7 +104,7 @@ function updateStudentsData(data: StudentResponse[], classNumber: number, letter
             </div>
 
             <div class="action-buttons">
-              <v-btn size="small" color="error" variant="outlined">Удалить</v-btn>
+              <v-btn size="small" color="error" variant="outlined" @click="deleteClass">Удалить</v-btn>
               <v-btn size="small" color="warning" variant="outlined">Архивировать</v-btn>
               <v-btn size="small" color="info" variant="outlined">Перевести на след. год</v-btn>
             </div>

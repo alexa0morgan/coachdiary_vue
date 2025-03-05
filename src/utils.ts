@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+
 export function getCookie(name: string): string | null {
   const cookieArr = document.cookie.split(';')
 
@@ -73,4 +75,70 @@ export function del(url: string): Promise<Response> {
       'X-CSRFToken': getCookie('csrftoken') ?? ''
     }
   })
+}
+
+
+export function flattenObject(obj: any, parentKey: string = '', result: Record<string, any> = {}): Record<string, any> {
+  for (const key in obj) {
+    // eslint-disable-next-line
+    if (obj.hasOwnProperty(key)) {
+      const newKey = parentKey ? `${parentKey}[${key}]` : key
+      if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+        flattenObject(obj[key], newKey, result)
+      } else if (Array.isArray(obj[key])) {
+        obj[key].forEach((item: any, index: number) => {
+          const arrayKey = `${newKey}[${index}]`
+          if (typeof item === 'object') {
+            flattenObject(item, arrayKey, result)
+          } else {
+            result[arrayKey] = item
+          }
+        })
+      } else {
+        result[newKey] = obj[key]
+      }
+    }
+  }
+  return result
+}
+
+export function getErrorMessage(error: any): string {
+  return Object.values(flattenObject(error)).join(' ')
+}
+
+
+type Dialog = {
+  title?: string
+  text: string
+  confirmText: string
+  cancelText: string
+  confirmAction: () => void
+  cancelAction: () => void
+}
+
+export const confirmDialogs = ref<Dialog[]>([])
+
+export function showConfirmDialog({ title, text, confirmText = 'Да', cancelText = 'Нет' }: {
+  title?: string,
+  text: string,
+  confirmText?: string,
+  cancelText?: string
+}) {
+  return new Promise((resolve, reject) => {
+    const dialog: Dialog = {
+      title,
+      text,
+      confirmText,
+      cancelText,
+      confirmAction: () => removeDialog(dialog, resolve as () => void),
+      cancelAction: () => removeDialog(dialog, reject)
+    }
+    confirmDialogs.value.push(dialog)
+  })
+}
+
+function removeDialog(dialog:Dialog, action: () => void) {
+  const index = confirmDialogs.value.indexOf(dialog)
+  confirmDialogs.value.splice(index, 1)
+  action()
 }
