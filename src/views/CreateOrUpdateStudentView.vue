@@ -172,7 +172,13 @@ async function createOrUpdateStudent() {
   justify-self: end;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1000px) {
+  .grid {
+    background: transparent;
+  }
+}
+
+@media (max-width: 800px) {
   .top-panel {
     display: none;
   }
@@ -180,7 +186,7 @@ async function createOrUpdateStudent() {
   .grid {
     grid-template-columns: 1fr;
     overflow: scroll;
-    padding: 5px;
+    padding: 15px;
     gap: 20px;
   }
 

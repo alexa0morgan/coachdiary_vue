@@ -179,7 +179,7 @@ onMounted(async () => {
   </TopPanel>
   <div v-auto-animate class="grid">
 
-    <FieldSet title="Тип">
+    <FieldSet title="Тип" class="standard-type">
       <v-radio-group v-model="standardType" :disabled="pageType === 'update-standard'" row
                      @update:model-value="setLevelsWithZeroes">
         <v-radio label="Физический" value="physical" />
@@ -322,11 +322,9 @@ onMounted(async () => {
   .grid {
     background: transparent;
   }
-
 }
 
-
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .top-panel {
     display: none;
   }
@@ -334,7 +332,7 @@ onMounted(async () => {
   .grid {
     grid-template-columns: 1fr;
     overflow: scroll;
-    padding: 5px;
+    padding: 15px;
     gap: 20px;
   }
 
@@ -343,7 +341,20 @@ onMounted(async () => {
   }
 
   .standards-table {
-    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .checkbox-group {
+    flex-direction: row;
+    height: auto;
+  }
+
+  .levels-text br {
+    display: none;
+  }
+
+  .standard-name {
+    order: -1;
   }
 
 }

@@ -43,7 +43,6 @@ const router = createRouter({
     {
       path: '/app',
       name: 'app',
-      /*component: AppView,*/
       redirect: { name: 'my-diary' },
       meta: { mobileTitle: 'Дневник тренера' },
       beforeEnter: isAuthenticated

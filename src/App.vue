@@ -16,14 +16,15 @@ const isLoggedInView = computed(() => route.path.startsWith('/app'))
 </script>
 
 <template>
-  <Toaster rich-colors expand close-button visible-toasts="3"/>
+  <Toaster rich-colors expand close-button visible-toasts="3" :position=" smAndUp ? 'bottom-right' : 'top-center' "
+           :offset="smAndUp ? 0 : '30px'" />
   <v-app>
     <AppBar />
     <v-main>
       <RouterView />
     </v-main>
     <BottomAppBar v-if="!smAndUp && isLoggedInView" />
-    <ConfirmDialog/>
+    <ConfirmDialog />
   </v-app>
 </template>
 
