@@ -20,21 +20,17 @@ const logoLink = computed(() => {
   return { name: 'home' }
 })
 
-const plusButtonLink = computed(() => {
-  if (route.name === 'my-diary') {
-    return { name: 'create-student' }
-  } else if (route.name === 'my-standards') {
-    return { name: 'create-standard' }
-  }
-  return ''
-})
-
 async function logout() {
   await userStore.logout()
   router.push({ name: 'login' })
 }
 
-const mobileTitle = computed(() => route.meta.mobileTitle)
+const mobileTitle = computed(() => {
+  if (route.name === 'student' && route.params.id) {
+    return route.meta.mobileTitle || 'Ученик'
+  }
+  return route.meta.mobileTitle
+})
 
 </script>
 
@@ -47,16 +43,17 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
       <v-list-item :to="{name: 'about-site'}" link title="О сайте" />
       <v-list-item :to="{name: 'about-us'}" link title="О нас" />
     </template>
-    <template v-else>
-      <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
-      <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
-      <v-list-item :to="{name: 'profile'}" link title="Профиль" />
-      <v-divider class="mb-2 mt-2" color="rgb(var(--v-theme-primary-darken-1))" />
-      <v-list-item link title="Выход" @click="logout" />
-    </template>
+<!--        <template v-else>
+          <v-list-item :to="{name: 'my-classes'}" link title="Мои ученики" />
+          <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
+          <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
+          <v-list-item :to="{name: 'profile'}" link title="Профиль" />
+          <v-divider class="mb-2 mt-2" color="rgb(var(&#45;&#45;v-theme-primary-darken-1))" />
+          <v-list-item link title="Выход" @click="logout" />
+        </template>-->
   </v-navigation-drawer>
 
-  <v-app-bar :elevation="2">
+  <v-app-bar :class="{'app-bar' : !smAndUp}">
     <v-app-bar-title>
       <router-link v-if="smAndUp" :to="logoLink" class="title">
         <img alt="logo" class="icon" src="/whistle.svg" />
@@ -65,7 +62,7 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
       <div v-else class="text-center mr-4 mobile-title">{{ mobileTitle }}</div>
     </v-app-bar-title>
 
-    <template #prepend>
+    <template #prepend v-if="!isLoggedInView">
       <v-btn v-if="!smAndUp" icon="mdi-menu" @click="isMenuOpen = true" />
     </template>
 
@@ -84,15 +81,16 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
         </template>
 
         <template v-else-if="smAndUp">
+          <v-btn :to="{name: 'my-classes'}" variant="text">Мои ученики</v-btn>
           <v-btn :to="{name: 'my-diary'}" variant="text">Дневник</v-btn>
           <v-btn :to="{name: 'my-standards'}" variant="text">Мои нормативы</v-btn>
+          <v-divider class="divider mb-2 mt-2" color="rgb(var(--v-theme-primary-darken-1))" vertical />
           <v-btn :to="{name: 'profile'}" variant="text">Профиль</v-btn>
           <v-btn rounded variant="flat" @click="logout">Выйти</v-btn>
         </template>
 
-        <template v-else-if="!smAndUp && plusButtonLink">
-          <v-btn :to="plusButtonLink" icon="mdi-plus" size="small" variant="outlined" />
-        </template>
+        <!--        <v-btn v-else-if="!smAndUp" :to="infoButtonLink" class="info-button"-->
+        <!--               icon="mdi-information-slab-circle-outline" />-->
       </div>
 
     </template>
@@ -113,16 +111,41 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
   font-weight: bold;
 }
 
+.app-bar {
+  border-bottom: 2px solid rgb(var(--v-theme-primary));
+  border-radius: 0 0 15px 15px;
+}
+
+.app-bar :deep(.v-toolbar__content) {
+  height: 45px !important;
+}
+
 .container {
   display: flex;
   gap: 10px;
+  align-items: center;
+  height: 100%
 }
 
 .icon {
   height: 32px;
 }
 
-@media (max-width: 760px) {
+.info-button :deep(.v-btn__content) {
+  font-size: 20px;
+}
+
+.info-button {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+}
+
+.divider {
+  height: calc(100% - 15px);
+}
+
+@media (max-width: 900px) {
   .text-title {
     display: none;
   }

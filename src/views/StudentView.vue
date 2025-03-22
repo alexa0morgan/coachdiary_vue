@@ -4,12 +4,15 @@ import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
 import DataTable from '@/components/DataTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
-import { del, get, post } from '@/utils'
+import { del, get, getErrorMessage, post, showConfirmDialog } from '@/utils'
 import type { StudentResponse, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
 import { useRoute } from 'vue-router'
 import router from '@/router'
+import { toast } from 'vue-sonner'
+import { useDisplay } from 'vuetify'
 
 const route = useRoute()
+const { smAndUp } = useDisplay()
 const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
 const standardsInfo = ref<StudentStandardResponse[]>([])
@@ -24,19 +27,34 @@ onMounted(async () => {
 })
 
 async function getStandardsByStudentId(studentId: number) {
-  standardsInfo.value = await get(`/api/students/${studentId}/standards/`)
-    .then(res => res.json())
-    .catch(() => {
-      alert('Ошибка доступа к данным')
-    })
+
+  try {
+    const response = await get(`/api/students/${studentId}/standards/`)
+    if (response.ok) {
+      standardsInfo.value = await response.json()
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
+    }
+  } catch {
+    toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
+  }
+
 }
 
 async function getStudentById(studentId: number) {
-  studentInfo.value = await get(`/api/students/${studentId}`)
-    .then(res => res.json())
-    .catch(() => {
-      alert('Ошибка доступа к данным')
-    })
+
+  try {
+    const response = await get(`/api/students/${studentId}`)
+    if (response.ok) {
+      studentInfo.value = await response.json()
+      route.meta.mobileTitle = studentInfo.value ? studentInfo.value.full_name : 'Студент не найден'
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
+    }
+  } catch {
+    toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
+  }
+
 }
 
 const labels = computed(() => {
@@ -44,7 +62,7 @@ const labels = computed(() => {
   return [
     {
       id: 0,
-      label: `Дата рождения: ${studentInfo.value.birthday}`
+      label: `Дата рождения: ${new Date(studentInfo.value.birthday).toLocaleDateString()}`
     },
     {
       id: 1,
@@ -76,12 +94,23 @@ function editStudent(): void {
 }
 
 async function deleteStudent() {
-  const response = await del('/api/students/' + studentId.value)
-  if (!response.ok) {
-    alert('Произошла ошибка при удалении, попробуйте снова')
-    return
+
+  await showConfirmDialog({
+    title: 'Удаление ученика',
+    text: 'Вы уверены, что хотите удалить этого ученика?'
+  })
+
+  try {
+    const response = await del('/api/students/' + studentId.value)
+    if (response.ok) {
+      await router.push({ name: 'my-diary' })
+      toast.success('Ученик успешно удален')
+    } else {
+      toast.error(getErrorMessage((await response.json()).details))
+    }
+  } catch {
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
-  router.push({ name: 'my-diary' })
 }
 
 async function postData() {
@@ -89,19 +118,19 @@ async function postData() {
     const response = await post('/api/students/results/create_or_update/', changedData.value)
     if (response.ok) {
       await getStandardsByStudentId(studentId.value)
-      alert('Данные успешно изменены')
+      toast.success('Данные успешно обновлены')
     } else {
-      alert('Ошибка при отправке данных, попробуйте позже')
+      toast.error(getErrorMessage((await response.json()).details))
     }
   } catch {
-    alert('Ошибка при отправке данных, попробуйте позже')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
 </script>
 
 <template>
   <div>
-    <TopPanel class="top-panel">
+    <TopPanel v-if="smAndUp" class="top-panel">
       <div class="top-panel-title">{{ studentInfo?.full_name ?? 'Студент не найден' }}</div>
     </TopPanel>
     <LevelPanel
@@ -116,7 +145,6 @@ async function postData() {
         @dataChanged="postData" />
       <DataTableSideNav
         :data="labels"
-        :hasDeleteMenu="false"
         :isContentStaticText="true"
         :pageType="'student'"
         :title="'Информация'"

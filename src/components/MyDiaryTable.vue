@@ -3,6 +3,10 @@
 import type { VDataTable } from 'vuetify/components'
 import type { StudentsValueResponse } from '@/types/types'
 import { computed } from 'vue'
+import { useDisplay } from 'vuetify'
+
+
+const { smAndUp } = useDisplay()
 
 const { data, standardType } = defineProps<{
   data: StudentsValueResponse[]
@@ -13,11 +17,12 @@ const emit = defineEmits<{
   saveData: []
 }>()
 
+
 const headers = computed<VDataTable['$props']['headers']>(() => {
   if (standardType === 'physical') {
     return [
       { title: 'ID', value: 'id', width: 50 },
-      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: true },
+      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
       { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
       { title: 'Результат', value: 'value', sortable: true, width: 120 },
@@ -26,7 +31,7 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
   } else {
     return [
       { title: 'ID', value: 'id', width: 50 },
-      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: true },
+      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
       { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
       { title: 'Оценка', value: 'value', sortable: true, width: 120 }
@@ -51,17 +56,36 @@ function getMarkColor(mark?: number): string {
   }
 }
 
+const sortedData = computed(() => {
+  return data.toSorted((a, b) => {
+    if (a.student_class.number !== b.student_class.number) {
+      return a.student_class.number - b.student_class.number
+    }
+    if (a.student_class.class_name !== b.student_class.class_name) {
+      return a.student_class.class_name.localeCompare(b.student_class.class_name)
+    }
+    return a.full_name.localeCompare(b.full_name)
+  })
+})
+
+
+function getStudentName(student: StudentsValueResponse) {
+  if (smAndUp.value) {
+    return student.full_name
+  }
+  return student.full_name.split(' ').map((v, i) => i === 0 ? v : v[0] + '.').join(' ')
+}
+
 </script>
 
 <template>
   <v-data-table
     :fixed-header="true"
     :headers="headers"
-    :items="data"
+    :items="sortedData"
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
-    :mobile="null"
+    :mobile="false"
     :show-current-page="true"
-    :sort-by="[{key: 'student_class.class_name', order: 'asc'}, { key: 'full_name', order: 'asc' },]"
     multi-sort
     class="table"
     item-key="name"
@@ -71,7 +95,8 @@ function getMarkColor(mark?: number): string {
       {{ item.student_class.number + item.student_class.class_name }}
     </template>
     <template #item.full_name="{item}">
-      <v-btn :to="{name: 'student', params: { id: item.id } }" class="button" variant="tonal">{{ item.full_name }}
+      <v-btn :to="{name: 'student', params: { id: item.id } }" class="button" variant="tonal">
+        {{ getStudentName(item) }}
       </v-btn>
     </template>
     <template #item.gender="{item}">

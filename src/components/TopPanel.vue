@@ -13,12 +13,9 @@
 
 <style scoped>
 .container {
-  padding: 5px 0;
+  padding: 5px 8px;
   height: 60px;
   background-color: rgb(var(--v-theme-primary));
-  @media (max-width: 760px) {
-    height: 70px;
-  }
 }
 
 .inner-container {
@@ -32,9 +29,11 @@
   font-size: 24px;
   text-transform: uppercase;
   font-weight: bold;
+}
 
-  @media (max-width: 1230px) {
-    padding: 8px;
+@media (max-width: 900px) {
+  .container {
+    height: fit-content;
   }
 }
 

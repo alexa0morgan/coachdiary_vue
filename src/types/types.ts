@@ -31,6 +31,8 @@ export type StudentResponse = {
   id: number,
   full_name: string,
   student_class: {
+    id: number,
+    recruitment_year: number,
     number: number,
     class_name: string
   },

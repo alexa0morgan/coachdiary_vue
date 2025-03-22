@@ -3,7 +3,8 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { post } from '@/utils'
+import { getErrorMessage, post } from '@/utils'
+import { toast } from 'vue-sonner'
 
 const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
 const router = useRouter()
@@ -58,6 +59,10 @@ const buttonText = computed(() => {
 const isLoading = ref(false)
 
 async function sendData() {
+  if (isSendButtonDisabled.value || isLoading.value) {
+    return
+  }
+
   isLoading.value = true
   try {
     let response
@@ -69,10 +74,10 @@ async function sendData() {
       response = await restore()
     }
     if (response?.status === 'error') {
-      alert(response.details)
+      toast.error(getErrorMessage(response.details))
     }
   } catch {
-    alert('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   } finally {
     isLoading.value = false
   }
@@ -107,7 +112,7 @@ async function signUp() {
     password.value = ''
     name.value = ''
     passwordConfirmation.value = ''
-    alert('Пользователь успешно создан')
+    toast.success('Пользователь успешно создан')
   } else {
     return response.json()
   }
@@ -124,7 +129,7 @@ async function restore() {
   <div class="page">
     <div class="container rounded-lg">
       <div class="text">{{ title }}</div>
-      <div class="border-container">
+      <form class="border-container" @submit.prevent="sendData">
         <v-text-field
           v-if="pageType === 'signUp'"
           v-model="name"
@@ -170,8 +175,8 @@ async function restore() {
           @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
         />
         <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
-               @click="sendData" />
-      </div>
+               type="submit" />
+      </form>
       <div v-if="pageType==='signIn'">
         <v-btn :disabled="isLoading" size="small" text="Регистрация" variant="text" @click="pageType = 'signUp'" />
         <v-btn :disabled="isLoading" size="small" text="Восстановление пароля" variant="text" @click="pageType =

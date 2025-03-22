@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { VDataTable } from 'vuetify/components'
 import { computed, ref } from 'vue'
 import type { StudentStandardRequest } from '@/types/types'
 
@@ -37,7 +36,7 @@ interface Item {
 
 const totalRate = computed(() => {
   const array = data.map((item) => item.rate)
-  return array ? +((array.reduce((acc: any, c: any) => acc + c, 0) / array.length).toFixed(2)) : 0
+  return array.length !== 0 ? +((array.reduce((acc: any, c: any) => acc + c, 0) / array.length).toFixed(2)) : ''
 })
 
 const headers = [
@@ -88,7 +87,7 @@ function getMarkColor(mark?: number): string {
     :headers="headers"
     :items="data"
     :itemsPerPageOptions="[10, 20, { title: 'Все', value: -1 }]"
-    :mobile="true"
+    :mobile="false"
     :show-current-page="true"
     :sort-by="[{ key: 'number', order: 'asc' }]"
     class="table"
@@ -100,7 +99,6 @@ function getMarkColor(mark?: number): string {
         v-model="item.result"
         class="changeable-fields"
         @update:modelValue="onRateChange(item)" />
-      <span v-else> нет</span>
     </template>
     <template #item.rate="{item}">
       <span v-if="item.has_numeric_value" :class="getMarkColor(item.rate ?? 0)" class="mark"> {{ item.rate }}</span>
@@ -131,7 +129,6 @@ function getMarkColor(mark?: number): string {
   border-radius: var(--v-border-radius);
   overflow: hidden;
   font-weight: bold;
-  text-transform: capitalize;
   color: rgb(var(--v-theme-primary));
 }
 
