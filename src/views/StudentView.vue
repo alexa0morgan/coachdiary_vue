@@ -9,8 +9,10 @@ import type { StudentResponse, StudentStandardRequest, StudentStandardResponse }
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { toast } from 'vue-sonner'
+import { useDisplay } from 'vuetify'
 
 const route = useRoute()
+const { smAndUp } = useDisplay()
 const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
 const standardsInfo = ref<StudentStandardResponse[]>([])
@@ -45,6 +47,7 @@ async function getStudentById(studentId: number) {
     const response = await get(`/api/students/${studentId}`)
     if (response.ok) {
       studentInfo.value = await response.json()
+      route.meta.mobileTitle = studentInfo.value ? studentInfo.value.full_name : 'Студент не найден'
     } else {
       toast.error(getErrorMessage((await response.json()).details))
     }
@@ -127,7 +130,7 @@ async function postData() {
 
 <template>
   <div>
-    <TopPanel class="top-panel">
+    <TopPanel v-if="smAndUp" class="top-panel">
       <div class="top-panel-title">{{ studentInfo?.full_name ?? 'Студент не найден' }}</div>
     </TopPanel>
     <LevelPanel

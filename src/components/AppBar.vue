@@ -25,7 +25,12 @@ async function logout() {
   router.push({ name: 'login' })
 }
 
-const mobileTitle = computed(() => route.meta.mobileTitle)
+const mobileTitle = computed(() => {
+  if (route.name === 'student' && route.params.id) {
+    return route.meta.mobileTitle || 'Ученик'
+  }
+  return route.meta.mobileTitle
+})
 
 </script>
 
@@ -38,14 +43,14 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
       <v-list-item :to="{name: 'about-site'}" link title="О сайте" />
       <v-list-item :to="{name: 'about-us'}" link title="О нас" />
     </template>
-    <!--    <template v-else>-->
-    <!--      <v-list-item :to="{name: 'my-classes'}" link title="Мои ученики" />-->
-    <!--      <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />-->
-    <!--      <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />-->
-    <!--      <v-list-item :to="{name: 'profile'}" link title="Профиль" />-->
-    <!--      <v-divider class="mb-2 mt-2" color="rgb(var(&#45;&#45;v-theme-primary-darken-1))" />-->
-    <!--      <v-list-item link title="Выход" @click="logout" />-->
-    <!--    </template>-->
+<!--        <template v-else>
+          <v-list-item :to="{name: 'my-classes'}" link title="Мои ученики" />
+          <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
+          <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
+          <v-list-item :to="{name: 'profile'}" link title="Профиль" />
+          <v-divider class="mb-2 mt-2" color="rgb(var(&#45;&#45;v-theme-primary-darken-1))" />
+          <v-list-item link title="Выход" @click="logout" />
+        </template>-->
   </v-navigation-drawer>
 
   <v-app-bar :class="{'app-bar' : !smAndUp}">
@@ -84,8 +89,8 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
           <v-btn rounded variant="flat" @click="logout">Выйти</v-btn>
         </template>
 
-<!--        <v-btn v-else-if="!smAndUp" :to="infoButtonLink" class="info-button"-->
-<!--               icon="mdi-information-slab-circle-outline" />-->
+        <!--        <v-btn v-else-if="!smAndUp" :to="infoButtonLink" class="info-button"-->
+        <!--               icon="mdi-information-slab-circle-outline" />-->
       </div>
 
     </template>
@@ -112,7 +117,7 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
 }
 
 .app-bar :deep(.v-toolbar__content) {
-  height: 55px !important;
+  height: 45px !important;
 }
 
 .container {
@@ -130,7 +135,7 @@ const mobileTitle = computed(() => route.meta.mobileTitle)
   font-size: 20px;
 }
 
-.info-button{
+.info-button {
   position: absolute;
   right: 4px;
   top: 4px;

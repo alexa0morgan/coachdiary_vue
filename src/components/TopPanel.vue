@@ -29,7 +29,12 @@
   font-size: 24px;
   text-transform: uppercase;
   font-weight: bold;
+}
 
+@media (max-width: 900px) {
+  .container {
+    height: fit-content;
+  }
 }
 
 </style>
