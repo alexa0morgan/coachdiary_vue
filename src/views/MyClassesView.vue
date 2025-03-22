@@ -24,7 +24,7 @@ const myClassesStore = useMyClassesStore()
 const activeLevelNumber = ref(-1)
 const studentsData = ref<StudentResponse[]>([])
 
-const studentsClasses = computed(() => {
+const groupedStudentsClasses = computed(() => {
   const students = studentsData.value.toSorted((a, b) => {
     if (a.student_class.number !== b.student_class.number) {
       return a.student_class.number - b.student_class.number
@@ -100,7 +100,7 @@ async function deleteClass() {
     <div class="students-container">
 
       <template
-        v-for="(studentsClasses, activeLevelNumber) in studentsClasses"
+        v-for="(studentsClasses, activeLevelNumber) in groupedStudentsClasses"
         :key="activeLevelNumber">
         <v-expansion-panels
           v-model="myClassesStore.activeClasses" multiple>
