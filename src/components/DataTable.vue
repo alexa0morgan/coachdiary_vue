@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { VDataTable } from 'vuetify/components'
 import { computed, ref } from 'vue'
 import type { StudentStandardRequest } from '@/types/types'
 
@@ -88,7 +87,7 @@ function getMarkColor(mark?: number): string {
     :headers="headers"
     :items="data"
     :itemsPerPageOptions="[10, 20, { title: 'Все', value: -1 }]"
-    :mobile="true"
+    :mobile="false"
     :show-current-page="true"
     :sort-by="[{ key: 'number', order: 'asc' }]"
     class="table"
