@@ -56,9 +56,14 @@ async function getStudentsData(classNumber: number, letter: string, emitButtonCl
   }
 
   try {
-    const response = await get(`/api/students/`, {
-      'student_class': fullClassName.value
-    })
+    let response
+    if (classNumber == 12) {
+      response = await get(`/api/students/`)
+    } else {
+      response = await get(`/api/students/`, {
+        'student_class': fullClassName.value
+      })
+    }
     if (response.ok) {
       const currentStudents = await response.json() as StudentResponse[]
       emit('studentsData', currentStudents, classNumber, letter)
@@ -69,6 +74,7 @@ async function getStudentsData(classNumber: number, letter: string, emitButtonCl
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
   }
 }
+
 
 onMounted(async () => {
   classesData.value = await get('/api/classes/').then(res => res.json())
@@ -107,6 +113,16 @@ onMounted(async () => {
         </v-list>
       </v-menu>
     </v-btn>
+    <v-divider v-if="!directionColumn" class="divider" vertical color="rgb(var(--v-theme-secondary))" thickness="3"
+               opacity="0.5" />
+    <v-divider v-else class="divider" color="rgb(var(--v-theme-secondary))" thickness="3" opacity="0.5" />
+    <v-btn
+      :variant="activeLevelNumber === 12 ? 'flat' : 'outlined'"
+      class="level-button top-button"
+      color="rgb(var(--v-theme-secondary))"
+      @click="getStudentsData(12, '', true) ">
+      все
+    </v-btn>
   </div>
 </template>
 
@@ -115,10 +131,13 @@ onMounted(async () => {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
 }
 
 .directionColumn {
   flex-direction: column;
+  height: 100%;
 }
 
 .top-button {
@@ -128,6 +147,21 @@ onMounted(async () => {
 .level-button.v-btn--variant-flat {
   border: 1px solid rgb(var(--v-theme-secondary)) !important;
 }
+
+.divider {
+  margin: 0 10px;
+}
+
+@media (max-height: 700px) {
+  .buttons-panel {
+    gap: 5px;
+  }
+
+  .divider {
+    margin: 10px 5px;
+  }
+}
+
 
 @media (max-width: 960px) {
   a.v-btn {

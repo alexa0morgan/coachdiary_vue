@@ -35,9 +35,9 @@ const selectedStandardType = computed<'physical' | 'technical'>(() => {
 
 const classesData = ref<ClassRequest[]>([])
 const standardsData = ref<StandardResponse[]>([])
-const studentsValueData = ref<StudentsValueResponse[]>([])
 const filteredData = ref<StudentsValueResponse[]>([])
-const currentStudentsData = ref<StudentResponse[]>([])
+let studentsValueData: StudentsValueResponse[] = []
+let studentsData: StudentResponse[] = []
 
 
 function updateClassesData(classes: ClassRequest[]) {
@@ -47,7 +47,7 @@ function updateClassesData(classes: ClassRequest[]) {
 function updateStudentsData(students: StudentResponse[], classNumber: number, letter: string) {
   activeLevelNumber.value = classNumber
   className.value = letter
-  currentStudentsData.value = students
+  studentsData = students
   filteredData.value = []
   if (!standards.value.some(v => v.id === selectedStandardId.value))
     selectedStandardId.value = -1
@@ -57,22 +57,27 @@ function updateStudentsData(students: StudentResponse[], classNumber: number, le
 
 onMounted(async () => {
   standardsData.value = await get('/api/standards/').then(res => res.json())
+
+
   if (activeLevelNumber.value !== -1 && selectedStandardId.value !== -1) {
     await getStudentsData()
   }
 })
 
 
-const standards = computed(() =>
-  standardsData.value
-    .filter(standard => standard.levels.some(level => level.level_number === activeLevelNumber.value))
-    .toSorted((a, b) => a.name.localeCompare(b.name))
+const standards = computed(() => {
+  let result = standardsData.value
 
+  if (activeLevelNumber.value !== 12) {
+    result = result.filter(standard => standard.levels.some(level => level.level_number === activeLevelNumber.value))
+  }
+  return result
+    .toSorted((a, b) => a.name.localeCompare(b.name))
     .map(standard => ({
       id: standard.id,
       label: standard.name
     }))
-)
+})
 
 function setQuery() {
   router.replace({
@@ -88,20 +93,43 @@ async function getStudentsData() {
   setQuery()
   if (selectedStandardId.value === -1) return
 
+  let currentClasses: number[]
+  let currentStudentsData: StudentResponse[]
 
-  const currentClasses = classesData.value
-    .filter(klass =>
-      klass.number === activeLevelNumber.value
-      && (className.value ? klass.class_name === className.value : true)
-    )
-    .map(klass => klass.id.toString())
+  if (activeLevelNumber.value === 12) {
+
+    const standardsLevels = standardsData.value
+      .reduce((acc, v) => {
+        acc[v.id] = v.levels.map(level => level.level_number)
+        return acc
+      }, {} as Record<number, number[]>)
+
+
+    currentClasses = classesData.value
+      .filter(klass => standardsLevels[selectedStandardId.value].includes(klass.number))
+      .map(klass => klass.id)
+
+    currentStudentsData = studentsData
+      .filter(student => currentClasses.includes(student.student_class.id))
+
+  } else {
+    currentClasses = classesData.value
+      .filter(klass =>
+        klass.number === activeLevelNumber.value
+        && (className.value ? klass.class_name === className.value : true)
+      )
+      .map(klass => klass.id)
+    currentStudentsData = studentsData
+  }
+
+
   try {
     const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/', {
       'class_id[]': currentClasses,
       standard_id: selectedStandardId.value
     }).then(res => res.json())
 
-    studentsValueData.value = currentStudentsData.value.map(student => {
+    studentsValueData = currentStudentsData.map(student => {
       const result = currentStudentsValue.find(v => v.id === student.id)
       return result ?? {
         ...student,
@@ -109,7 +137,7 @@ async function getStudentsData() {
         grade: null
       }
     })
-    filteredData.value = studentsValueData.value
+    filteredData.value = studentsValueData
   } catch {
     toast.error('Ошибка при получении данных, попробуйте позже')
   }
@@ -123,7 +151,7 @@ const filters = ref<FilterData>({
 })
 
 function acceptFilters() {
-  filteredData.value = studentsValueData.value
+  filteredData.value = studentsValueData
     .filter(student =>
       (filters.value.gender ? student.gender === filters.value.gender : true)
       && (filters.value.grades.length ? filters.value.grades.includes(student.grade) : true)
@@ -135,11 +163,11 @@ function acceptFilters() {
 async function saveStudentsValue() {
   try {
     const request: StudentValueRequest[] = filteredData.value
-      .filter(v => v.value !== null && v.value)
+      .filter(v => v.value != null && v.value)
       .map(student => ({
         student_id: student.id,
         standard_id: selectedStandardId.value,
-        value: student.value
+        value: student.value == null ? null : +student.value
       }))
 
     const response = await post('/api/students/results/create_or_update/', request)
@@ -166,7 +194,7 @@ async function saveStudentsValue() {
     <FilterBlock v-model="filters" class="filters-block" @accept="acceptFilters" />
 
     <MyDiaryTable :data="filteredData" :standard-type="selectedStandardType" class="table"
-                    @saveData="saveStudentsValue" />
+                  @saveData="saveStudentsValue" />
 
     <DataTableSideNav v-model="selectedStandardId" :data="standards"
                       :has-action-buttons="false" class="data-table-side-nav"
