@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="container">
+  <div class="top-panel">
     <div class="inner-container">
       <slot />
       <slot name="right" />
@@ -12,7 +12,7 @@
 </template>
 
 <style scoped>
-.container {
+.top-panel {
   padding: 5px 8px;
   height: 60px;
   background-color: rgb(var(--v-theme-primary));
@@ -31,8 +31,8 @@
   font-weight: bold;
 }
 
-@media (max-width: 900px) {
-  .container {
+@media (max-width: 600px) {
+  .top-panel {
     height: fit-content;
   }
 }

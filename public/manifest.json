@@ -1,0 +1,20 @@
+{
+  "short_name": "Дневник Тренера",
+  "name": "Дневник Тренера",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#eee",
+  "theme_color": "#6750A4",
+  "icons": [
+    {
+      "src": "/whistle.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/whistle.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
