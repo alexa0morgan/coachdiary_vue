@@ -141,7 +141,7 @@ async function deleteClass() {
 
 .top-panel {
   position: sticky;
-  top: 65px;
+  top: 64px;
   z-index: 1000;
 }
 
