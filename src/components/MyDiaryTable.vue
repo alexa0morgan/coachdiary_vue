@@ -21,19 +21,17 @@ const emit = defineEmits<{
 const headers = computed<VDataTable['$props']['headers']>(() => {
   if (standardType === 'physical') {
     return [
-      { title: 'ID', value: 'id', width: 50 },
       { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
+      { title: 'ПОЛ', value: 'gender', width: 83 },
       { title: 'Результат', value: 'value', sortable: true, width: 120 },
       { title: 'Оценка', value: 'grade', sortable: true, width: 102 }
     ]
   } else {
     return [
-      { title: 'ID', value: 'id', width: 50 },
       { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'ПОЛ', value: 'gender', sortable: true, width: 83 },
+      { title: 'ПОЛ', value: 'gender', width: 83 },
       { title: 'Оценка', value: 'value', sortable: true, width: 120 }
     ]
   }

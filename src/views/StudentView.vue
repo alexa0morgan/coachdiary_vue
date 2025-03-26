@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, ref } from 'vue'
 import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
-import DataTable from '@/components/DataTable.vue'
+import StudentTable from '@/components/StudentTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import { del, get, getErrorMessage, post, showConfirmDialog } from '@/utils'
 import type { StudentResponse, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
@@ -138,7 +138,7 @@ async function postData() {
       :classNumber="studentInfo?.student_class.number ?? 0"
       class="level-panel" />
     <div class="main">
-      <DataTable
+      <StudentTable
         v-model="changedData"
         :data="standards"
         class="table"
