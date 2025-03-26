@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 
-const { title, data, isStandardTypeTechnical, isContentStaticText, hasActionButtons = true } = defineProps<{
-  title: string;
+const { hasActionButtons = true } = defineProps<{
+  title?: string;
   data: {
     label: string;
     id: number;
@@ -12,24 +12,21 @@ const { title, data, isStandardTypeTechnical, isContentStaticText, hasActionButt
   hasDeleteMenu?: boolean;
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   edit: [];
   delete: [inAllLevels: boolean];
 }>()
-
 
 const selectedId = defineModel<number>({ default: -1, required: false })
 
 function onSelect(id: number): void {
   selectedId.value = id
 }
-
-
 </script>
 
 <template>
   <div class="container">
-    <div class="title">{{ title }}</div>
+    <div v-if="title" class="title">{{ title }}</div>
     <div :class="{grid: isStandardTypeTechnical}" class="data">
       <template v-if="!isContentStaticText">
         <v-btn v-for="item in data" :key="item.id" :active="selectedId === item.id" :ripple="false" :text="item.label"
@@ -42,15 +39,15 @@ function onSelect(id: number): void {
     <div v-if="hasActionButtons" class="action-buttons">
       <v-btn class="button action-button" color="primary-darken-1"
              size="small" text="Изменить"
-             variant="outlined" @click="emit('edit')" />
+             variant="outlined" @click="$emit('edit')" />
       <v-btn v-if="hasDeleteMenu" class="button action-button" color="error" size="small" variant="outlined">
         Удалить
         <v-menu activator="parent">
           <v-list density="compact">
-            <v-list-item @click="emit('delete', false)">
+            <v-list-item @click="$emit('delete', false)">
               <v-list-item-title>у уровня</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="emit('delete', true)">
+            <v-list-item @click="$emit('delete', true)">
               <v-list-item-title>у всех уровней</v-list-item-title>
             </v-list-item>
             <v-list-item @click="() => {}">
@@ -59,9 +56,8 @@ function onSelect(id: number): void {
           </v-list>
         </v-menu>
       </v-btn>
-      <v-btn v-else class="button action-button" color="error" size="small" variant="outlined" @click="emit('delete', false)">
-        Удалить
-      </v-btn>
+      <v-btn v-else class="button action-button" color="error" size="small" variant="outlined" text="Удалить"
+             @click="$emit('delete', false)" />
 
     </div>
   </div>
@@ -105,7 +101,6 @@ function onSelect(id: number): void {
   gap: 20px;
 }
 
-
 .button {
   border-radius: var(--v-border-radius);
   font-size: 16px;
@@ -117,7 +112,6 @@ function onSelect(id: number): void {
 .button:deep(.v-btn__content) {
   white-space: normal !important;
 }
-
 
 .button.v-btn--active {
   background-color: rgb(var(--v-theme-surface));
