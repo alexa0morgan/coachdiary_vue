@@ -82,8 +82,10 @@ async function deleteClass() {
               hide-details
               @update:search="search"
             />-->
-    <classes-panel v-if="!smAndUp" @studentsData="updateStudentsData"
+    <classes-panel v-if="!smAndUp"
+                   @studentsData="updateStudentsData"
                    @buttonClick="myClassesStore.activeClasses = []" />
+    <div v-if="smAndUp"></div>
     <template #right v-if="smAndUp">
       <v-btn :to="{name: 'create-student'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
              variant="outlined" />
@@ -91,7 +93,8 @@ async function deleteClass() {
   </TopPanel>
 
   <div class="classes-panel" v-if="smAndUp">
-    <classes-panel direction-column @studentsData="updateStudentsData"
+    <classes-panel direction-column
+                   @studentsData="updateStudentsData"
                    @buttonClick="myClassesStore.activeClasses = []" />
   </div>
 
@@ -160,7 +163,7 @@ async function deleteClass() {
 }
 
 .container {
-  margin: 30px 0 60px 130px;
+  margin: 30px 0 60px 100px;
 }
 
 .students-container {
@@ -192,7 +195,7 @@ async function deleteClass() {
   width: 100%;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 600px) {
   .students-container {
     width: 100%;
   }
@@ -201,8 +204,6 @@ async function deleteClass() {
     grid-template-columns: 0 1fr;
     margin: 10px;
   }
-
-
 }
 
 </style>

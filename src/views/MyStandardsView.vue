@@ -20,7 +20,8 @@ const pageType = ref<'standards' | 'technical'>('standards')
 const selectedStandardId = ref(-1)
 const standards = ref<StandardResponse[]>([])
 
-const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (selectedLevelNumber.value + ' уровень') : 'Уровень')
+const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (selectedLevelNumber.value + ' год обучения') :
+  'Года обучения')
 const standardButtonText = computed(() => simplifiedStandards.value.find(v => v.id === selectedStandardId.value)?.label ?? 'Норматив')
 
 
@@ -93,13 +94,13 @@ async function deleteStandard(): Promise<void> {
 </script>
 
 <template>
-  <TopPanel v-if="smAndUp">
+  <TopPanel v-if="smAndUp" class="top-panel">
     <div class="buttons-panel">
       <v-btn
         v-for="n in 11"
         :key="n"
         :disabled="!levels.includes(n)"
-        :text="n + ' УР'"
+        :text="n + ' год'"
         :variant="selectedLevelNumber === n ? 'flat' : 'outlined'"
         class="level-button button"
         color="rgb(var(--v-theme-secondary))"
@@ -113,14 +114,14 @@ async function deleteStandard(): Promise<void> {
 
 
   <div v-if="!smAndUp" class="top-panel-mobile">
-    <BottomSheetWithButton :button-text="levelButtonText" sheet-title="Уровни">
+    <BottomSheetWithButton :button-text="levelButtonText" sheet-title="Года обучения">
       <template #default="{ toggle }">
         <div class="level-button-mobile">
           <v-btn
             v-for="n in 11"
             :key="n"
             :disabled="!levels.includes(n)"
-            :text="n + ' УР'"
+            :text="n + ' год'"
             :variant="selectedLevelNumber === n ? 'flat' : 'outlined'"
             class="level-button button"
             color="rgb(var(--v-theme-secondary))"
@@ -224,6 +225,12 @@ async function deleteStandard(): Promise<void> {
   gap: 10px;
   max-width: 1200px;
   margin: 40px auto 0;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    padding: 0 10px;
+    margin: 25px 0;
+  }
 }
 
 .technical-grid {
@@ -235,6 +242,10 @@ async function deleteStandard(): Promise<void> {
   flex-direction: column;
   gap: 50px;
   margin-top: 30px;
+
+  @media (width <= 600px) {
+    margin-top: 0;
+  }
 }
 
 .buttons-panel {
@@ -287,7 +298,7 @@ async function deleteStandard(): Promise<void> {
 .top-panel-mobile {
   display: flex;
   justify-content: space-between;
-  padding: 0 10px;
+  margin: 0 10px;
 }
 
 .action-buttons-mobile {
@@ -304,11 +315,9 @@ async function deleteStandard(): Promise<void> {
   justify-content: center;
 }
 
-@media (max-width: 600px) {
-  .grid {
-    grid-template-columns: 1fr;
-    padding: 0 10px;
-    margin: 5px 0;
-  }
+.top-panel {
+  height: fit-content;
+  min-height: 60px;
 }
+
 </style>
