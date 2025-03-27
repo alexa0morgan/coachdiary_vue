@@ -162,24 +162,10 @@ onMounted(async () => {
   }
 }
 
-
-@media (max-width: 960px) {
-  a.v-btn {
-    display: none;
-  }
-
+@media (max-width: 870px) {
   button.v-btn {
-    height: 1.5em;
-  }
-
-  .buttons-panel {
-    gap: 5px;
+    height: 2em;
   }
 }
 
-@media (max-width: 430px) {
-  button.v-btn {
-    height: 1.3em;
-  }
-}
 </style>

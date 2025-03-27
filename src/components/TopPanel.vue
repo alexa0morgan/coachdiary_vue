@@ -31,9 +31,10 @@
   font-weight: bold;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .top-panel {
     height: fit-content;
+    min-height: 60px;
   }
 }
 
