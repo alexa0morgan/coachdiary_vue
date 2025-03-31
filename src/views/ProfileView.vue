@@ -2,14 +2,34 @@
 import { computed, onMounted, ref } from 'vue'
 import { get, getErrorMessage, patch, put } from '@/utils'
 import { toast } from 'vue-sonner'
+import { useUserStore } from '@/stores/user'
 
-onMounted(async () => {
-  await getData()
-})
+
+const userStore = useUserStore()
+
 const currentName = ref('')
 const currentEmail = ref('')
+
 const name = ref('')
 const email = ref('')
+const password = ref('')
+const newPassword = ref('')
+const passwordConfirmation = ref('')
+
+const passwordType = ref<'password' | 'text'>('password')
+const newPasswordType = ref<'password' | 'text'>('password')
+const passwordConfirmationType = ref<'password' | 'text'>('password')
+
+const isSetNameButtonDisabled = computed(() => {
+  return name.value?.trim() === currentName.value || name.value?.trim().length === 0 || !name.value
+})
+const isSetEmailButtonDisabled = computed(() => {
+  return email.value?.trim() === currentEmail.value || email.value?.trim().length === 0
+})
+
+const isSetPasswordButtonDisabled = computed(() => {
+  return !(password.value?.trim().length && newPassword.value?.trim().length && newPassword.value?.trim() === passwordConfirmation.value?.trim())
+})
 
 async function getData() {
   try {
@@ -91,31 +111,16 @@ async function putPassword() {
   }
 }
 
-const isSetNameButtonDisabled = computed(() => {
-  return name.value?.trim() === currentName.value || name.value?.trim().length === 0 || !name.value
+onMounted(async () => {
+  await getData()
 })
-const isSetEmailButtonDisabled = computed(() => {
-  return email.value?.trim() === currentEmail.value || email.value?.trim().length === 0
-})
-const password = ref('')
-const newPassword = ref('')
-const passwordConfirmation = ref('')
-const isSetPasswordButtonDisabled = computed(() => {
-  return !(password.value?.trim().length && newPassword.value?.trim().length && newPassword.value?.trim() === passwordConfirmation.value?.trim())
-})
-
-const passwordType = ref<'password' | 'text'>('password')
-const newPasswordType = ref<'password' | 'text'>('password')
-const passwordConfirmationType = ref<'password' | 'text'>('password')
 
 </script>
 
 <template>
   <div class="main">
     <div class="container rounded-lg">
-      <div class="text">
-        Смена имени и почты
-      </div>
+      <div class="text">Смена имени и почты</div>
       <form class="text-field mb-4" @submit.prevent="patchName">
         <v-text-field
           v-model="name"
@@ -183,6 +188,11 @@ const passwordConfirmationType = ref<'password' | 'text'>('password')
           type="submit" />
       </form>
     </div>
+    <div class="container rounded-lg">
+      <div class="text">Выйти из аккаунта</div>
+      <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
+    </div>
+
   </div>
 </template>
 
