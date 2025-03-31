@@ -7,6 +7,8 @@ defineProps<{
   buttonText: string;
   sheetTitle: string;
   wrapButton?: boolean;
+  icon?: string;
+  buttonColor?: string;
 }>()
 
 const isSheetActive = ref(false)
@@ -19,7 +21,8 @@ function toggle() {
 
 <template>
 
-  <v-btn :text="buttonText" class="button" :class="{wrapButton}" variant="outlined" @click="toggle" />
+  <v-btn v-if="icon" class="button" variant="outlined" :icon="icon" @click="toggle" :color="buttonColor"/>
+  <v-btn v-else :text="buttonText" class="button" :class="{wrapButton}" variant="outlined" @click="toggle" :color="buttonColor"/>
 
   <BottomSheet v-model="isSheetActive" :sheet-title="sheetTitle">
     <slot :toggle="toggle" />
@@ -29,7 +32,6 @@ function toggle() {
 <style scoped>
 .button {
   border-radius: var(--v-border-button-radius);
-
 }
 
 .button:deep(.v-btn__content) {
