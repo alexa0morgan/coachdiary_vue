@@ -42,6 +42,9 @@ const filters = ref<FilterData>({
 let studentsValueData: StudentsValueResponse[] = []
 let studentsData: StudentResponse[] = []
 
+const standardButtonText = computed(() => standards.value.find(v => v.id === selectedStandardId.value)?.label ??
+  'Норматив')
+
 const selectedStandardType = computed<'physical' | 'technical'>(() => {
   if (standardsData.value.find(v => v.id === selectedStandardId.value)?.has_numeric_value) {
     return 'physical'
@@ -216,6 +219,15 @@ onMounted(async () => {
 
   <div v-if="!smAndUp" class="top-panel-mobile">
 
+    <BottomSheetWithButton :button-text="standardButtonText" sheet-title="Нормативы" wrap-button>
+      <template #default="{ toggle }">
+        <DataTableSideNav v-model="selectedStandardId"
+                          :data="standards"
+                          :has-action-buttons="false"
+                          class="data-table-side-nav-mobile"
+                          @update:model-value="getStudentsData(); toggle()" />
+      </template>
+    </BottomSheetWithButton>
 
     <BottomSheetWithButton button-text="фильтры" icon="mdi-filter" sheet-title="Фильтры">
       <template #default="{ toggle }">
@@ -267,11 +279,6 @@ onMounted(async () => {
   align-items: center;
 }
 
-.top-panel {
-  height: fit-content;
-  min-height: 60px;
-}
-
 .data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {
   color: rgb(var(--v-theme-primary)) !important;
   border: 1px solid white !important;
@@ -306,16 +313,8 @@ onMounted(async () => {
   .filters-block {
     width: min-content;
   }
-
-  button.v-btn {
-    height: 2em;
-  }
-
 }
 
-@media (width <= 870px) {
-
-}
 
 @media (width <= 800px) {
   .grid {
@@ -324,12 +323,10 @@ onMounted(async () => {
 }
 
 @media (max-width: 600px) {
-
   .grid {
     grid-template-columns: 1fr;
     padding: 0 10px 10px;
     margin: 5px 0;
   }
-
 }
 </style>

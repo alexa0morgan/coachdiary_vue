@@ -39,6 +39,7 @@ function toggle() {
 }
 
 .wrapButton {
+  min-height: 36px;
   height: auto !important;
   max-width: min-content;
 }
