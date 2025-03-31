@@ -153,7 +153,7 @@ onMounted(async () => {
 .horizontal-menu {
   flex-direction: row;
   flex-wrap: wrap;
-  width: calc(100dvw - 110px);
+  max-width: calc(100dvw - 110px);
   justify-content: center;
 }
 

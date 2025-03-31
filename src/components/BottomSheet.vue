@@ -4,11 +4,12 @@ const isActive = defineModel<boolean>({ required: true })
 
 defineProps<{
   sheetTitle: string;
+  eager?: boolean;
 }>()
 </script>
 
 <template>
-  <v-bottom-sheet v-model="isActive" inset>
+  <v-bottom-sheet v-model="isActive" inset :eager>
     <div class="container">
       <div class="top-panel">
         <v-btn color="white" icon="mdi-chevron-left" variant="text" @click="isActive = !isActive" />

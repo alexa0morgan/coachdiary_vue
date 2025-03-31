@@ -207,7 +207,11 @@ onMounted(async () => {
 
 <template>
   <TopPanel v-if="smAndUp" class="top-panel">
-    <classes-panel :classes-data menu @studentsData="updateStudentsData" @classes-data="updateClassesData" />
+    <ClassesPanel
+      :classes-data
+      menu
+      @studentsData="updateStudentsData"
+      @classes-data="updateClassesData" />
     <template #right v-if="w800">
       <BottomSheetWithButton
         button-color="secondary"
@@ -227,16 +231,20 @@ onMounted(async () => {
 
   <div v-if="!smAndUp" class="top-panel-mobile">
     <div class="buttons-panel">
-      <BottomSheetWithButton prerender :button-text="classButtonText" :sheet-title="classButtonText">
-        <template #default="{ toggle }">
-          <ClassesPanel :classes-data
-                        menu
-                        direction-column
-                        @studentsData="updateStudentsData"
-                        @classes-data="updateClassesData"
-                        @buttonClick="toggle" />
-        </template>
-      </BottomSheetWithButton>
+      <keep-alive>
+
+        <BottomSheetWithButton :button-text="classButtonText" sheet-title="Классы" eager>
+          <template #default="{ toggle }">
+            <ClassesPanel :classes-data
+                          menu
+                          direction-column
+                          @studentsData="updateStudentsData"
+                          @classes-data="updateClassesData"
+                          @buttonClick="toggle" />
+          </template>
+        </BottomSheetWithButton>
+      </keep-alive>
+
       <BottomSheetWithButton :button-text="standardButtonText" sheet-title="Нормативы" wrap-button>
         <template #default="{ toggle }">
           <DataTableSideNav v-model="selectedStandardId"

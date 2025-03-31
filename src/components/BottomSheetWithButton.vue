@@ -9,6 +9,7 @@ defineProps<{
   wrapButton?: boolean;
   icon?: string;
   buttonColor?: string;
+  eager?: boolean;
 }>()
 
 const isSheetActive = ref(false)
@@ -21,10 +22,21 @@ function toggle() {
 
 <template>
 
-  <v-btn v-if="icon" class="button" variant="outlined" :icon="icon" @click="toggle" :color="buttonColor"/>
-  <v-btn v-else :text="buttonText" class="button" :class="{wrapButton}" variant="outlined" @click="toggle" :color="buttonColor"/>
+  <v-btn v-if="icon"
+         class="button"
+         variant="outlined"
+         :icon="icon"
+         :color="buttonColor"
+         @click="toggle" />
+  <v-btn v-else
+         :text="buttonText"
+         :color="buttonColor"
+         :class="{wrapButton}"
+         class="button"
+         variant="outlined"
+         @click="toggle" />
 
-  <BottomSheet v-model="isSheetActive" :sheet-title="sheetTitle">
+  <BottomSheet v-model="isSheetActive" :sheet-title="sheetTitle" :eager>
     <slot :toggle="toggle" />
   </BottomSheet>
 </template>
