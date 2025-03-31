@@ -44,6 +44,15 @@ let studentsData: StudentResponse[] = []
 
 const standardButtonText = computed(() => standards.value.find(v => v.id === selectedStandardId.value)?.label ??
   'Норматив')
+const classButtonText = computed(() => {
+  if (activeLevelNumber.value === 12) {
+    return 'Все классы'
+  } else if (activeLevelNumber.value === -1) {
+    return 'Классы'
+  } else {
+    return activeLevelNumber.value + className.value
+  }
+})
 
 const selectedStandardType = computed<'physical' | 'technical'>(() => {
   if (standardsData.value.find(v => v.id === selectedStandardId.value)?.has_numeric_value) {
@@ -189,7 +198,6 @@ async function saveStudentsValue() {
 onMounted(async () => {
   standardsData.value = await get('/api/standards/').then(res => res.json())
 
-
   if (activeLevelNumber.value !== -1 && selectedStandardId.value !== -1) {
     await getStudentsData()
   }
@@ -218,16 +226,28 @@ onMounted(async () => {
   </TopPanel>
 
   <div v-if="!smAndUp" class="top-panel-mobile">
+    <div class="buttons-panel">
+      <BottomSheetWithButton prerender :button-text="classButtonText" :sheet-title="classButtonText">
+        <template #default="{ toggle }">
+          <ClassesPanel :classes-data
+                        menu
+                        direction-column
+                        @studentsData="updateStudentsData"
+                        @classes-data="updateClassesData"
+                        @buttonClick="toggle" />
+        </template>
+      </BottomSheetWithButton>
+      <BottomSheetWithButton :button-text="standardButtonText" sheet-title="Нормативы" wrap-button>
+        <template #default="{ toggle }">
+          <DataTableSideNav v-model="selectedStandardId"
+                            :data="standards"
+                            :has-action-buttons="false"
+                            class="data-table-side-nav-mobile"
+                            @update:model-value="getStudentsData(); toggle()" />
+        </template>
+      </BottomSheetWithButton>
+    </div>
 
-    <BottomSheetWithButton :button-text="standardButtonText" sheet-title="Нормативы" wrap-button>
-      <template #default="{ toggle }">
-        <DataTableSideNav v-model="selectedStandardId"
-                          :data="standards"
-                          :has-action-buttons="false"
-                          class="data-table-side-nav-mobile"
-                          @update:model-value="getStudentsData(); toggle()" />
-      </template>
-    </BottomSheetWithButton>
 
     <BottomSheetWithButton button-text="фильтры" icon="mdi-filter" sheet-title="Фильтры">
       <template #default="{ toggle }">
@@ -277,6 +297,11 @@ onMounted(async () => {
   justify-content: space-between;
   margin: 0 10px 14px;
   align-items: center;
+}
+
+.buttons-panel {
+  display: flex;
+  gap: 10px;
 }
 
 .data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {

@@ -25,6 +25,7 @@ const classesData = ref<ClassRequest[]>([])
 
 const activeLevelNumber = ref(+route.query.classNumber! || -1)
 const className = ref(route.query.letter as string || '')
+
 const fullClassName = computed(() =>
   className.value ? activeLevelNumber.value + className.value : activeLevelNumber.value
 )
@@ -99,18 +100,25 @@ onMounted(async () => {
       @click="!menu ? getStudentsData(n, '', true) : ''">
 
       {{ n }}{{ activeLevelNumber === n ? className : '' }}
-      <v-menu v-if="menu" activator="parent" location="bottom center" offset="5"
-              transition="slide-y-transition">
-        <v-list base-color="rgb(var(--v-theme-secondary))" bg-color="rgb(var(--v-theme-primary))"
-                density="compact" elevation="0">
-          <v-list-item v-for="letter in classes[n]" :key='n + letter' class="text-center"
-                       @click="getStudentsData(n, letter, true)">
-            <v-list-item-title>{{ letter.toUpperCase() }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item class="text-center" @click="getStudentsData(n, '', true)">
-            <v-list-item-title>Параллель</v-list-item-title>
-          </v-list-item>
-        </v-list>
+      <v-menu v-if="menu"
+              activator="parent"
+              :location="directionColumn ? 'right center' : 'bottom center'"
+              :transition=" directionColumn ? 'slide-x-transition' : 'slide-y-transition'"
+              offset="5">
+        <div :class="directionColumn ? 'horizontal-menu' : ''" class="menu">
+          <v-btn v-for="letter in classes[n]"
+                 :key='n + letter'
+                 variant="text"
+                 color="secondary"
+                 @click="getStudentsData(n, letter, true)">
+            {{ letter.toUpperCase() }}
+          </v-btn>
+          <v-btn variant="text"
+                 color="rgb(var(--v-theme-secondary))"
+                 @click="getStudentsData(n, '', true)">
+            Параллель
+          </v-btn>
+        </div>
       </v-menu>
     </v-btn>
     <v-divider v-if="!directionColumn" class="divider" vertical color="rgb(var(--v-theme-secondary))" thickness="3"
@@ -135,9 +143,24 @@ onMounted(async () => {
   width: 100%;
 }
 
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 2px;
+  background-color: rgb(var(--v-theme-primary));
+}
+
+.horizontal-menu {
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: calc(100dvw - 110px);
+  justify-content: center;
+}
+
 .directionColumn {
   flex-direction: column;
   height: 100%;
+  width: fit-content;
 }
 
 .top-button {
