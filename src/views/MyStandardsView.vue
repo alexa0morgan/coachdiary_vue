@@ -282,6 +282,10 @@ async function deleteStandard(): Promise<void> {
   color: white !important;
 }
 
+.data-table-side-nav {
+  height: calc(100vh - 220px);
+}
+
 .data-table-side-nav-mobile :deep(.v-btn) {
   color: white !important;
 }
@@ -289,10 +293,6 @@ async function deleteStandard(): Promise<void> {
 .data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {
   color: rgb(var(--v-theme-primary)) !important;
   border: 1px solid white !important;
-}
-
-.data-table-side-nav {
-  height: calc(100vh - 220px);
 }
 
 .top-panel-mobile {
@@ -313,11 +313,6 @@ async function deleteStandard(): Promise<void> {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-}
-
-.top-panel {
-  height: fit-content;
-  min-height: 60px;
 }
 
 </style>
