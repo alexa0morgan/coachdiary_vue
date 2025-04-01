@@ -5,11 +5,13 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getErrorMessage, post } from '@/utils'
 import { toast } from 'vue-sonner'
+import PageFooter from '@/components/PageFooter.vue'
 
 const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
 const router = useRouter()
 const userStore = useUserStore()
 
+const privacyPolicy = ref(false)
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -27,7 +29,7 @@ const isSendButtonDisabled = computed(() => {
   }
   if (pageType.value === 'signUp') {
     return !password.value?.length || !name.value?.length ||
-      !passwordConfirmation.value?.length || password.value !== passwordConfirmation.value
+      !passwordConfirmation.value?.length || password.value !== passwordConfirmation.value || !privacyPolicy.value
   }
   return false
 })
@@ -174,6 +176,17 @@ async function restore() {
           variant="outlined"
           @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
         />
+
+        <v-checkbox v-if="pageType === 'signUp'" v-model="privacyPolicy">
+          <template #label>
+            <span>
+              Я соглашаюсь с
+              <RouterLink :to="{name: 'privacy-policy'}" target="_blank">политикой в отношении персональных
+                                                                    данных</RouterLink>
+            </span>
+          </template>
+        </v-checkbox>
+
         <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
                type="submit" />
       </form>
@@ -186,6 +199,7 @@ async function restore() {
              @click="pageType = 'signIn'" />
     </div>
   </div>
+  <PageFooter/>
 </template>
 
 <style scoped>
