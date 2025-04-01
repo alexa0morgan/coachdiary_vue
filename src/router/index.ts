@@ -12,6 +12,7 @@ import { useUserStore } from '@/stores/user'
 import AboutSiteView from '@/views/AboutSiteView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
 import MyClassesView from '@/views/MyClassesView.vue'
+import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,11 @@ const router = createRouter({
       name: 'about-us',
       component: AboutUsView,
       meta: { mobileTitle: 'О нас' }
+    },
+    {
+      path: '/privacy-policy',
+      name: 'privacy-policy',
+      component: PrivacyPolicyView,
     },
     {
       path: '/login',
