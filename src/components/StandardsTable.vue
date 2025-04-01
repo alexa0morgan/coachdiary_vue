@@ -75,4 +75,11 @@ defineProps<{
   }
 }
 
+@media (width <= 600px) {
+  .gender-text{
+    text-align: center;
+    margin-bottom: 5px;
+  }
+}
+
 </style>

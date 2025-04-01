@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import TopPanel from '@/components/TopPanel.vue'
-import { computed, onMounted, ref } from 'vue'
-import { get, getErrorMessage, post } from '@/utils'
-import { useRoute, useRouter } from 'vue-router'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyDiaryTable from '@/components/MyDiaryTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
+import ClassesPanel from '@/components/ClassesPanel.vue'
 import type {
   ClassRequest,
   FilterData,
@@ -14,16 +12,47 @@ import type {
   StudentsValueResponse,
   StudentValueRequest
 } from '@/types/types'
-import ClassesPanel from '@/components/ClassesPanel.vue'
+
+import { computed, onMounted, ref } from 'vue'
+import { get, getErrorMessage, post } from '@/utils'
+import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import { useDisplay } from 'vuetify'
+import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 
 
 const router = useRouter()
 const route = useRoute()
+const { smAndUp, width } = useDisplay()
+const w800 = computed(() => width.value <= 800)
 
 const activeLevelNumber = ref(+route.query.classNumber! || -1)
 const className = ref(route.query.letter as string || '')
 const selectedStandardId = ref(+route.query.standard! || -1)
+
+const classesData = ref<ClassRequest[]>([])
+const standardsData = ref<StandardResponse[]>([])
+const filteredData = ref<StudentsValueResponse[]>([])
+const filters = ref<FilterData>({
+  gender: null,
+  grades: [],
+  birthYearFrom: null,
+  birthYearUntil: null
+})
+let studentsValueData: StudentsValueResponse[] = []
+let studentsData: StudentResponse[] = []
+
+const standardButtonText = computed(() => standards.value.find(v => v.id === selectedStandardId.value)?.label ??
+  'Нормативы')
+const classButtonText = computed(() => {
+  if (activeLevelNumber.value === 12) {
+    return 'Все классы'
+  } else if (activeLevelNumber.value === -1) {
+    return 'Классы'
+  } else {
+    return activeLevelNumber.value + className.value
+  }
+})
 
 const selectedStandardType = computed<'physical' | 'technical'>(() => {
   if (standardsData.value.find(v => v.id === selectedStandardId.value)?.has_numeric_value) {
@@ -32,38 +61,6 @@ const selectedStandardType = computed<'physical' | 'technical'>(() => {
     return 'technical'
   }
 })
-
-const classesData = ref<ClassRequest[]>([])
-const standardsData = ref<StandardResponse[]>([])
-const filteredData = ref<StudentsValueResponse[]>([])
-let studentsValueData: StudentsValueResponse[] = []
-let studentsData: StudentResponse[] = []
-
-
-function updateClassesData(classes: ClassRequest[]) {
-  classesData.value = classes
-}
-
-function updateStudentsData(students: StudentResponse[], classNumber: number, letter: string) {
-  activeLevelNumber.value = classNumber
-  className.value = letter
-  studentsData = students
-  filteredData.value = []
-  if (!standards.value.some(v => v.id === selectedStandardId.value))
-    selectedStandardId.value = -1
-
-  getStudentsData()
-}
-
-onMounted(async () => {
-  standardsData.value = await get('/api/standards/').then(res => res.json())
-
-
-  if (activeLevelNumber.value !== -1 && selectedStandardId.value !== -1) {
-    await getStudentsData()
-  }
-})
-
 
 const standards = computed(() => {
   let result = standardsData.value
@@ -79,6 +76,29 @@ const standards = computed(() => {
     }))
 })
 
+function updateClassesData(classes: ClassRequest[]) {
+  classesData.value = classes
+}
+
+function updateStudentsData(students: StudentResponse[], classNumber: number, letter: string) {
+  activeLevelNumber.value = classNumber
+  className.value = letter
+  studentsData = students
+  filteredData.value = []
+
+  filters.value = {
+    gender: null,
+    grades: [],
+    birthYearFrom: null,
+    birthYearUntil: null
+  }
+
+  if (!standards.value.some(v => v.id === selectedStandardId.value))
+    selectedStandardId.value = -1
+
+  getStudentsData()
+}
+
 function setQuery() {
   router.replace({
     query: {
@@ -87,7 +107,6 @@ function setQuery() {
     }
   })
 }
-
 
 async function getStudentsData() {
   setQuery()
@@ -143,12 +162,6 @@ async function getStudentsData() {
   }
 }
 
-const filters = ref<FilterData>({
-  gender: null,
-  grades: [],
-  birthYearFrom: null,
-  birthYearUntil: null
-})
 
 function acceptFilters() {
   filteredData.value = studentsValueData
@@ -182,21 +195,83 @@ async function saveStudentsValue() {
   }
 }
 
+onMounted(async () => {
+  standardsData.value = await get('/api/standards/').then(res => res.json())
+
+  if (activeLevelNumber.value !== -1 && selectedStandardId.value !== -1) {
+    await getStudentsData()
+  }
+})
+
 </script>
 
 <template>
-  <TopPanel>
-    <classes-panel :classes-data menu @studentsData="updateStudentsData" @classes-data="updateClassesData" />
+  <TopPanel v-if="smAndUp" class="top-panel">
+    <ClassesPanel
+      :classes-data
+      menu
+      @studentsData="updateStudentsData"
+      @classes-data="updateClassesData" />
+    <template #right v-if="w800">
+      <BottomSheetWithButton
+        button-color="secondary"
+        button-text="фильтры"
+        icon="mdi-filter"
+        sheet-title="Фильтры">
+        <template #default="{ toggle }">
+          <FilterBlock v-model="filters"
+                       class="filters-block-mobile"
+                       mobile
+                       @accept="acceptFilters(); toggle()"
+          />
+        </template>
+      </BottomSheetWithButton>
+    </template>
   </TopPanel>
+
+  <div v-if="!smAndUp" class="top-panel-mobile">
+    <div class="buttons-panel">
+      <keep-alive>
+
+        <BottomSheetWithButton :button-text="classButtonText" sheet-title="Классы" eager>
+          <template #default="{ toggle }">
+            <ClassesPanel :classes-data
+                          menu
+                          direction-column
+                          @studentsData="updateStudentsData"
+                          @classes-data="updateClassesData"
+                          @buttonClick="toggle" />
+          </template>
+        </BottomSheetWithButton>
+      </keep-alive>
+
+      <BottomSheetWithButton :button-text="standardButtonText" sheet-title="Нормативы" wrap-button>
+        <template #default="{ toggle }">
+          <DataTableSideNav v-model="selectedStandardId"
+                            :data="standards"
+                            :has-action-buttons="false"
+                            class="data-table-side-nav-mobile"
+                            @update:model-value="getStudentsData(); toggle()" />
+        </template>
+      </BottomSheetWithButton>
+    </div>
+
+
+    <BottomSheetWithButton button-text="фильтры" icon="mdi-filter" sheet-title="Фильтры">
+      <template #default="{ toggle }">
+        <FilterBlock v-model="filters" class="filters-block-mobile" mobile @accept="acceptFilters(); toggle()" />
+      </template>
+    </BottomSheetWithButton>
+  </div>
 
   <div class="grid">
 
-    <FilterBlock v-model="filters" class="filters-block" @accept="acceptFilters" />
+    <FilterBlock v-if="!w800" v-model="filters" class="filters-block" @accept="acceptFilters" />
 
     <MyDiaryTable :data="filteredData" :standard-type="selectedStandardType" class="table"
                   @saveData="saveStudentsValue" />
 
-    <DataTableSideNav v-model="selectedStandardId" :data="standards"
+    <DataTableSideNav v-if="smAndUp" v-model="selectedStandardId" :data="standards"
                       :has-action-buttons="false" class="data-table-side-nav"
                       title="Нормативы" @update:model-value="getStudentsData" />
   </div>
@@ -225,31 +300,58 @@ async function saveStudentsValue() {
   max-width: calc(100dvw - 20px);
 }
 
-@media (max-width: 960px) {
-  a.v-btn {
-    display: none;
+.top-panel-mobile {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 10px 15px;
+  align-items: center;
+}
+
+.buttons-panel {
+  display: flex;
+  gap: 10px;
+}
+
+.filters-block-mobile, :is(.filters-block-mobile, .data-table-side-nav-mobile) :deep(.v-btn) {
+  color: white !important;
+}
+
+
+.data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {
+  color: rgb(var(--v-theme-primary)) !important;
+  border: 1px solid white !important;
+}
+
+@media (width <= 950px) {
+  .grid {
+    grid-template-columns: 136px 1fr 160px;
   }
 
+  .data-table-side-nav {
+    width: min-content;
+  }
+
+  .filters-block {
+    width: min-content;
+  }
+}
+
+@media (width <= 800px) {
+  .grid {
+    grid-template-columns: 1fr 160px;
+  }
+}
+
+@media (max-width: 600px) {
   .grid {
     grid-template-columns: 1fr;
     padding: 0 10px 10px;
     margin: 5px 0;
   }
 
-  .filters-block {
-    @media (max-width: 600px) {
-      width: 100%;
-      height: 200px;
-    }
-  }
-
-  .data-table-side-nav {
-    order: 1;
-    height: 200px
-  }
-
   .table {
-    order: 2;
+    height: calc(100dvh - 200px);
   }
+
 }
 </style>

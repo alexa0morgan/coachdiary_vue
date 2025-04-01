@@ -17,6 +17,7 @@ export const useUserStore = defineStore('user', () => {
     await post('/api/logout/')
     isLoggedIn.value = false
     localStorage.removeItem('isLoggedIn')
+    await router.push({ name: 'login' })
   }
 
   async function fetchProfile() {

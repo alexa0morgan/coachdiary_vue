@@ -3,6 +3,10 @@ import type { FilterData, GenderNullable } from '@/types/types'
 
 const filterData = defineModel<FilterData>({ required: true })
 
+defineProps<{
+  mobile?: boolean
+}>()
+
 const emit = defineEmits<{
   accept: []
 }>()
@@ -28,42 +32,50 @@ function clearFilters(): void {
 </script>
 
 <template>
-  <div class="filters-grid">
+  <div class="filters-grid" :class="mobile? 'filters-grid-mobile' : ''">
 
     <div class="filters">
 
       <div>
         <div class="title">Пол</div>
-        <div class="filter-gender">
+        <div class="filter-gender" :class="mobile ? 'flex-align-left' : ''">
           <v-btn :active="filterData.gender === 'f'" :ripple="false" class="button" size="small"
-                 text="Ж" variant="outlined" @click="selectGender('f')" />
-          <v-btn :active="filterData.gender==='m'" :ripple="false" class="button" size="small" text="М"
+                 :text="mobile ? 'девочки' : 'Ж'" variant="outlined" @click="selectGender('f')" />
+          <v-btn :active="filterData.gender==='m'" :ripple="false" class="button" size="small"
+                 :text="mobile ? 'мальчики' : 'М'"
                  variant="outlined"
                  @click="selectGender('m')" />
         </div>
       </div>
 
+      <v-divider v-if="mobile" color="white" thickness="2" opacity="0.7" />
+
       <div>
         <div class="title">Оценка</div>
-        <div class="checkbox-group">
+        <div :class="mobile? 'checkbox-group-mobile' : 'checkbox-group'">
           <v-checkbox v-for="n in 4" :key="n" v-model="filterData.grades" :label="(n +1).toString()"
                       :value="n+1" density="compact" />
           <v-checkbox v-model="filterData.grades" :value="null" density="compact" label="Нет" />
         </div>
       </div>
 
+      <v-divider v-if="mobile" color="white" thickness="2" opacity="0.7" />
+
       <div>
-        <div class="title title-year">Год рождения</div>
-        <div class="filter-year">
-          <v-text-field v-model.number="filterData.birthYearFrom" :max="currentYear - 5" density="compact" label="От"
+        <div class="title" :class="mobile ? '' : 'title-year'">Год рождения</div>
+        <div class="filter-year" :class="mobile ? 'filter-year-mobile' : ''">
+          <v-text-field v-model.number="filterData.birthYearFrom" :max="currentYear - 2" density="compact" label="От"
                         min="1900" type="number" />
-          <v-text-field v-model.number="filterData.birthYearUntil" :max="currentYear - 5" density="compact" label="До"
+          <v-text-field v-model.number="filterData.birthYearUntil" :max="currentYear - 2" density="compact" label="До"
                         min="1900" type="number" />
         </div>
       </div>
+
+      <v-divider v-if="mobile" color="white" thickness="2" opacity="0.7" />
+
     </div>
 
-    <div class="action-buttons">
+    <div class="action-buttons" :class="mobile ? 'action-buttons-mobile' : ''">
       <v-btn class="button action-button" color="error" size="small" text="Сбросить" variant="outlined"
              @click="clearFilters" />
       <v-btn class="button action-button" color="primary-darken-1" size="small" text="Принять" variant="outlined"
@@ -85,6 +97,25 @@ function clearFilters(): void {
   overflow: hidden;
 }
 
+.filters-grid-mobile {
+  height: auto;
+  padding: 0 0 10px;
+  text-align: left;
+}
+
+.filters-grid-mobile {
+  color: white !important;
+}
+
+.filters-grid-mobile :deep(.v-btn) {
+  color: white !important;
+}
+
+.filters-grid-mobile :deep(.v-btn.v-btn--active) {
+  color: rgb(var(--v-theme-primary)) !important;
+  border: 1px solid white !important;
+}
+
 .filters {
   display: flex;
   flex-direction: column;
@@ -98,12 +129,12 @@ function clearFilters(): void {
 .title {
   text-transform: uppercase;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .title-year {
   font-size: 14px;
-  margin-bottom: 15px
+  margin-bottom: 20px
 }
 
 .filter-gender {
@@ -129,18 +160,31 @@ function clearFilters(): void {
   color: black;
 }
 
+.checkbox-group-mobile {
+  display: flex;
+  flex-direction: row;
+  height: auto;
+  justify-content: flex-start;
+  gap: 20px;
+}
+
 .button {
   border-radius: var(--v-border-radius);
   font-size: 16px;
   flex-grow: 0;
   height: auto !important;
   min-height: 24px;
+  text-transform: uppercase;
 }
 
 .filter-year {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.filter-year-mobile {
+  flex-direction: row;
 }
 
 .button:deep(.v-btn__content) {
@@ -156,5 +200,15 @@ function clearFilters(): void {
   flex-direction: column;
   gap: 8px;
   padding-top: 15px;
+}
+
+.action-buttons-mobile {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.flex-align-left {
+  justify-content: flex-start;
+  gap: 10px;
 }
 </style>

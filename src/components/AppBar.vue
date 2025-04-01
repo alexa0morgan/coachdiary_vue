@@ -2,14 +2,15 @@
 
 import { useDisplay } from 'vuetify'
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { useUIStore } from '@/stores/ui'
 
 const userStore = useUserStore()
+const uiStore = useUIStore()
 const { smAndUp } = useDisplay()
 const isMenuOpen = ref(false)
 const route = useRoute()
-const router = useRouter()
 
 const isLoginPage = computed(() => route.name === 'login')
 
@@ -20,15 +21,10 @@ const logoLink = computed(() => {
   return { name: 'home' }
 })
 
-async function logout() {
-  await userStore.logout()
-  router.push({ name: 'login' })
-}
-
 const mobileTitle = computed(() => {
-  if (route.name === 'student' && route.params.id) {
-    return route.meta.mobileTitle || 'Ученик'
-  }
+
+  if (uiStore.mobileTitle)   return uiStore.mobileTitle
+
   return route.meta.mobileTitle
 })
 
@@ -43,14 +39,14 @@ const mobileTitle = computed(() => {
       <v-list-item :to="{name: 'about-site'}" link title="О сайте" />
       <v-list-item :to="{name: 'about-us'}" link title="О нас" />
     </template>
-<!--        <template v-else>
-          <v-list-item :to="{name: 'my-classes'}" link title="Мои ученики" />
-          <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
-          <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
-          <v-list-item :to="{name: 'profile'}" link title="Профиль" />
-          <v-divider class="mb-2 mt-2" color="rgb(var(&#45;&#45;v-theme-primary-darken-1))" />
-          <v-list-item link title="Выход" @click="logout" />
-        </template>-->
+    <!--        <template v-else>
+              <v-list-item :to="{name: 'my-classes'}" link title="Мои ученики" />
+              <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
+              <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
+              <v-list-item :to="{name: 'profile'}" link title="Профиль" />
+              <v-divider class="mb-2 mt-2" color="rgb(var(&#45;&#45;v-theme-primary-darken-1))" />
+              <v-list-item link title="Выход" @click="logout" />
+            </template>-->
   </v-navigation-drawer>
 
   <v-app-bar :class="{'app-bar' : !smAndUp}">
@@ -86,7 +82,7 @@ const mobileTitle = computed(() => {
           <v-btn :to="{name: 'my-standards'}" variant="text">Мои нормативы</v-btn>
           <v-divider class="divider mb-2 mt-2" color="rgb(var(--v-theme-primary-darken-1))" vertical />
           <v-btn :to="{name: 'profile'}" variant="text">Профиль</v-btn>
-          <v-btn rounded variant="flat" @click="logout">Выйти</v-btn>
+          <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
         </template>
 
         <!--        <v-btn v-else-if="!smAndUp" :to="infoButtonLink" class="info-button"-->

@@ -14,7 +14,7 @@ export function getCookie(name: string): string | null {
 }
 
 export function get(url: string, data?: Record<string | number, unknown | unknown[]>): Promise<Response> {
-  const urlObj = new URL(import.meta.env.VITE_APP_API_BASE + url)
+  const urlObj = new URL(location.origin + url)
   for (const key in data) {
     if (Array.isArray(data[key])) {
       for (const item of data[key] as unknown[]) {
@@ -34,7 +34,7 @@ export function get(url: string, data?: Record<string | number, unknown | unknow
 }
 
 export function post(url: string, data?: Record<string | number, unknown> | unknown[]): Promise<Response> {
-  return fetch(import.meta.env.VITE_APP_API_BASE + url, {
+  return fetch(location.origin + url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export function post(url: string, data?: Record<string | number, unknown> | unkn
 }
 
 export function put(url: string, data?: Record<string | number, unknown>): Promise<Response> {
-  return fetch(import.meta.env.VITE_APP_API_BASE + url, {
+  return fetch(location.origin + url, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export function put(url: string, data?: Record<string | number, unknown>): Promi
 }
 
 export function patch(url: string, data?: Record<string | number, unknown>): Promise<Response> {
-  return fetch(import.meta.env.VITE_APP_API_BASE + url, {
+  return fetch(location.origin + url, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export function patch(url: string, data?: Record<string | number, unknown>): Pro
 }
 
 export function del(url: string): Promise<Response> {
-  return fetch(import.meta.env.VITE_APP_API_BASE + url, {
+  return fetch(location.origin + url, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',

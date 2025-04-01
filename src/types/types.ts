@@ -93,9 +93,10 @@ export type StudentStandardResponse = {
   Value: number | null,
   Level_number: number
 }
+
 export type StudentStandardRequest = {
   student_id: number,
   standard_id: number,
-  value: number,
+  value: number | null,
   level_number: number,
-}[]
+}
