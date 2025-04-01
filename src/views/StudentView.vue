@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
@@ -11,8 +11,10 @@ import router from '@/router'
 import { toast } from 'vue-sonner'
 import { useDisplay } from 'vuetify'
 import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
+import { useUIStore } from '@/stores/ui'
 
 const route = useRoute()
+const uiStore = useUIStore()
 const { smAndUp } = useDisplay()
 const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
@@ -21,7 +23,6 @@ const selectedLevelNumber = ref(-1)
 
 const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (selectedLevelNumber.value + ' год обучения') :
   'Года обучения')
-const studentButtonText = computed(() => studentInfo.value?.full_name ?? 'Студент не найден')
 
 const labels = computed(() => {
   if (!studentInfo.value) return []
@@ -65,7 +66,7 @@ async function getStudentById(studentId: number) {
     const response = await get(`/api/students/${studentId}`)
     if (response.ok) {
       studentInfo.value = await response.json()
-      route.meta.mobileTitle = studentInfo.value ? studentInfo.value.full_name : 'Студент не найден'
+      uiStore.mobileTitle = studentInfo.value ? studentInfo.value.full_name : 'Студент не найден'
     } else {
       toast.error(getErrorMessage((await response.json()).details))
     }
@@ -125,6 +126,10 @@ onMounted(async () => {
   await getStandardsByStudentId(studentId.value)
   await nextTick()
   selectedLevelNumber.value = studentInfo?.value?.student_class.number ?? 0
+})
+
+onUnmounted(() => {
+  uiStore.mobileTitle = ''
 })
 </script>
 

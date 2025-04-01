@@ -4,8 +4,10 @@ import { useDisplay } from 'vuetify'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { useUIStore } from '@/stores/ui'
 
 const userStore = useUserStore()
+const uiStore = useUIStore()
 const { smAndUp } = useDisplay()
 const isMenuOpen = ref(false)
 const route = useRoute()
@@ -20,9 +22,9 @@ const logoLink = computed(() => {
 })
 
 const mobileTitle = computed(() => {
-  if (route.name === 'student' && route.params.id) {
-    return route.meta.mobileTitle ?? 'Студент не найден'
-  }
+
+  if (uiStore.mobileTitle)   return uiStore.mobileTitle
+
   return route.meta.mobileTitle
 })
 
