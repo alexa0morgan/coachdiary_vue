@@ -21,18 +21,18 @@ const emit = defineEmits<{
 const headers = computed<VDataTable['$props']['headers']>(() => {
   if (standardType === 'physical') {
     return [
-      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: false },
+      { title: 'Класс', value: 'student_class.class_name', width: 50, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'ПОЛ', value: 'gender', width: 83 },
-      { title: 'Результат', value: 'value', sortable: true, width: 120 },
-      { title: 'Оценка', value: 'grade', sortable: true, width: 102 }
+      { title: 'ПОЛ', value: 'gender', width: 70 },
+      { title: 'Результат', value: 'value', sortable: true, width: 100 },
+      { title: 'Оценка', value: 'grade', sortable: true, width: 80 }
     ]
   } else {
     return [
-      { title: 'Класс', value: 'student_class.class_name', width: 70, sortable: false },
+      { title: 'Класс', value: 'student_class.class_name', width: 50, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'ПОЛ', value: 'gender', width: 83 },
-      { title: 'Оценка', value: 'value', sortable: true, width: 120 }
+      { title: 'ПОЛ', value: 'gender', width: 70 },
+      { title: 'Оценка', value: 'value', sortable: true, width: 80 }
     ]
   }
 
@@ -87,7 +87,7 @@ function getStudentName(student: StudentsValueResponse) {
     multi-sort
     class="table"
     item-key="name"
-    no-data-text="Чтобы появились ученики, выберите Класс сверху, потом Норматив справа"
+    no-data-text="Чтобы появились ученики, выберите Класс, потом Норматив"
   >
     <template #item.student_class.class_name="{item}">
       {{ item.student_class.number + item.student_class.class_name }}
@@ -111,7 +111,8 @@ function getStudentName(student: StudentsValueResponse) {
       </div>
     </template>
     <template #item.value="{item}">
-      <v-text-field v-model="item.value" class="result" />
+      <v-text-field v-model="item.value" :class="standardType === 'technical' ? getMarkColor(item.grade ?? 0) +
+      ' mark' : ''"/>
     </template>
     <template #item.grade=" {item} ">
       <div :class="getMarkColor(item.grade ?? 0)" class="mark">{{ item.grade }}</div>
@@ -149,7 +150,6 @@ function getStudentName(student: StudentsValueResponse) {
   font-size: 20px;
   font-weight: bold;
   text-align: center;
-
 }
 
 .mark-bad {

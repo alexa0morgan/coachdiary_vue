@@ -312,22 +312,10 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {
-  color: rgb(var(--v-theme-primary)) !important;
-  border: 1px solid white !important;
-}
-
-.filters-block-mobile {
-  color: white;
-}
-
-.filters-block-mobile :deep(.v-btn) {
-  color: white;
-}
-
-.data-table-side-nav-mobile :deep(.v-btn) {
+.filters-block-mobile, :is(.filters-block-mobile, .data-table-side-nav-mobile) :deep(.v-btn) {
   color: white !important;
 }
+
 
 .data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {
   color: rgb(var(--v-theme-primary)) !important;
