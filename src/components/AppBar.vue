@@ -21,7 +21,7 @@ const logoLink = computed(() => {
 
 const mobileTitle = computed(() => {
   if (route.name === 'student' && route.params.id) {
-    return route.meta.mobileTitle || 'Ученик'
+    return route.meta.mobileTitle ?? 'Студент не найден'
   }
   return route.meta.mobileTitle
 })
