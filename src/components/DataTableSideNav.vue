@@ -10,6 +10,7 @@ const { hasActionButtons = true } = defineProps<{
   isContentStaticText?: boolean;
   hasActionButtons?: boolean;
   hasDeleteMenu?: boolean;
+  mobile?: boolean;
 }>()
 
 defineEmits<{
@@ -36,7 +37,7 @@ function onSelect(id: number): void {
         <div v-for="item in data" :key="item.id" class="static-text">{{ item.label }}</div>
       </template>
     </div>
-    <div v-if="hasActionButtons" class="action-buttons">
+    <div v-if="hasActionButtons" class="action-buttons" :class="mobile ? 'action-buttons-mobile' : ''">
       <v-btn class="button action-button" color="primary-darken-1"
              size="small" text="Изменить"
              variant="outlined" @click="$emit('edit')" />
@@ -130,6 +131,11 @@ function onSelect(id: number): void {
   font-size: 12px;
 }
 
+.action-buttons-mobile {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .static-text {
   font-size: 16px;
   border: 1px solid rgb(var(--v-theme-primary));
@@ -141,4 +147,6 @@ function onSelect(id: number): void {
   letter-spacing: 1px;
   line-height: 1.2;
 }
+
+
 </style>

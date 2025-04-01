@@ -43,7 +43,7 @@ let studentsValueData: StudentsValueResponse[] = []
 let studentsData: StudentResponse[] = []
 
 const standardButtonText = computed(() => standards.value.find(v => v.id === selectedStandardId.value)?.label ??
-  'Норматив')
+  'Нормативы')
 const classButtonText = computed(() => {
   if (activeLevelNumber.value === 12) {
     return 'Все классы'
@@ -303,7 +303,7 @@ onMounted(async () => {
 .top-panel-mobile {
   display: flex;
   justify-content: space-between;
-  margin: 0 10px 14px;
+  margin: 0 10px 15px;
   align-items: center;
 }
 
@@ -336,7 +336,6 @@ onMounted(async () => {
   }
 }
 
-
 @media (width <= 800px) {
   .grid {
     grid-template-columns: 1fr 160px;
@@ -349,5 +348,10 @@ onMounted(async () => {
     padding: 0 10px 10px;
     margin: 5px 0;
   }
+
+  .table {
+    height: calc(100dvh - 200px);
+  }
+
 }
 </style>
