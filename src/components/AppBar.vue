@@ -22,7 +22,6 @@ const logoLink = computed(() => {
 })
 
 const mobileTitle = computed(() => {
-
   if (uiStore.mobileTitle)   return uiStore.mobileTitle
 
   return route.meta.mobileTitle
@@ -120,7 +119,8 @@ const mobileTitle = computed(() => {
   display: flex;
   gap: 10px;
   align-items: center;
-  height: 100%
+  height: 100%;
+  margin-right: 16px;
 }
 
 .icon {

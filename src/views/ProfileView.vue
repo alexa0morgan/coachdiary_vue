@@ -4,7 +4,6 @@ import { get, getErrorMessage, patch, put } from '@/utils'
 import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/user'
 
-
 const userStore = useUserStore()
 
 const currentName = ref('')

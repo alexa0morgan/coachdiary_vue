@@ -23,17 +23,6 @@ const isSaveButtonDisabled = computed(() => {
     !className.value
 })
 
-onMounted(async () => {
-  if (pageType.value === 'update-student') {
-    const data: StudentResponse = await get(`/api/students/${route.params.id}/`).then(res => res.json())
-    studentName.value = data.full_name
-    genderType.value = data.gender
-    birthdayDate.value = data.birthday
-    classNumber.value = data.student_class.number
-    className.value = data.student_class.class_name
-  }
-})
-
 async function createOrUpdateStudent() {
   try {
     const requestData: StudentRequest = {
@@ -66,6 +55,17 @@ async function createOrUpdateStudent() {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
+
+onMounted(async () => {
+  if (pageType.value === 'update-student') {
+    const data: StudentResponse = await get(`/api/students/${route.params.id}/`).then(res => res.json())
+    studentName.value = data.full_name
+    genderType.value = data.gender
+    birthdayDate.value = data.birthday
+    classNumber.value = data.student_class.number
+    className.value = data.student_class.class_name
+  }
+})
 </script>
 
 <template>

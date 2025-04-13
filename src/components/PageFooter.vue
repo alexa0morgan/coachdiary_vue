@@ -34,7 +34,7 @@ import { RouterLink } from 'vue-router'
             <img src="/public/vk-1-logo-svgrepo-com.svg" alt="VK" width="24" height="24">
           </v-btn>
         </div>
-        <div> 2023 - 2025 — <strong>CoachDiary</strong></div>
+        <div> 2023 - 2025 — <strong>Дневник Тренера</strong></div>
 
       </div>
     </div>

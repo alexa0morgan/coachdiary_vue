@@ -4,6 +4,7 @@ import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyDiaryTable from '@/components/MyDiaryTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
 import ClassesPanel from '@/components/ClassesPanel.vue'
+import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 import type {
   ClassRequest,
   FilterData,
@@ -18,7 +19,6 @@ import { get, getErrorMessage, post } from '@/utils'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useDisplay } from 'vuetify'
-import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 
 
 const router = useRouter()

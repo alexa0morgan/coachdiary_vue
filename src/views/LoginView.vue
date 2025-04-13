@@ -181,8 +181,9 @@ async function restore() {
           <template #label>
             <span>
               Я соглашаюсь с
-              <RouterLink :to="{name: 'privacy-policy'}" target="_blank">политикой в отношении персональных
-                                                                    данных</RouterLink>
+              <RouterLink :to="{name: 'privacy-policy'}" target="_blank">
+                политикой в отношении персональных данных
+              </RouterLink>
             </span>
           </template>
         </v-checkbox>
@@ -199,7 +200,7 @@ async function restore() {
              @click="pageType = 'signIn'" />
     </div>
   </div>
-  <PageFooter/>
+  <PageFooter />
 </template>
 
 <style scoped>

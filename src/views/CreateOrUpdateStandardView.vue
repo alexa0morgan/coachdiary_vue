@@ -277,7 +277,6 @@ onMounted(async () => {
 }
 
 
-
 .grid :deep(.v-label) {
   opacity: 1;
   color: black;
