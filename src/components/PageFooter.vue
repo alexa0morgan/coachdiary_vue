@@ -45,7 +45,7 @@ import { RouterLink } from 'vue-router'
 <style scoped>
 footer {
   padding: 20px 30px;
-  background-color: rgb(var(--v-theme-surface-variant));
+  background-color: rgb(var(--v-theme-primary-darken-1));
   color: rgb(var(--v-theme-on-surface-variant));
 }
 
