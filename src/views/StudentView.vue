@@ -54,7 +54,7 @@ async function getStandardsByStudentId(studentId: number) {
     if (response.ok) {
       standardsInfo.value = await response.json()
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
@@ -68,7 +68,7 @@ async function getStudentById(studentId: number) {
       studentInfo.value = await response.json()
       uiStore.mobileTitle = studentInfo.value ? studentInfo.value.full_name : 'Студент не найден'
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
@@ -91,7 +91,7 @@ async function deleteStudent() {
       await router.push({ name: 'my-diary' })
       toast.success('Ученик успешно удален')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -114,7 +114,7 @@ async function saveStudentValue() {
       await getStandardsByStudentId(studentId.value)
       toast.success('Данные успешно обновлены')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')

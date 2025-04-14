@@ -41,7 +41,7 @@ async function getData() {
       name.value = currentName.value
       email.value = currentEmail.value
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
@@ -59,7 +59,7 @@ async function patchName() {
       await getData()
       toast.success('Имя успешно изменено')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -77,7 +77,7 @@ async function patchEmail() {
       await getData()
       toast.success('Почта успешно изменена')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -103,7 +103,7 @@ async function putPassword() {
       passwordConfirmation.value = ''
       toast.success('Пароль успешно изменен')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')

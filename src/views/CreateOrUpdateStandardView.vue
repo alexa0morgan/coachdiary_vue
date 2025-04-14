@@ -122,7 +122,7 @@ async function createOrUpdateStandard() {
     } else if (response.ok && pageType.value === 'update-standard') {
       toast.success('Данные о нормативе успешно обновлены')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')

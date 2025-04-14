@@ -79,6 +79,9 @@ export function del(url: string): Promise<Response> {
 
 
 export function flattenObject(obj: any, parentKey: string = '', result: Record<string, any> = {}): Record<string, any> {
+  if (typeof obj === 'string' && parentKey === '') {
+    return {obj}
+  }
   for (const key in obj) {
     // eslint-disable-next-line
     if (obj.hasOwnProperty(key)) {
@@ -103,7 +106,16 @@ export function flattenObject(obj: any, parentKey: string = '', result: Record<s
 }
 
 export function getErrorMessage(error: any): string {
-  return Object.values(flattenObject(error)).join(' ')
+  if ('details' in error) {
+    return Object.values(flattenObject(error.details)).join(' ')
+  }
+  if ('errors' in error) {
+    return Object.values(flattenObject(error.errors)).join(' ')
+  }
+  if ('детали' in error) {
+    return Object.values(flattenObject(error.детали)).join(' ')
+  }
+  return 'Неизвестная ошибка'
 }
 
 
@@ -137,7 +149,7 @@ export function showConfirmDialog({ title, text, confirmText = 'Да', cancelTex
   })
 }
 
-function removeDialog(dialog:Dialog, action: () => void) {
+function removeDialog(dialog: Dialog, action: () => void) {
   const index = confirmDialogs.value.indexOf(dialog)
   confirmDialogs.value.splice(index, 1)
   action()

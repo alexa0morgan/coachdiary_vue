@@ -75,9 +75,10 @@ async function sendData() {
     } else if (pageType.value === 'restore') {
       response = await restore()
     }
-    if (response?.status === 'error') {
-      toast.error(getErrorMessage(response.details))
+    if (response?.status === 'error' || response?.статус === 'ошибка') {
+      toast.error(getErrorMessage(response))
     }
+
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   } finally {

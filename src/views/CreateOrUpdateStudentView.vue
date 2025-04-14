@@ -48,7 +48,7 @@ async function createOrUpdateStudent() {
       toast.success('Данные о ученике успешно обновлены')
       router.push({ name: 'student', params: { id: route.params.id } })
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
 
   } catch (e) {

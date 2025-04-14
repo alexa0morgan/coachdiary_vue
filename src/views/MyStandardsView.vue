@@ -84,7 +84,7 @@ async function deleteStandard(): Promise<void> {
       await setFirst()
       toast.success('Норматив был успешно удален')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')

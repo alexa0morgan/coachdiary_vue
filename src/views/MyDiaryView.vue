@@ -188,7 +188,7 @@ async function saveStudentsValue() {
     if (response.ok) {
       await getStudentsData()
     } else {
-      toast.error(getErrorMessage((await response.json()).errors))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Ошибка при сохранении данных, попробуйте позже')
