@@ -29,7 +29,9 @@ export type StandardRequest = {
 
 export type StudentResponse = {
   id: number,
-  full_name: string,
+  first_name: string,
+  last_name: string,
+  patronymic: string,
   student_class: {
     id: number,
     recruitment_year: number,
@@ -41,7 +43,9 @@ export type StudentResponse = {
 }
 
 export type StudentRequest = {
-  full_name: string,
+  first_name: string,
+  last_name: string,
+  patronymic: string,
   student_class: {
     number: number,
     class_name: string

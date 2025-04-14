@@ -20,6 +20,10 @@ const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
 const standardsInfo = ref<StudentStandardResponse[]>([])
 const selectedLevelNumber = ref(-1)
+const fullName = computed(() => {
+  if (!studentInfo.value) return ''
+  return `${studentInfo.value.last_name} ${studentInfo.value.first_name} ${studentInfo.value.patronymic}`
+})
 
 const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (selectedLevelNumber.value + ' год обучения') :
   'Года обучения')
@@ -66,7 +70,7 @@ async function getStudentById(studentId: number) {
     const response = await get(`/api/students/${studentId}`)
     if (response.ok) {
       studentInfo.value = await response.json()
-      uiStore.mobileTitle = studentInfo.value ? studentInfo.value.full_name : 'Студент не найден'
+      uiStore.mobileTitle = studentInfo.value ? fullName.value : 'Студент не найден'
     } else {
       toast.error(getErrorMessage(await response.json()))
     }
@@ -136,7 +140,7 @@ onUnmounted(() => {
 <template>
 
   <TopPanel v-if="smAndUp" class="top-panel">
-    <div class="top-panel-title">{{ studentInfo?.full_name ?? 'Студент не найден' }}</div>
+    <div class="top-panel-title">{{ fullName ?? 'Студент не найден' }}</div>
   </TopPanel>
 
   <div v-if="!smAndUp" class="top-panel-mobile">

@@ -189,7 +189,6 @@ onMounted(async () => {
 
     <v-text-field v-model="standardName" class="standard-name" label="Название" />
 
-
     <FieldSet title="Уровни">
       <p class="levels-text">Выберите один <br /> или несколько</p>
 

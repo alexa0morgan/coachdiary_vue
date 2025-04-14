@@ -122,7 +122,7 @@ async function deleteClass() {
                   :to="{name: 'student', params: { id: students[i-1].id } }"
                   class="button"
                   variant="text">
-                  {{ students[i - 1].full_name }}
+                  {{ students[i - 1].last_name + ' ' + students[i - 1].first_name + ' ' + students[i - 1].patronymic }}
                 </v-btn>
               </div>
 
