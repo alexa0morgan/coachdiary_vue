@@ -3,10 +3,12 @@
 import TopPanel from '@/components/TopPanel.vue'
 import ClassesPanel from '@/components/ClassesPanel.vue'
 import { computed, ref } from 'vue'
-import type { StudentResponse } from '@/types/types'
+import type { ClassRequest, StudentResponse } from '@/types/types'
 import { useMyClassesStore } from '@/stores/myClasses'
 import { useDisplay } from 'vuetify'
-import { showConfirmDialog } from '@/utils'
+import { del, getErrorMessage, showConfirmDialog } from '@/utils'
+import router from '@/router'
+import { toast } from 'vue-sonner'
 
 let timer: number | null = null
 
@@ -23,6 +25,7 @@ const { smAndUp } = useDisplay()
 const myClassesStore = useMyClassesStore()
 const activeLevelNumber = ref(-1)
 const studentsData = ref<StudentResponse[]>([])
+const classesData = ref<ClassRequest[]>([])
 
 const groupedStudentsClasses = computed(() => {
   const students = studentsData.value.toSorted((a, b) => {
@@ -32,7 +35,9 @@ const groupedStudentsClasses = computed(() => {
     if (a.student_class.class_name !== b.student_class.class_name) {
       return a.student_class.class_name.localeCompare(b.student_class.class_name)
     }
-    return a.full_name.localeCompare(b.full_name)
+    let fullNameA = `${a.last_name} ${a.first_name} ${a.patronymic}`
+    let fullNameB = `${b.last_name} ${b.first_name} ${b.patronymic}`
+    return fullNameA.localeCompare(fullNameB)
   })
   const result: Record<number, Record<string, StudentResponse[]>> = {}
   for (const student of students) {
@@ -45,7 +50,6 @@ const groupedStudentsClasses = computed(() => {
     result[student.student_class.number][student.student_class.class_name].push(student)
   }
 
-
   return result
 })
 
@@ -54,12 +58,30 @@ function updateStudentsData(data: StudentResponse[], classNumber: number, letter
   activeLevelNumber.value = classNumber
 }
 
-async function deleteClass() {
-  //TODO создать функционал удаления классов
+function getClassesData(data: ClassRequest[]) {
+  classesData.value = data
+}
+
+async function deleteClass(number: number, name: string) {
   await showConfirmDialog({
     title: 'Удаление класса',
     text: 'Вы уверены, что хотите удалить класс?'
   })
+
+
+  const id = classesData.value.find((item) => item.number === number && item.class_name === name)?.id
+
+  try {
+    const response = await del('/api/classes/' + id)
+    if (response.ok) {
+      router.go(0)
+      toast.success('Класс успешно удален')
+    } else {
+      toast.error(getErrorMessage(await response.json()))
+    }
+  } catch {
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+  }
 }
 
 </script>
@@ -82,9 +104,9 @@ async function deleteClass() {
               hide-details
               @update:search="search"
             />-->
-    <classes-panel v-if="!smAndUp"
-                   @studentsData="updateStudentsData"
-                   @buttonClick="myClassesStore.activeClasses = []" />
+    <ClassesPanel v-if="!smAndUp"
+                  @studentsData="updateStudentsData"
+                  @buttonClick="myClassesStore.activeClasses = []" />
     <div v-if="smAndUp"></div>
     <template #right v-if="smAndUp">
       <v-btn :to="{name: 'create-student'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
@@ -93,9 +115,10 @@ async function deleteClass() {
   </TopPanel>
 
   <div class="classes-panel" v-if="smAndUp">
-    <classes-panel direction-column
-                   @studentsData="updateStudentsData"
-                   @buttonClick="myClassesStore.activeClasses = []" />
+    <ClassesPanel direction-column
+                  @studentsData="updateStudentsData"
+                  @classesData="getClassesData"
+                  @buttonClick="myClassesStore.activeClasses = []" />
   </div>
 
   <div class="container">
@@ -126,11 +149,13 @@ async function deleteClass() {
                 </v-btn>
               </div>
 
-              <!--                          <div class="action-buttons">
-                                          <v-btn size="small" color="error" variant="outlined" @click="deleteClass">Удалить</v-btn>
-                                          <v-btn size="small" color="warning" variant="outlined">Архивировать</v-btn>
-                                          <v-btn size="small" color="info" variant="outlined">Перевести на след. год</v-btn>
-                                        </div>-->
+              <div class="action-buttons">
+                <v-btn size="small" color="error" variant="outlined" @click="deleteClass(+activeLevelNumber, klass)">
+                  Удалить
+                </v-btn>
+                <!--    <v-btn size="small" color="warning" variant="outlined">Архивировать</v-btn>
+                        <v-btn size="small" color="info" variant="outlined">Перевести на след. год</v-btn>-->
+              </div>
 
             </v-expansion-panel-text>
           </v-expansion-panel>

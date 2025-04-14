@@ -68,7 +68,7 @@ export function patch(url: string, data?: Record<string | number, unknown>): Pro
 }
 
 export function del(url: string): Promise<Response> {
-  return fetch(location.origin + url, {
+  return fetch(location.origin + url + '/', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -114,6 +114,9 @@ export function getErrorMessage(error: any): string {
   }
   if ('детали' in error) {
     return Object.values(flattenObject(error.детали)).join(' ')
+  }
+  if ('Детали' in error) {
+    return Object.values(flattenObject(error.Детали)).join(' ')
   }
   return 'Неизвестная ошибка'
 }
