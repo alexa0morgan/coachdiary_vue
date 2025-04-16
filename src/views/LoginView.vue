@@ -12,7 +12,9 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const privacyPolicy = ref(false)
-const name = ref('')
+const firstName = ref('')
+const lastName = ref('')
+const patronymic = ref('')
 const email = ref('')
 const password = ref('')
 const passwordConfirmation = ref('')
@@ -28,7 +30,7 @@ const isSendButtonDisabled = computed(() => {
     return !password.value?.length
   }
   if (pageType.value === 'signUp') {
-    return !password.value?.length || !name.value?.length ||
+    return !password.value?.length || !firstName.value?.length || !lastName.value?.length ||
       !passwordConfirmation.value?.length || password.value !== passwordConfirmation.value || !privacyPolicy.value
   }
   return false
@@ -89,7 +91,7 @@ async function sendData() {
 async function signIn() {
   const requestData = { email: email.value, password: password.value }
 
-  const response = await post('/api/login/', requestData)
+  const response = await post('/api/login/session_login/', requestData)
 
   if (response.ok) {
     userStore.login()
@@ -104,7 +106,9 @@ async function signUp() {
     email: email.value,
     password: password.value,
     confirm_password: passwordConfirmation.value,
-    name: name.value
+    first_name: firstName.value,
+    last_name: lastName.value,
+    patronymic: patronymic.value,
   }
 
   const response = await post('/api/create-user/', requestData)
@@ -113,13 +117,14 @@ async function signUp() {
     pageType.value = 'signIn'
     email.value = ''
     password.value = ''
-    name.value = ''
+    firstName.value = ''
+    lastName.value = ''
+    patronymic.value = ''
     passwordConfirmation.value = ''
     toast.success('Пользователь успешно создан')
   } else {
     return response.json()
   }
-
 }
 
 async function restore() {
@@ -135,12 +140,29 @@ async function restore() {
       <form class="border-container" @submit.prevent="sendData">
         <v-text-field
           v-if="pageType === 'signUp'"
-          v-model="name"
+          v-model="firstName"
           :disabled="isLoading"
           clearable
           label="Имя"
           persistent-clear
-          placeholder="ФИО"
+          variant="outlined"
+        />
+        <v-text-field
+          v-if="pageType === 'signUp'"
+          v-model="lastName"
+          :disabled="isLoading"
+          clearable
+          label="Фамилия"
+          persistent-clear
+          variant="outlined"
+        />
+        <v-text-field
+          v-if="pageType === 'signUp'"
+          v-model="patronymic"
+          :disabled="isLoading"
+          clearable
+          label="Отчество"
+          persistent-clear
           variant="outlined"
         />
         <v-text-field
