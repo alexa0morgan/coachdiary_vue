@@ -8,7 +8,7 @@ import { useUIStore } from '@/stores/ui'
 
 const userStore = useUserStore()
 const uiStore = useUIStore()
-const { smAndUp } = useDisplay()
+const { smAndUp, width } = useDisplay()
 const isMenuOpen = ref(false)
 const route = useRoute()
 
@@ -51,8 +51,8 @@ const mobileTitle = computed(() => {
   <v-app-bar :class="{'app-bar' : !smAndUp}">
     <v-app-bar-title>
       <router-link v-if="smAndUp" :to="logoLink" class="title">
-        <img alt="logo" class="icon" src="/whistle.svg" />
-        <span class="text-title">Дневник тренера</span>
+        <img v-if="width<820" alt="logo" class="icon" src="/mobile_man_run_blue.svg" />
+        <img v-else alt="logo" class="icon" src="/mobile_logo_blue.svg" />
       </router-link>
       <div v-else class="text-center mr-4 mobile-title">{{ mobileTitle }}</div>
     </v-app-bar-title>
@@ -124,7 +124,7 @@ const mobileTitle = computed(() => {
 }
 
 .icon {
-  height: 32px;
+  height: 50px;
 }
 
 .info-button :deep(.v-btn__content) {
@@ -141,10 +141,5 @@ const mobileTitle = computed(() => {
   height: calc(100% - 15px);
 }
 
-@media (max-width: 900px) {
-  .text-title {
-    display: none;
-  }
-}
 
 </style>

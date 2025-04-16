@@ -10,6 +10,8 @@ const { smAndDown } = useDisplay()
   <v-img class="main-img" cover src="/luthfi-alfarizi-8i_KGxVeLtQ-unsplash.webp">
     <div class="main-img-overlay">
       <h1 class="main-text main-header">Дневник Тренера</h1>
+      <!--      <SVGLogo class="icon" />
+            <img src="/mobile_logo_blue (2).png" alt="ss">-->
       <p class="main-text describe">Универсальное приложение для тренеров спортивных секций</p>
       <div class="text">
         <v-btn :to="{name: 'login'}" class="sigh-up-btn" rounded size="x-large" variant="flat">Зарегистрироваться
@@ -95,7 +97,7 @@ const { smAndDown } = useDisplay()
 }
 
 .main-img-overlay {
-  backdrop-filter: brightness(110%);
+  backdrop-filter: brightness(80%);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -116,8 +118,13 @@ const { smAndDown } = useDisplay()
 }
 
 .main-header {
-  font-size: 70px;
+  font-size: 80px;
   text-transform: uppercase;
+}
+
+.icon {
+  height: 250px;
+  color: black;
 }
 
 .describe {
