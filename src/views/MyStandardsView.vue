@@ -26,11 +26,6 @@ const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (select
 const standardButtonText = computed(() => simplifiedStandards.value.find(v => v.id === selectedStandardId.value)?.label ?? 'Норматив')
 
 
-onMounted(async () => {
-  standards.value = await get('/api/standards/').then(res => res.json())
-  await setFirst()
-})
-
 async function setFirst(levelNumber?: number): Promise<void> {
   selectedLevelNumber.value = levelNumber ?? levels.value[0] ?? -1
   await nextTick()
@@ -71,16 +66,37 @@ function editStandard(): void {
   router.push({ name: 'update-standard', params: { id: selectedStandardId.value } })
 }
 
-async function deleteStandard(): Promise<void> {
+async function deleteStandard(inAllLevels: boolean): Promise<void> {
+
+  const dialogText = inAllLevels ?
+    'Вы уверены, что хотите удалить этот норматив для всех уровней?' :
+    `Вы уверены, что хотите удалить этот норматив для текущего уровня: ${selectedLevelNumber.value}?`
+
+  const deleteURl = inAllLevels ?
+    `/api/standards/${selectedStandardId.value}/` :
+    `/api/standards/${selectedStandardId.value}/remove_level/?level_number=${selectedLevelNumber.value}`
+
   await showConfirmDialog({
     title: 'Удаление норматива',
-    text: 'Вы уверены, что хотите удалить этот норматив?'
+    text: dialogText
   })
 
   try {
-    const response = await del('/api/standards/' + selectedStandardId.value)
+    const response = await del(deleteURl)
     if (response.ok) {
-      standards.value = standards.value.filter(standard => standard.id !== selectedStandardId.value)
+      if (inAllLevels) {
+        standards.value = standards.value.filter(standard => standard.id !== selectedStandardId.value)
+      } else {
+        standards.value = standards.value.map(standard => {
+          if (standard.id === selectedStandardId.value) {
+            return {
+              ...standard,
+              levels: standard.levels.filter(level => level.level_number !== selectedLevelNumber.value)
+            }
+          }
+          return standard
+        })
+      }
       await setFirst()
       toast.success('Норматив был успешно удален')
     } else {
@@ -89,9 +105,13 @@ async function deleteStandard(): Promise<void> {
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
+
 }
 
-
+onMounted(async () => {
+  standards.value = await get('/api/standards/').then(res => res.json())
+  await setFirst()
+})
 </script>
 
 <template>
@@ -168,9 +188,9 @@ async function deleteStandard(): Promise<void> {
           v-for="level in currentStandardLevels"
           :key="level.id"
           :gender="level.gender"
-          :high="level.high_level_value"
-          :low="level.low_level_value"
-          :middle="level.middle_level_value" />
+          :high="level.high_value"
+          :low="level.low_value"
+          :middle="level.middle_value" />
       </template>
     </div>
 
@@ -211,6 +231,7 @@ async function deleteStandard(): Promise<void> {
         :is-standard-type-technical="pageType==='technical'"
         :title="pageType==='standards' ? 'Физические' : 'Технические'"
         class="data-table-side-nav"
+        has-delete-menu
         @delete="deleteStandard"
         @edit="editStandard"
       />

@@ -7,10 +7,11 @@ export type StandardResponse = {
   has_numeric_value: boolean
   levels: {
     id: number,
+    is_lower_better: boolean,
     level_number: number,
-    low_level_value: number,
-    middle_level_value: number,
-    high_level_value: number,
+    low_value: number,
+    middle_value: number,
+    high_value: number,
     gender: Gender,
   }[]
 }
@@ -19,10 +20,11 @@ export type StandardRequest = {
   name: string,
   has_numeric_value: boolean
   levels: {
+    is_lower_better: boolean,
     level_number: number,
-    low_level_value: number | null,
-    middle_level_value: number | null,
-    high_level_value: number | null,
+    low_value: number | null,
+    middle_value: number | null,
+    high_value: number | null,
     gender: Gender,
   }[]
 }
