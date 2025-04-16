@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouteLocationRaw } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import MyDiaryView from '@/views/MyDiaryView.vue'
@@ -7,12 +8,11 @@ import ProfileView from '@/views/ProfileView.vue'
 import CreateOrUpdateStandardView from '@/views/CreateOrUpdateStandardView.vue'
 import CreateOrUpdateStudentView from '@/views/CreateOrUpdateStudentView.vue'
 import StudentView from '@/views/StudentView.vue'
-
-import { useUserStore } from '@/stores/user'
 import AboutSiteView from '@/views/AboutSiteView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
 import MyClassesView from '@/views/MyClassesView.vue'
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,23 +27,25 @@ const router = createRouter({
       path: '/about-site',
       name: 'about-site',
       component: AboutSiteView,
-      meta: { mobileTitle: 'О сайте' }
+      meta: { mobileTitle: 'Дневник тренера' }
     },
     {
       path: '/about-us',
       name: 'about-us',
       component: AboutUsView,
-      meta: { mobileTitle: 'О нас' }
+      meta: { mobileTitle: 'Дневник Тренера' }
     },
     {
       path: '/privacy-policy',
       name: 'privacy-policy',
       component: PrivacyPolicyView,
+      meta: { mobileTitle: 'Дневник Тренера' }
     },
     {
       path: '/login',
       name: 'login',
       component: LoginView,
+      meta: { mobileTitle: 'Дневник Тренера' },
       beforeEnter: isNotAuthenticated
     },
     {

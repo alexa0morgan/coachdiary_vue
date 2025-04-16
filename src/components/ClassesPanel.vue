@@ -69,7 +69,7 @@ async function getStudentsData(classNumber: number, letter: string, emitButtonCl
       const currentStudents = await response.json() as StudentResponse[]
       emit('studentsData', currentStudents, classNumber, letter)
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')

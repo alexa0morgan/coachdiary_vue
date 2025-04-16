@@ -4,13 +4,13 @@ import TopPanel from '@/components/TopPanel.vue'
 import LevelPanel from '@/components/LevelPanel.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import StudentTable from '@/components/StudentTable.vue'
+import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 import { del, get, getErrorMessage, post, showConfirmDialog } from '@/utils'
 import type { StudentResponse, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { toast } from 'vue-sonner'
 import { useDisplay } from 'vuetify'
-import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 import { useUIStore } from '@/stores/ui'
 
 const route = useRoute()
@@ -20,6 +20,10 @@ const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
 const standardsInfo = ref<StudentStandardResponse[]>([])
 const selectedLevelNumber = ref(-1)
+const fullName = computed(() => {
+  if (!studentInfo.value) return ''
+  return `${studentInfo.value.last_name} ${studentInfo.value.first_name} ${studentInfo.value.patronymic}`
+})
 
 const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (selectedLevelNumber.value + ' год обучения') :
   'Года обучения')
@@ -54,7 +58,7 @@ async function getStandardsByStudentId(studentId: number) {
     if (response.ok) {
       standardsInfo.value = await response.json()
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
@@ -66,9 +70,9 @@ async function getStudentById(studentId: number) {
     const response = await get(`/api/students/${studentId}`)
     if (response.ok) {
       studentInfo.value = await response.json()
-      uiStore.mobileTitle = studentInfo.value ? studentInfo.value.full_name : 'Студент не найден'
+      uiStore.mobileTitle = studentInfo.value ? fullName.value : 'Студент не найден'
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
@@ -86,12 +90,12 @@ async function deleteStudent() {
   })
 
   try {
-    const response = await del('/api/students/' + studentId.value)
+    const response = await del('/api/students/' + studentId.value + '/')
     if (response.ok) {
       await router.push({ name: 'my-diary' })
       toast.success('Ученик успешно удален')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -114,7 +118,7 @@ async function saveStudentValue() {
       await getStandardsByStudentId(studentId.value)
       toast.success('Данные успешно обновлены')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -136,7 +140,7 @@ onUnmounted(() => {
 <template>
 
   <TopPanel v-if="smAndUp" class="top-panel">
-    <div class="top-panel-title">{{ studentInfo?.full_name ?? 'Студент не найден' }}</div>
+    <div class="top-panel-title">{{ fullName ?? 'Студент не найден' }}</div>
   </TopPanel>
 
   <div v-if="!smAndUp" class="top-panel-mobile">
@@ -198,7 +202,7 @@ onUnmounted(() => {
   max-width: 1200px;
   margin: 10px auto 0;
 
-  @media (max-width: 600px) {
+  @media (max-width: 1200px) {
     margin: 10px;
   }
 }

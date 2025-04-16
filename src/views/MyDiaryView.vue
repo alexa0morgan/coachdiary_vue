@@ -4,6 +4,7 @@ import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import MyDiaryTable from '@/components/MyDiaryTable.vue'
 import FilterBlock from '@/components/FilterBlock.vue'
 import ClassesPanel from '@/components/ClassesPanel.vue'
+import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 import type {
   ClassRequest,
   FilterData,
@@ -18,7 +19,6 @@ import { get, getErrorMessage, post } from '@/utils'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useDisplay } from 'vuetify'
-import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 
 
 const router = useRouter()
@@ -183,12 +183,13 @@ async function saveStudentsValue() {
         value: student.value == null ? null : +student.value
       }))
 
-    const response = await post('/api/students/results/create_or_update/', request)
+    const response = await post('/api/students/results/new/', request)
 
     if (response.ok) {
       await getStudentsData()
+      acceptFilters()
     } else {
-      toast.error(getErrorMessage((await response.json()).errors))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Ошибка при сохранении данных, попробуйте позже')

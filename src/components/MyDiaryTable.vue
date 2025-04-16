@@ -23,7 +23,7 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
     return [
       { title: 'Класс', value: 'student_class.class_name', width: 50, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'ПОЛ', value: 'gender', width: 70 },
+      { title: 'Пол', value: 'gender', width: 70 },
       { title: 'Результат', value: 'value', sortable: true, width: 100 },
       { title: 'Оценка', value: 'grade', sortable: true, width: 80 }
     ]
@@ -31,7 +31,7 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
     return [
       { title: 'Класс', value: 'student_class.class_name', width: 50, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'ПОЛ', value: 'gender', width: 70 },
+      { title: 'Пол', value: 'gender', width: 70 },
       { title: 'Оценка', value: 'value', sortable: true, width: 80 }
     ]
   }
@@ -69,9 +69,9 @@ const sortedData = computed(() => {
 
 function getStudentName(student: StudentsValueResponse) {
   if (smAndUp.value) {
-    return student.full_name
+    return student.last_name + ' ' + student.first_name + ' ' + student.patronymic
   }
-  return student.full_name.split(' ').map((v, i) => i === 0 ? v : v[0] + '.').join(' ')
+  return student.last_name + ' ' + student.first_name[0] + '. ' + student.patronymic[0] + '.'
 }
 
 </script>

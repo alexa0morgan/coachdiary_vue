@@ -4,13 +4,16 @@ import { get, getErrorMessage, patch, put } from '@/utils'
 import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/user'
 
-
 const userStore = useUserStore()
 
-const currentName = ref('')
+const currentFirstName = ref('')
+const currentLastName = ref('')
+const currentPatronymic = ref('')
 const currentEmail = ref('')
 
-const name = ref('')
+const firstName = ref('')
+const lastName = ref('')
+const patronymic = ref('')
 const email = ref('')
 const password = ref('')
 const newPassword = ref('')
@@ -21,8 +24,11 @@ const newPasswordType = ref<'password' | 'text'>('password')
 const passwordConfirmationType = ref<'password' | 'text'>('password')
 
 const isSetNameButtonDisabled = computed(() => {
-  return name.value?.trim() === currentName.value || name.value?.trim().length === 0 || !name.value
+  return (firstName.value?.trim() === currentFirstName.value && lastName.value?.trim() === currentLastName.value &&
+      patronymic.value?.trim() === currentPatronymic.value) ||
+    firstName.value?.trim().length === 0 || !firstName.value || lastName.value?.trim().length === 0 || !lastName.value
 })
+
 const isSetEmailButtonDisabled = computed(() => {
   return email.value?.trim() === currentEmail.value || email.value?.trim().length === 0
 })
@@ -37,12 +43,16 @@ async function getData() {
     if (response.ok) {
       const data = await response.json()
 
-      currentName.value = data.name
+      currentFirstName.value = data.first_name
+      currentLastName.value = data.last_name
+      currentPatronymic.value = data.patronymic
       currentEmail.value = data.email
-      name.value = currentName.value
+      firstName.value = currentFirstName.value
+      lastName.value = currentLastName.value
+      patronymic.value = currentPatronymic.value
       email.value = currentEmail.value
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
@@ -55,12 +65,16 @@ async function patchName() {
   }
 
   try {
-    const response = await patch('/api/profile/', { name: name.value })
+    const response = await patch('/api/profile/change_details/', {
+      first_name: firstName.value,
+      last_name: lastName.value,
+      patronymic: patronymic.value ?? '',
+    })
     if (response.ok) {
       await getData()
       toast.success('Имя успешно изменено')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -73,12 +87,14 @@ async function patchEmail() {
   }
 
   try {
-    const response = await patch('/api/profile/', { email: email.value })
+    const response = await patch('/api/profile/change_email/', {
+      email: email.value
+    })
     if (response.ok) {
       await getData()
       toast.success('Почта успешно изменена')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -97,14 +113,14 @@ async function putPassword() {
       confirm_new_password: passwordConfirmation.value,
       current_password: password.value
     }
-    const response = await put('/api/profile/', requestData)
+    const response = await put('/api/profile/change_password/', requestData)
     if (response.ok) {
       password.value = ''
       newPassword.value = ''
       passwordConfirmation.value = ''
       toast.success('Пароль успешно изменен')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
@@ -122,11 +138,23 @@ onMounted(async () => {
     <div class="container rounded-lg">
       <div class="text">Смена имени и почты</div>
       <form class="text-field mb-4" @submit.prevent="patchName">
-        <v-text-field
-          v-model="name"
-          clearable
-          persistent-clear
-          label="Полное имя" />
+        <div class="text-field-fio">
+          <v-text-field
+            v-model="firstName"
+            clearable
+            persistent-clear
+            label="Имя" />
+          <v-text-field
+            v-model="lastName"
+            clearable
+            persistent-clear
+            label="Фамилия" />
+          <v-text-field
+            v-model="patronymic"
+            clearable
+            persistent-clear
+            label="Отчество" />
+        </div>
         <v-btn
           :disabled="isSetNameButtonDisabled"
           class="button"
@@ -218,6 +246,10 @@ onMounted(async () => {
   gap: 10px;
 }
 
+.text-field-fio {
+  display: flex;
+  gap: 10px;
+}
 
 .text {
   font-size: 24px;
@@ -240,5 +272,10 @@ onMounted(async () => {
     background: transparent;
     padding: 20px;
   }
+
+  .text-field-fio {
+  flex-direction: column;
+}
+
 }
 </style>

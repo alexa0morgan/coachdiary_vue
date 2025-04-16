@@ -3,13 +3,14 @@
 import StandardsTable from '@/components/StandardsTable.vue'
 import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import TopPanel from '@/components/TopPanel.vue'
+import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
+
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { del, get, getErrorMessage, showConfirmDialog } from '@/utils'
 import type { StandardResponse } from '@/types/types'
 import router from '@/router'
 import { toast } from 'vue-sonner'
 import { useDisplay } from 'vuetify'
-import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 
 
 const { smAndUp } = useDisplay()
@@ -24,11 +25,6 @@ const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (select
   'Года обучения')
 const standardButtonText = computed(() => simplifiedStandards.value.find(v => v.id === selectedStandardId.value)?.label ?? 'Норматив')
 
-
-onMounted(async () => {
-  standards.value = await get('/api/standards/').then(res => res.json())
-  await setFirst()
-})
 
 async function setFirst(levelNumber?: number): Promise<void> {
   selectedLevelNumber.value = levelNumber ?? levels.value[0] ?? -1
@@ -70,27 +66,52 @@ function editStandard(): void {
   router.push({ name: 'update-standard', params: { id: selectedStandardId.value } })
 }
 
-async function deleteStandard(): Promise<void> {
+async function deleteStandard(inAllLevels: boolean): Promise<void> {
+
+  const dialogText = inAllLevels ?
+    'Вы уверены, что хотите удалить этот норматив для всех уровней?' :
+    `Вы уверены, что хотите удалить этот норматив для текущего уровня: ${selectedLevelNumber.value}?`
+
+  const deleteURl = inAllLevels ?
+    `/api/standards/${selectedStandardId.value}/` :
+    `/api/standards/${selectedStandardId.value}/remove_level/?level_number=${selectedLevelNumber.value}`
+
   await showConfirmDialog({
     title: 'Удаление норматива',
-    text: 'Вы уверены, что хотите удалить этот норматив?'
+    text: dialogText
   })
 
   try {
-    const response = await del('/api/standards/' + selectedStandardId.value)
+    const response = await del(deleteURl)
     if (response.ok) {
-      standards.value = standards.value.filter(standard => standard.id !== selectedStandardId.value)
+      if (inAllLevels) {
+        standards.value = standards.value.filter(standard => standard.id !== selectedStandardId.value)
+      } else {
+        standards.value = standards.value.map(standard => {
+          if (standard.id === selectedStandardId.value) {
+            return {
+              ...standard,
+              levels: standard.levels.filter(level => level.level_number !== selectedLevelNumber.value)
+            }
+          }
+          return standard
+        })
+      }
       await setFirst()
       toast.success('Норматив был успешно удален')
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
+
 }
 
-
+onMounted(async () => {
+  standards.value = await get('/api/standards/').then(res => res.json())
+  await setFirst()
+})
 </script>
 
 <template>
@@ -167,9 +188,9 @@ async function deleteStandard(): Promise<void> {
           v-for="level in currentStandardLevels"
           :key="level.id"
           :gender="level.gender"
-          :high="level.high_level_value"
-          :low="level.low_level_value"
-          :middle="level.middle_level_value" />
+          :high="level.high_value"
+          :low="level.low_value"
+          :middle="level.middle_value" />
       </template>
     </div>
 
@@ -179,11 +200,22 @@ async function deleteStandard(): Promise<void> {
              text="Изменить"
              variant="outlined"
              @click="editStandard" />
-      <v-btn class="button"
-             color="error"
-             variant="outlined"
-             text="Удалить"
-             @click="deleteStandard" />
+      <v-btn class="button" color="error" variant="outlined">
+        Удалить
+        <v-menu activator="parent">
+          <v-list density="compact">
+            <v-list-item @click="deleteStandard(false)">
+              <v-list-item-title>данные {{selectedLevelNumber}} года</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="deleteStandard(true)">
+              <v-list-item-title>данные всех годов</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="() => {}">
+              <v-list-item-title>Отмена</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-btn>
     </div>
 
 
@@ -210,6 +242,7 @@ async function deleteStandard(): Promise<void> {
         :is-standard-type-technical="pageType==='technical'"
         :title="pageType==='standards' ? 'Физические' : 'Технические'"
         class="data-table-side-nav"
+        has-delete-menu
         @delete="deleteStandard"
         @edit="editStandard"
       />

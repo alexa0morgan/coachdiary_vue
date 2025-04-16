@@ -5,14 +5,14 @@ defineProps<{
 </script>
 
 <template>
-  <fieldset class="container">
+  <fieldset class="fieldset">
     <legend>{{ title }}</legend>
     <slot></slot>
   </fieldset>
 </template>
 
 <style scoped>
-.container {
+.fieldset {
   border-radius: var(--v-border-radius);
   padding: 5px 10px 7px;
 }

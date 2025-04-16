@@ -34,7 +34,7 @@ import { RouterLink } from 'vue-router'
             <img src="/public/vk-1-logo-svgrepo-com.svg" alt="VK" width="24" height="24">
           </v-btn>
         </div>
-        <div> 2023 - 2025 — <strong>CoachDiary</strong></div>
+        <div> 2023 - 2025 — <strong>Дневник Тренера</strong></div>
 
       </div>
     </div>
@@ -45,7 +45,7 @@ import { RouterLink } from 'vue-router'
 <style scoped>
 footer {
   padding: 20px 30px;
-  background-color: rgb(var(--v-theme-surface-variant));
+  background-color: rgb(var(--v-theme-primary-darken-1));
   color: rgb(var(--v-theme-on-surface-variant));
 }
 

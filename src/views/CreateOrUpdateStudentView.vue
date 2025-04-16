@@ -12,32 +12,25 @@ const route = useRoute()
 const router = useRouter()
 const pageType = ref(route.name as 'create-student' | 'update-student')
 
-const studentName = ref('')
+const firstName = ref('')
+const lastName = ref('')
+const patronymic = ref('')
 const genderType = ref<GenderNullable>(null)
 const birthdayDate = ref('') //2024-05-08
 const classNumber = ref(-1)
 const className = ref('')
 
 const isSaveButtonDisabled = computed(() => {
-  return !studentName.value || !genderType.value || !birthdayDate.value || classNumber.value === -1 ||
+  return !firstName.value || !lastName.value || !genderType.value || !birthdayDate.value || classNumber.value === -1 ||
     !className.value
-})
-
-onMounted(async () => {
-  if (pageType.value === 'update-student') {
-    const data: StudentResponse = await get(`/api/students/${route.params.id}/`).then(res => res.json())
-    studentName.value = data.full_name
-    genderType.value = data.gender
-    birthdayDate.value = data.birthday
-    classNumber.value = data.student_class.number
-    className.value = data.student_class.class_name
-  }
 })
 
 async function createOrUpdateStudent() {
   try {
     const requestData: StudentRequest = {
-      full_name: studentName.value,
+      first_name: firstName.value,
+      last_name: lastName.value,
+      patronymic: patronymic.value,
       student_class: {
         number: classNumber.value,
         class_name: className.value
@@ -52,28 +45,47 @@ async function createOrUpdateStudent() {
 
     if (response.ok && pageType.value === 'create-student') {
       toast.success('Ученик успешно создан')
-      studentName.value = ''
+      firstName.value = ''
+      lastName.value = ''
+      patronymic.value = ''
       genderType.value = null
       birthdayDate.value = ''
     } else if (response.ok && pageType.value == 'update-student') {
       toast.success('Данные о ученике успешно обновлены')
       router.push({ name: 'student', params: { id: route.params.id } })
     } else {
-      toast.error(getErrorMessage((await response.json()).details))
+      toast.error(getErrorMessage(await response.json()))
     }
 
   } catch (e) {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
   }
 }
+
+onMounted(async () => {
+  if (pageType.value === 'update-student') {
+    const data: StudentResponse = await get(`/api/students/${route.params.id}/`).then(res => res.json())
+    firstName.value = data.first_name
+    lastName.value = data.last_name
+    patronymic.value = data.patronymic
+    genderType.value = data.gender
+    birthdayDate.value = data.birthday
+    classNumber.value = data.student_class.number
+    className.value = data.student_class.class_name
+  }
+})
 </script>
 
 <template>
   <TopPanel class="top-panel">{{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}</TopPanel>
-  <div v-auto-animate class="grid">
-    <div class="left">
-      <v-text-field v-model="studentName" class="text-field" label="ФИО" />
+  <div class="container">
+    <div class="names">
+      <v-text-field v-model="lastName" class="text-field" label="Фамилия" />
+      <v-text-field v-model="firstName" class="text-field" label="Имя" />
+      <v-text-field v-model="patronymic" class="text-field" label="Отчество" />
+    </div>
 
+    <div class="left">
       <FieldSet title="Пол">
         <v-radio-group v-model="genderType">
           <v-radio label="Женский" value="f" />
@@ -82,7 +94,6 @@ async function createOrUpdateStudent() {
       </FieldSet>
 
       <v-text-field v-model="birthdayDate" class="text-field" label="Дата рождения" type="date" />
-
     </div>
 
     <FieldSet class="class" title="Класс">
@@ -103,40 +114,41 @@ async function createOrUpdateStudent() {
 </template>
 
 <style scoped>
-.grid {
-  max-width: 1000px;
+.container{
+  max-width: 800px;
   margin: 20px auto;
   padding: 30px;
+  background: rgb(var(--v-theme-surface));
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 80px 100px;
-  align-items: stretch;
-  background: rgb(var(--v-theme-surface));
+  gap: 20px 100px;
 }
 
-.grid :deep(.v-label) {
-  opacity: 1;
-  color: black;
-}
-
-.grid :deep(.v-text-field .v-label) {
-  opacity: var(--v-medium-emphasis-opacity);
+.names{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  grid-column: 1 / -1;
 }
 
 .left {
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  gap: 10px;
+  gap: 20px;
+  align-items: stretch;
 }
 
 .text-field {
-  padding-top: 12px;
   flex: 0;
 }
 
-.text-field:deep(.v-field__outline) {
-  --v-field-border-opacity: 1;
+.text-field :deep(.v-field__outline) {
+  --v-field-border-opacity: 0.5;
+}
+
+.text-field :deep(.v-label:not(:has(+input:empty))) {
+  opacity: 1;
+  color: black;
 }
 
 .class {
@@ -173,21 +185,37 @@ async function createOrUpdateStudent() {
 }
 
 @media (max-width: 1000px) {
-  .grid {
+  .container {
     background: transparent;
   }
 }
 
-@media (max-width: 800px) {
+@media (width <= 800px) {
+  .container{
+    gap: 20px 30px;
+  }
+
+  .class{
+    grid-template-columns: 1fr 100px;
+  }
+}
+
+@media (max-width: 600px) {
   .top-panel {
     display: none;
   }
 
-  .grid {
+  .container {
+    width: 100%;
     grid-template-columns: 1fr;
-    overflow: scroll;
-    padding: 15px;
-    gap: 20px;
+    margin: 10px auto;
+    gap: 15px;
+    padding: 10px 20px;
+  }
+
+  .names{
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .button {
