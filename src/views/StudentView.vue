@@ -90,7 +90,7 @@ async function deleteStudent() {
   })
 
   try {
-    const response = await del('/api/students/' + studentId.value)
+    const response = await del('/api/students/' + studentId.value + '/')
     if (response.ok) {
       await router.push({ name: 'my-diary' })
       toast.success('Ученик успешно удален')

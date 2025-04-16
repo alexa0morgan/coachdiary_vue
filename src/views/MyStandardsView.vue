@@ -200,11 +200,22 @@ onMounted(async () => {
              text="Изменить"
              variant="outlined"
              @click="editStandard" />
-      <v-btn class="button"
-             color="error"
-             variant="outlined"
-             text="Удалить"
-             @click="deleteStandard" />
+      <v-btn class="button" color="error" variant="outlined">
+        Удалить
+        <v-menu activator="parent">
+          <v-list density="compact">
+            <v-list-item @click="deleteStandard(false)">
+              <v-list-item-title>данные {{selectedLevelNumber}} года</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="deleteStandard(true)">
+              <v-list-item-title>данные всех годов</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="() => {}">
+              <v-list-item-title>Отмена</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-btn>
     </div>
 
 

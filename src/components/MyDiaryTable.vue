@@ -69,9 +69,9 @@ const sortedData = computed(() => {
 
 function getStudentName(student: StudentsValueResponse) {
   if (smAndUp.value) {
-    return student.full_name
+    return student.last_name + ' ' + student.first_name + ' ' + student.patronymic
   }
-  return student.full_name.split(' ').map((v, i) => i === 0 ? v : v[0] + '.').join(' ')
+  return student.last_name + ' ' + student.first_name[0] + '. ' + student.patronymic[0] + '.'
 }
 
 </script>

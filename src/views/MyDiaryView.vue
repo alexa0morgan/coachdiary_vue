@@ -183,10 +183,11 @@ async function saveStudentsValue() {
         value: student.value == null ? null : +student.value
       }))
 
-    const response = await post('/api/students/results/create_or_update/', request)
+    const response = await post('/api/students/results/new/', request)
 
     if (response.ok) {
       await getStudentsData()
+      acceptFilters()
     } else {
       toast.error(getErrorMessage(await response.json()))
     }

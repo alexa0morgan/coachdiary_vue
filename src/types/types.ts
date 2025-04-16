@@ -66,6 +66,9 @@ export type ClassRequest = {
 
 export type StudentsValueResponse = {
   id: number,
+  first_name: string,
+  last_name: string,
+  patronymic: string,
   full_name: string,
   student_class: {
     number: number,

@@ -65,14 +65,14 @@ function getClassesData(data: ClassRequest[]) {
 async function deleteClass(number: number, name: string) {
   await showConfirmDialog({
     title: 'Удаление класса',
-    text: 'Вы уверены, что хотите удалить класс?'
+    text: 'Вы уверены, что хотите удалить весь класс?'
   })
 
 
   const id = classesData.value.find((item) => item.number === number && item.class_name === name)?.id
 
   try {
-    const response = await del('/api/classes/' + id)
+    const response = await del(`/api/classes/${id}/`)
     if (response.ok) {
       router.go(0)
       toast.success('Класс успешно удален')
