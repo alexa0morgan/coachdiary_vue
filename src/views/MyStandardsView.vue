@@ -26,10 +26,18 @@ const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (select
 const standardButtonText = computed(() => simplifiedStandards.value.find(v => v.id === selectedStandardId.value)?.label ?? 'Норматив')
 
 
-async function setFirst(levelNumber?: number): Promise<void> {
-  selectedLevelNumber.value = levelNumber ?? levels.value[0] ?? -1
+async function setFirst({
+                          standard = true,
+                          level = true,
+                          levelNumber
+                        }: {
+  standard?: boolean,
+  level?: boolean,
+  levelNumber?: number
+} = {}): Promise<void> {
+  if (level) selectedLevelNumber.value = levelNumber ?? levels.value[0] ?? -1
   await nextTick()
-  selectedStandardId.value = simplifiedStandards.value[0]?.id ?? -1
+  if (standard) selectedStandardId.value = simplifiedStandards.value[0]?.id ?? -1
 }
 
 const levels = computed(() =>
@@ -125,7 +133,7 @@ onMounted(async () => {
         :variant="selectedLevelNumber === n ? 'flat' : 'outlined'"
         class="level-button button"
         color="rgb(var(--v-theme-secondary))"
-        @click="setFirst(n)" />
+        @click="setFirst({levelNumber: n})" />
     </div>
     <template #right>
       <v-btn :to="{name: 'create-standard'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
@@ -146,7 +154,7 @@ onMounted(async () => {
             :variant="selectedLevelNumber === n ? 'flat' : 'outlined'"
             class="level-button button"
             color="rgb(var(--v-theme-secondary))"
-            @click="setFirst(n); toggle()" />
+            @click="setFirst({levelNumber: n}); toggle()" />
         </div>
       </template>
     </BottomSheetWithButton>
@@ -160,14 +168,14 @@ onMounted(async () => {
             size="small"
             text="Физические"
             variant="outlined"
-            @click="pageType = 'standards'; setFirst()" />
+            @click="pageType = 'standards'; setFirst({level:false})" />
           <v-btn
             :active="pageType==='technical'"
             class="button side-nav-button-mobile"
             size="small"
             text="Технические"
             variant="outlined"
-            @click="pageType = 'technical'; setFirst()" />
+            @click="pageType = 'technical'; setFirst({level:false})" />
         </div>
         <DataTableSideNav
           v-model="selectedStandardId"
@@ -205,7 +213,7 @@ onMounted(async () => {
         <v-menu activator="parent">
           <v-list density="compact">
             <v-list-item @click="deleteStandard(false)">
-              <v-list-item-title>данные {{selectedLevelNumber}} года</v-list-item-title>
+              <v-list-item-title>данные {{ selectedLevelNumber }} года</v-list-item-title>
             </v-list-item>
             <v-list-item @click="deleteStandard(true)">
               <v-list-item-title>данные всех годов</v-list-item-title>
@@ -227,14 +235,14 @@ onMounted(async () => {
           size="small"
           text="Физические"
           variant="outlined"
-          @click="pageType = 'standards'; setFirst()" />
+          @click="pageType = 'standards'; setFirst({level:false})" />
         <v-btn
           :active="pageType==='technical'"
           class="button side-nav-button"
           size="small"
           text="Технические"
           variant="outlined"
-          @click="pageType = 'technical'; setFirst()" />
+          @click="pageType = 'technical'; setFirst({level:false})" />
       </div>
       <DataTableSideNav
         v-model="selectedStandardId"
