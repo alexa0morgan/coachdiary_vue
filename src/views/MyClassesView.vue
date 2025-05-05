@@ -6,7 +6,7 @@ import { computed, ref } from 'vue'
 import type { ClassRequest, StudentResponse } from '@/types/types'
 import { useMyClassesStore } from '@/stores/myClasses'
 import { useDisplay } from 'vuetify'
-import { del, getErrorMessage, showConfirmDialog } from '@/utils'
+import { del, get, getErrorMessage, showConfirmDialog } from '@/utils'
 import router from '@/router'
 import { toast } from 'vue-sonner'
 
@@ -26,6 +26,7 @@ const myClassesStore = useMyClassesStore()
 const activeLevelNumber = ref(-1)
 const studentsData = ref<StudentResponse[]>([])
 const classesData = ref<ClassRequest[]>([])
+const showCode = ref(false)
 
 const groupedStudentsClasses = computed(() => {
   const students = studentsData.value.toSorted((a, b) => {
@@ -62,12 +63,42 @@ function getClassesData(data: ClassRequest[]) {
   classesData.value = data
 }
 
+async function getPDFQRCodes(number: number, name: string) {
+  const id = classesData.value.find((item) => item.number === number && item.class_name === name)?.id
+  try {
+    const response = await get(`/api/students/generate_qr_codes_pdf/`, {
+      'class_id': id
+    })
+    if (response.ok) {
+      // Получаем файл как blob
+      const blob = await response.blob()
+      // Создаем ссылку на blob
+      const url = window.URL.createObjectURL(blob)
+      // Создаем временный элемент ссылки
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `QR-коды класса ${number}${name}.pdf`
+      // Эмулируем клик для скачивания
+      document.body.appendChild(link)
+      link.click()
+      // Очищаем
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      toast.success('QR-коды успешно скачаны')
+    } else {
+      toast.error(getErrorMessage(await response.json()))
+    }
+  } catch {
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+  }
+}
+
 async function deleteClass(number: number, name: string) {
   await showConfirmDialog({
     title: 'Удаление класса',
     text: 'Вы уверены, что хотите удалить весь класс?'
   })
-
 
   const id = classesData.value.find((item) => item.number === number && item.class_name === name)?.id
 
@@ -128,6 +159,7 @@ async function deleteClass(number: number, name: string) {
       <template
         v-for="(studentsClasses, activeLevelNumber) in groupedStudentsClasses"
         :key="activeLevelNumber">
+
         <v-expansion-panels
           v-model="myClassesStore.activeClasses" multiple>
           <v-expansion-panel
@@ -138,21 +170,43 @@ async function deleteClass(number: number, name: string) {
             <v-expansion-panel-title>
               <strong>{{ activeLevelNumber + klass }}</strong>
             </v-expansion-panel-title>
-            <v-expansion-panel-text>
+
+            <v-expansion-panel-text class="expansion-panel-text">
+
+              <div class="students-list">
+                <div>№</div>
+                <div style="padding: 0 16px">ФИО</div>
+                <div v-if="smAndUp">Код приглашения</div>
+                <div v-else>Код</div>
+              </div>
+
               <div class="students-list" v-for="i in students.length" :key="students[i-1].id">
+
                 <div>{{ i }}</div>
                 <v-btn
                   :to="{name: 'student', params: { id: students[i-1].id } }"
                   class="button"
                   variant="text">
-                  {{ students[i - 1].last_name + ' ' + students[i - 1].first_name + ' ' + students[i - 1].patronymic }}
+                  {{ students[i - 1].last_name + ' ' + students[i - 1].first_name + ' ' + students[i - 1].patronymic
+                  }}
                 </v-btn>
+                <v-btn
+                  v-if="!showCode"
+                  variant="tonal"
+                  text="Показать"
+                  @click="showCode=!showCode" />
+                <v-btn
+                  v-else
+                  variant="tonal"
+                  :text="students[i - 1].invitation_link.replace('https://coachdiary.ru/join/', '')"
+                  @click="showCode=!showCode" />
               </div>
 
               <div class="action-buttons">
-                <v-btn size="small" color="error" variant="outlined" @click="deleteClass(+activeLevelNumber, klass)">
-                  Удалить
-                </v-btn>
+                <v-btn size="small" color="info" variant="outlined" text="Скачать qr коды приглашений"
+                       @click="getPDFQRCodes(+activeLevelNumber, klass)" />
+                <v-btn size="small" color="error" variant="outlined" text="Удалить"
+                       @click="deleteClass(+activeLevelNumber, klass)" />
                 <!--    <v-btn size="small" color="warning" variant="outlined">Архивировать</v-btn>
                         <v-btn size="small" color="info" variant="outlined">Перевести на след. год</v-btn>-->
               </div>
@@ -202,13 +256,18 @@ async function deleteClass(number: number, name: string) {
 
 .students-list {
   display: grid;
-  grid-template-columns: 10px 1fr;
+  grid-template-columns: 20px 1fr 136px;
   gap: 10px;
   align-items: center;
+  margin-bottom: 5px;
 }
 
 .button {
   justify-content: start;
+}
+
+.button:deep(.v-btn__content) {
+  white-space: normal !important;
 }
 
 .action-buttons {
@@ -220,6 +279,7 @@ async function deleteClass(number: number, name: string) {
   width: 100%;
 }
 
+
 @media (max-width: 600px) {
   .students-container {
     width: 100%;
@@ -228,6 +288,15 @@ async function deleteClass(number: number, name: string) {
   .container {
     grid-template-columns: 0 1fr;
     margin: 10px;
+  }
+
+  .students-list {
+    grid-template-columns: 20px 1fr 80px;
+  }
+
+  .expansion-panel-text:deep(.v-expansion-panel-text__wrapper) {
+    padding: 8px 10px 16px;
+
   }
 }
 

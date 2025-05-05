@@ -43,6 +43,7 @@ export type StudentResponse = {
   },
   birthday: string,
   gender: Gender,
+  invitation_link: string
 }
 
 export type StudentRequest = {
