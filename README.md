@@ -1,39 +1,100 @@
-# coachdiary
 
-This template should help get you started developing with Vue 3 in Vite.
+![cd_background](https://github.com/user-attachments/assets/dbcb3301-9881-4ced-b3f3-3ef03c6fbb42)
 
-## Recommended IDE Setup
+# 📘 Дневник тренера – клиентская часть
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Привет! 👋  
+Это мой учебный проект — клиентская часть приложения **"Дневник тренера"**, разработанная с использованием **Vue.js** и **TypeScript**.
 
-## Type Support for `.vue` Imports in TS
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## 🛠️ Стек технологий
 
-## Customize configuration
+- Vue.js 3
+- TypeScript
+- Vue Router
+- Pinia (для управления состоянием)
+- Vue Composition API
+- CSS/SCSS
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+## 🚀 Запуск проекта локально
 
-## Project Setup
+Для запуска следуйте инструкции ниже.
 
-```sh
+### 1. Клонируйте репозиторий и перейдите в директорию проекта:
+
+```bash
+git clone https://github.com/darkselia/coachdiary_vue.git
+cd coachdiary_vue
+```
+
+### 2. Установите зависимости:
+
+```bash
 npm install
+# или
+yarn install
 ```
 
-### Compile and Hot-Reload for Development
+### 3. Создайте файл .env в корне проекта по примеру:
 
-```sh
+```env
+VITE_API_URL=http://localhost:5173
+```
+
+### 4. Запустите проект в режиме разработки:
+
+```bash
 npm run dev
+# или
+yarn dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Теперь проект доступен по адресу: http://localhost:5173
 
-```sh
+### 5. Для сборки проекта:
+
+```bash
 npm run build
+# или
+yarn build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## 📱 Функциональность
 
-```sh
-npm run lint
+- Регистрация и авторизация
+- Управление аккаунтом
+- Управление нормативами
+- Управление классами и учениками
+- Управление результатами нормативов
+
+
+## 🔧 Требования
+
+- Node.js 16+
+- npm или yarn
+- Современный браузер с поддержкой ES6+
+
+## 🤝 Связанные проекты
+
+Серверная часть приложения доступна в репозитории [CoachDiary-backend](https://github.com/screenviolence/CoachDiary-backend)
+
+## 📦 Структура проекта
+
 ```
+src/
+├── assets/         # Статические ресурсы
+├── components/     # Vue компоненты
+├── router/         # Настройки маршрутизации
+├── stores/         # Хранилища Pinia
+├── types/          # TypeScript типы
+├── utils/          # Вспомогательные функции
+└── views/          # Компоненты-страницы
+```
+
+## 🔨 Скрипты
+
+- `npm run dev` - Запуск сервера разработки
+- `npm run build` - Сборка проекта
+- `npm run preview` - Предпросмотр собранного проекта
+- `npm run lint` - Проверка кода
+- `npm run type-check` - Проверка типов TypeScript
