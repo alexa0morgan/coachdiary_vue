@@ -155,7 +155,7 @@ onUnmounted(() => {
           class="level-button-mobile"
           mobile
           color="secondary"
-          @update:model-value="toggle" />
+          @update:model-value="toggle(); getStandardsByStudentId(studentId)" />
       </template>
     </BottomSheetWithButton>
 

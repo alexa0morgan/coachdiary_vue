@@ -26,15 +26,16 @@ const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (select
 const standardButtonText = computed(() => simplifiedStandards.value.find(v => v.id === selectedStandardId.value)?.label ?? 'Норматив')
 
 
-async function setFirst({
-                          standard = true,
-                          level = true,
-                          levelNumber
-                        }: {
-  standard?: boolean,
-  level?: boolean,
-  levelNumber?: number
-} = {}): Promise<void> {
+async function setFirst(
+  {
+    standard = true,
+    level = true,
+    levelNumber
+  }: {
+    standard?: boolean,
+    level?: boolean,
+    levelNumber?: number
+  } = {}): Promise<void> {
   if (level) selectedLevelNumber.value = levelNumber ?? levels.value[0] ?? -1
   await nextTick()
   if (standard) selectedStandardId.value = simplifiedStandards.value[0]?.id ?? -1

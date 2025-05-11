@@ -9,6 +9,7 @@ import { useDisplay } from 'vuetify'
 import { del, get, getErrorMessage, showConfirmDialog } from '@/utils'
 import router from '@/router'
 import { toast } from 'vue-sonner'
+import MyClassesStudent from '@/components/MyClassesStudent.vue'
 
 let timer: number | null = null
 
@@ -26,7 +27,6 @@ const myClassesStore = useMyClassesStore()
 const activeLevelNumber = ref(-1)
 const studentsData = ref<StudentResponse[]>([])
 const classesData = ref<ClassRequest[]>([])
-const showCode = ref(false)
 
 const groupedStudentsClasses = computed(() => {
   const students = studentsData.value.toSorted((a, b) => {
@@ -70,19 +70,9 @@ async function getPDFQRCodes(number: number, name: string) {
       'class_id': id
     })
     if (response.ok) {
-      // Получаем файл как blob
       const blob = await response.blob()
-      // Создаем ссылку на blob
       const url = window.URL.createObjectURL(blob)
-      // Создаем временный элемент ссылки
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `QR-коды класса ${number}${name}.pdf`
-      // Эмулируем клик для скачивания
-      document.body.appendChild(link)
-      link.click()
-      // Очищаем
-      document.body.removeChild(link)
+      window.open(url, '_blank')
       window.URL.revokeObjectURL(url)
 
       toast.success('QR-коды успешно скачаны')
@@ -181,25 +171,7 @@ async function deleteClass(number: number, name: string) {
               </div>
 
               <div class="students-list" v-for="i in students.length" :key="students[i-1].id">
-
-                <div>{{ i }}</div>
-                <v-btn
-                  :to="{name: 'student', params: { id: students[i-1].id } }"
-                  class="button"
-                  variant="text">
-                  {{ students[i - 1].last_name + ' ' + students[i - 1].first_name + ' ' + students[i - 1].patronymic
-                  }}
-                </v-btn>
-                <v-btn
-                  v-if="!showCode"
-                  variant="tonal"
-                  text="Показать"
-                  @click="showCode=!showCode" />
-                <v-btn
-                  v-else
-                  variant="tonal"
-                  :text="students[i - 1].invitation_link.replace('https://coachdiary.ru/join/', '')"
-                  @click="showCode=!showCode" />
+                <MyClassesStudent :i="i" :student="students[i-1]" />
               </div>
 
               <div class="action-buttons">
@@ -262,14 +234,6 @@ async function deleteClass(number: number, name: string) {
   margin-bottom: 5px;
 }
 
-.button {
-  justify-content: start;
-}
-
-.button:deep(.v-btn__content) {
-  white-space: normal !important;
-}
-
 .action-buttons {
   display: flex;
   justify-content: flex-end;
@@ -296,7 +260,6 @@ async function deleteClass(number: number, name: string) {
 
   .expansion-panel-text:deep(.v-expansion-panel-text__wrapper) {
     padding: 8px 10px 16px;
-
   }
 }
 
