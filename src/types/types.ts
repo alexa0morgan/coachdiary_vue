@@ -95,14 +95,8 @@ export type FilterData = {
 }
 
 export type StudentStandardResponse = {
-  Standard: {
-    Id: number,
-    Name: string,
-    Has_numeric_value: boolean
-  },
-  Grade: number | null,
-  Value: number | null,
-  Level_number: number
+  standards: StudentStandard[],
+  summary_grade: number
 }
 
 export type StudentStandardRequest = {
@@ -111,3 +105,14 @@ export type StudentStandardRequest = {
   value: number | null,
   level_number: number,
 }
+
+export type StudentStandard = {
+      standard: {
+        id: number,
+        name: string,
+        has_numeric_value: boolean
+      },
+      grade: number | null,
+      value: number | null,
+      level_number: number
+    }

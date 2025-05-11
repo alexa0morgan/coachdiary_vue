@@ -18,7 +18,10 @@ const uiStore = useUIStore()
 const { smAndUp } = useDisplay()
 const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
-const standardsInfo = ref<StudentStandardResponse[]>([])
+const standardsInfo = ref<StudentStandardResponse>({
+  summary_grade: -1,
+  standards: []
+})
 const selectedLevelNumber = ref(-1)
 const fullName = computed(() => {
   if (!studentInfo.value) return ''
@@ -42,21 +45,21 @@ const labels = computed(() => {
     {
       id: 2,
       label: `Пол: ${studentInfo.value.gender === 'm' ? 'муж' : 'жен'}`
+    },
+    {
+      id: 3,
+      label: `Код приглашения: ${studentInfo.value.invitation_link.split('/').pop()}`
     }
   ]
 })
 
-const standards = computed(() =>
-  standardsInfo.value
-    .filter(standard => standard.Level_number === selectedLevelNumber.value)
-)
 
-
-async function getStandardsByStudentId(studentId: number) {
+async function getStudentById(studentId: number) {
   try {
-    const response = await get(`/api/students/${studentId}/standards/`)
+    const response = await get(`/api/students/${studentId}`)
     if (response.ok) {
-      standardsInfo.value = await response.json()
+      studentInfo.value = await response.json()
+      uiStore.mobileTitle = studentInfo.value ? fullName.value : 'Студент не найден'
     } else {
       toast.error(getErrorMessage(await response.json()))
     }
@@ -65,12 +68,11 @@ async function getStandardsByStudentId(studentId: number) {
   }
 }
 
-async function getStudentById(studentId: number) {
+async function getStandardsByStudentId(studentId: number) {
   try {
-    const response = await get(`/api/students/${studentId}`)
+    const response = await get(`/api/students/${studentId}/standards/`, { level_number: selectedLevelNumber.value })
     if (response.ok) {
-      studentInfo.value = await response.json()
-      uiStore.mobileTitle = studentInfo.value ? fullName.value : 'Студент не найден'
+      standardsInfo.value = await response.json()
     } else {
       toast.error(getErrorMessage(await response.json()))
     }
@@ -104,16 +106,16 @@ async function deleteStudent() {
 
 async function saveStudentValue() {
   try {
-    const request: StudentStandardRequest[] = standards.value
-      .filter(v => v.Value != null && v.Value)
+    const request: StudentStandardRequest[] = standardsInfo.value ? standardsInfo.value.standards
+      .filter(v => v.value != null && v.value)
       .map(v => ({
         student_id: studentId.value,
-        standard_id: v.Standard.Id,
-        value: v.Standard.Has_numeric_value ? v.Value : v.Grade,
-        level_number: v.Level_number
-      }))
+        standard_id: v.standard.id,
+        value: v.standard.has_numeric_value ? v.value : v.grade,
+        level_number: v.level_number
+      })) : []
 
-    const response = await post('/api/students/results/create_or_update/', request)
+    const response = await post('/api/students/results/create/', request)
     if (response.ok) {
       await getStandardsByStudentId(studentId.value)
       toast.success('Данные успешно обновлены')
@@ -127,9 +129,9 @@ async function saveStudentValue() {
 
 onMounted(async () => {
   await getStudentById(studentId.value)
-  await getStandardsByStudentId(studentId.value)
   await nextTick()
   selectedLevelNumber.value = studentInfo?.value?.student_class.number ?? 0
+  await getStandardsByStudentId(studentId.value)
 })
 
 onUnmounted(() => {
@@ -176,11 +178,12 @@ onUnmounted(() => {
     <LevelPanel v-if="smAndUp"
                 v-model="selectedLevelNumber"
                 :class-number="studentInfo?.student_class.number ?? 0"
-                class="level-panel" />
+                class="level-panel"
+                @update:model-value="getStandardsByStudentId(studentId)" />
 
     <div class="grid">
       <StudentTable
-        :data="standards"
+        :data="standardsInfo "
         class="table"
         @save-data="saveStudentValue" />
 
