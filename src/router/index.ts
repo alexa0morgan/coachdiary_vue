@@ -13,7 +13,6 @@ import AboutUsView from '@/views/AboutUsView.vue'
 import MyClassesView from '@/views/MyClassesView.vue'
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -49,32 +48,46 @@ const router = createRouter({
       beforeEnter: isNotAuthenticated
     },
     {
+      path: '/join/:token',
+      name: 'join',
+      component: LoginView,
+      props: true,
+      meta: { mobileTitle: 'Дневник Тренера' }
+    },
+    {
       path: '/app',
       name: 'app',
       redirect: { name: 'my-diary' },
       meta: { mobileTitle: 'Дневник тренера' },
-      beforeEnter: isAuthenticated
+      beforeEnter: isAuthenticatedTeacher
     },
     {
       path: '/app/my-diary',
       name: 'my-diary',
       component: MyDiaryView,
       meta: { mobileTitle: 'Дневник' },
-      beforeEnter: isAuthenticated
+      beforeEnter: isAuthenticatedTeacher
     },
     {
       path: '/app/my-classes',
       name: 'my-classes',
       component: MyClassesView,
       meta: { mobileTitle: 'Мои ученики' },
-      beforeEnter: isAuthenticated
+      beforeEnter: isAuthenticatedTeacher
     },
     {
       path: '/app/my-classes/create',
       name: 'create-student',
       component: CreateOrUpdateStudentView,
       meta: { mobileTitle: 'Создание ученика' },
-      beforeEnter: isAuthenticated
+      beforeEnter: isAuthenticatedTeacher
+    },
+    {
+      path: '/app/my-classes/update/:id',
+      name: 'update-student',
+      component: CreateOrUpdateStudentView,
+      meta: { mobileTitle: 'Обновление ученика' },
+      beforeEnter: isAuthenticatedTeacher
     },
     {
       path: '/app/my-classes/:id',
@@ -84,32 +97,25 @@ const router = createRouter({
       beforeEnter: isAuthenticated
     },
     {
-      path: '/app/my-classes/update/:id',
-      name: 'update-student',
-      component: CreateOrUpdateStudentView,
-      meta: { mobileTitle: 'Обновление ученика' },
-      beforeEnter: isAuthenticated
-    },
-    {
       path: '/app/my-standards',
       name: 'my-standards',
       component: MyStandardsView,
       meta: { mobileTitle: 'Мои нормативы' },
-      beforeEnter: isAuthenticated
+      beforeEnter: isAuthenticatedTeacher
     },
     {
       path: '/app/my-standards/create',
       name: 'create-standard',
       component: CreateOrUpdateStandardView,
       meta: { mobileTitle: 'Создание норматива' },
-      beforeEnter: isAuthenticated
+      beforeEnter: isAuthenticatedTeacher
     },
     {
       path: '/app/my-standards/update/:id',
       name: 'update-standard',
       component: CreateOrUpdateStandardView,
       meta: { mobileTitle: 'Обновление норматива' },
-      beforeEnter: isAuthenticated
+      beforeEnter: isAuthenticatedTeacher
     },
     {
       path: '/app/profile',
@@ -118,7 +124,6 @@ const router = createRouter({
       meta: { mobileTitle: 'Профиль' },
       beforeEnter: isAuthenticated
     }
-
   ],
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
@@ -128,11 +133,20 @@ const router = createRouter({
   }
 })
 
-
 function isAuthenticated(): RouteLocationRaw | undefined {
   if (!useUserStore().isLoggedIn) {
     return {
       name: 'login'
+    }
+  }
+}
+
+function isAuthenticatedTeacher(): RouteLocationRaw | undefined {
+  isAuthenticated()
+  if (!useUserStore().isTeacher) {
+    return {
+      name: 'student',
+      params: { id: useUserStore().studentId }
     }
   }
 }
@@ -144,6 +158,5 @@ function isNotAuthenticated(): RouteLocationRaw | undefined {
     }
   }
 }
-
 
 export default router

@@ -24,9 +24,15 @@ const newPasswordType = ref<'password' | 'text'>('password')
 const passwordConfirmationType = ref<'password' | 'text'>('password')
 
 const isSetNameButtonDisabled = computed(() => {
-  return (firstName.value?.trim() === currentFirstName.value && lastName.value?.trim() === currentLastName.value &&
+  return (
+    (firstName.value?.trim() === currentFirstName.value &&
+      lastName.value?.trim() === currentLastName.value &&
       patronymic.value?.trim() === currentPatronymic.value) ||
-    firstName.value?.trim().length === 0 || !firstName.value || lastName.value?.trim().length === 0 || !lastName.value
+    firstName.value?.trim().length === 0 ||
+    !firstName.value ||
+    lastName.value?.trim().length === 0 ||
+    !lastName.value
+  )
 })
 
 const isSetEmailButtonDisabled = computed(() => {
@@ -34,7 +40,11 @@ const isSetEmailButtonDisabled = computed(() => {
 })
 
 const isSetPasswordButtonDisabled = computed(() => {
-  return !(password.value?.trim().length && newPassword.value?.trim().length && newPassword.value?.trim() === passwordConfirmation.value?.trim())
+  return !(
+    password.value?.trim().length &&
+    newPassword.value?.trim().length &&
+    newPassword.value?.trim() === passwordConfirmation.value?.trim()
+  )
 })
 
 async function getData() {
@@ -68,7 +78,7 @@ async function patchName() {
     const response = await patch('/api/profile/change_details/', {
       first_name: firstName.value,
       last_name: lastName.value,
-      patronymic: patronymic.value ?? '',
+      patronymic: patronymic.value ?? ''
     })
     if (response.ok) {
       await getData()
@@ -101,7 +111,6 @@ async function patchEmail() {
   }
 }
 
-
 async function putPassword() {
   if (isSetPasswordButtonDisabled.value) {
     return
@@ -130,7 +139,6 @@ async function putPassword() {
 onMounted(async () => {
   await getData()
 })
-
 </script>
 
 <template>
@@ -141,40 +149,44 @@ onMounted(async () => {
         <div class="text-field-fio">
           <v-text-field
             v-model="firstName"
-            clearable
+            :readonly="userStore.isStudent"
+            :clearable="!userStore.isStudent"
             persistent-clear
-            label="Имя" />
+            label="Имя"
+          />
           <v-text-field
             v-model="lastName"
-            clearable
+            :readonly="userStore.isStudent"
+            :clearable="!userStore.isStudent"
             persistent-clear
-            label="Фамилия" />
+            label="Фамилия"
+          />
           <v-text-field
             v-model="patronymic"
-            clearable
+            :readonly="userStore.isStudent"
+            :clearable="!userStore.isStudent"
             persistent-clear
-            label="Отчество" />
+            label="Отчество"
+          />
         </div>
         <v-btn
+          v-if="!userStore.isStudent"
           :disabled="isSetNameButtonDisabled"
           class="button"
           rounded
           text="Изменить"
-          type="submit" />
+          type="submit"
+        />
       </form>
       <form class="text-field" @submit.prevent="patchEmail">
-        <v-text-field
-          v-model="email"
-          clearable
-          persistent-clear
-          label="Почта"
-          type="email" />
+        <v-text-field v-model="email" clearable persistent-clear label="Почта" type="email" />
         <v-btn
           :disabled="isSetEmailButtonDisabled"
           class="button"
           rounded
           text="Изменить"
-          type="submit" />
+          type="submit"
+        />
       </form>
     </div>
     <div class="container rounded-lg">
@@ -197,7 +209,9 @@ onMounted(async () => {
           clearable
           label="Новый пароль"
           persistent-clear
-          @click:append-inner="newPasswordType = newPasswordType === 'password' ? 'text' : 'password'"
+          @click:append-inner="
+            newPasswordType = newPasswordType === 'password' ? 'text' : 'password'
+          "
         />
         <v-text-field
           v-model="passwordConfirmation"
@@ -206,21 +220,23 @@ onMounted(async () => {
           clearable
           label="Проверка пароля"
           persistent-clear
-          @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
+          @click:append-inner="
+            passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'
+          "
         />
         <v-btn
           :disabled="isSetPasswordButtonDisabled"
           class="button"
           rounded
           text="Изменить"
-          type="submit" />
+          type="submit"
+        />
       </form>
     </div>
     <div class="container rounded-lg">
       <div class="text">Выйти из аккаунта</div>
       <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
     </div>
-
   </div>
 </template>
 
@@ -274,8 +290,7 @@ onMounted(async () => {
   }
 
   .text-field-fio {
-  flex-direction: column;
-}
-
+    flex-direction: column;
+  }
 }
 </style>

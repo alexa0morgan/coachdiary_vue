@@ -2,8 +2,10 @@
 import type { StudentStandard } from '@/types/types'
 
 const { standards, summaryGrade } = defineProps<{
-  standards: StudentStandard[],
+  standards: StudentStandard[]
   summaryGrade: number
+  hideSaveButton?: boolean
+  readonlyInput?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -30,7 +32,6 @@ function getMarkColor(mark?: number): string {
       return ''
   }
 }
-
 </script>
 
 <template>
@@ -44,22 +45,29 @@ function getMarkColor(mark?: number): string {
     :sort-by="[{ key: 'number', order: 'asc' }]"
     class="table"
     item-key="id"
-    no-data-text="Нет данных о нормативах на данном уровне">
-    <template #item.value="{item}">
+    no-data-text="Нет данных о нормативах на данном уровне"
+  >
+    <template #item.value="{ item }">
       <v-text-field
         v-if="item.standard.has_numeric_value"
-        v-model="item.value" />
+        v-model="item.value"
+        :readonly="readonlyInput"
+      />
     </template>
-    <template #item.grade="{item}">
-      <div v-if="item.standard.has_numeric_value"
-           :class="getMarkColor(item.grade ?? 0)"
-           class="mark">
+    <template #item.grade="{ item }">
+      <div
+        v-if="item.standard.has_numeric_value"
+        :class="getMarkColor(item.grade ?? 0)"
+        class="mark"
+      >
         {{ item.grade }}
       </div>
       <v-text-field
         v-else
         v-model="item.grade"
-        :class="getMarkColor(item.grade?? 0)" class="mark"
+        :readonly="readonlyInput"
+        :class="getMarkColor(item.grade ?? 0)"
+        class="mark"
       />
     </template>
     <template #body.append>
@@ -70,7 +78,9 @@ function getMarkColor(mark?: number): string {
       </tr>
     </template>
     <template #footer.prepend>
-      <v-btn class="button" color="primary" @click="emit('saveData')">Сохранить</v-btn>
+      <v-btn v-if="!hideSaveButton" class="button" color="primary" @click="emit('saveData')"
+        >Сохранить
+      </v-btn>
       <div class="space" />
     </template>
   </v-data-table>
@@ -93,7 +103,7 @@ function getMarkColor(mark?: number): string {
 }
 
 .space {
-  flex: 1
+  flex: 1;
 }
 
 .table:deep(.v-data-table-header__content) {

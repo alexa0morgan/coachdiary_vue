@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { useDisplay } from 'vuetify'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -8,12 +7,12 @@ import { useUIStore } from '@/stores/ui'
 
 const userStore = useUserStore()
 const uiStore = useUIStore()
+
 const { smAndUp, width } = useDisplay()
 const isMenuOpen = ref(false)
+
 const route = useRoute()
-
 const isLoginPage = computed(() => route.name === 'login')
-
 const isLoggedInView = computed(() => route.path.startsWith('/app'))
 
 const logoLink = computed(() => {
@@ -22,36 +21,25 @@ const logoLink = computed(() => {
 })
 
 const mobileTitle = computed(() => {
-  if (uiStore.mobileTitle)   return uiStore.mobileTitle
+  if (uiStore.mobileTitle) return uiStore.mobileTitle
 
   return route.meta.mobileTitle
 })
-
 </script>
 
 <template>
-  <v-navigation-drawer v-if="!smAndUp" v-model="isMenuOpen">
+  <v-navigation-drawer v-if="!smAndUp && !isLoggedInView" v-model="isMenuOpen">
     <v-list-item :key="logoLink.name" :to="logoLink" title="Дневник Тренера" />
     <v-divider class="mb-2" color="rgb(var(--v-theme-primary-darken-1))" />
-    <template v-if="!isLoggedInView">
-      <v-list-item href="/#Capabilities" link title="Возможности" />
-      <v-list-item :to="{name: 'about-site'}" link title="О сайте" />
-      <v-list-item :to="{name: 'about-us'}" link title="О нас" />
-    </template>
-    <!--        <template v-else>
-              <v-list-item :to="{name: 'my-classes'}" link title="Мои ученики" />
-              <v-list-item :to="{name: 'my-diary'}" link title="Дневник" />
-              <v-list-item :to="{name: 'my-standards'}" link title="Мои нормативы" />
-              <v-list-item :to="{name: 'profile'}" link title="Профиль" />
-              <v-divider class="mb-2 mt-2" color="rgb(var(&#45;&#45;v-theme-primary-darken-1))" />
-              <v-list-item link title="Выход" @click="logout" />
-            </template>-->
+    <v-list-item href="/#Capabilities" link title="Возможности" />
+    <v-list-item :to="{ name: 'about-site' }" link title="О сайте" />
+    <v-list-item :to="{ name: 'about-us' }" link title="О нас" />
   </v-navigation-drawer>
 
-  <v-app-bar :class="{'app-bar' : !smAndUp}">
+  <v-app-bar :class="{ 'app-bar': !smAndUp }">
     <v-app-bar-title>
       <router-link v-if="smAndUp" :to="logoLink" class="title">
-        <img v-if="width<820" alt="logo" class="icon" src="/mobile_man_run_blue.svg" />
+        <img v-if="width < 820" alt="logo" class="icon" src="/mobile_man_run_blue.svg" />
         <img v-else alt="logo" class="icon" src="/mobile_logo_blue.svg" />
       </router-link>
       <div v-else class="text-center mr-4 mobile-title">{{ mobileTitle }}</div>
@@ -62,32 +50,55 @@ const mobileTitle = computed(() => {
     </template>
 
     <template #append>
-
       <div class="container">
         <template v-if="!isLoggedInView">
-
           <template v-if="smAndUp">
             <v-btn href="/#Capabilities" variant="text">Возможности</v-btn>
-            <v-btn :to="{name: 'about-site'}" variant="text">О сайте</v-btn>
-            <v-btn :to="{name: 'about-us'}" variant="text">О нас</v-btn>
+            <v-btn :to="{ name: 'about-site' }" variant="text">О сайте</v-btn>
+            <v-btn :to="{ name: 'about-us' }" variant="text">О нас</v-btn>
           </template>
 
-          <v-btn v-if="!isLoginPage" :to="{name: 'login'}" rounded variant="flat">Войти</v-btn>
+          <v-btn v-if="!isLoginPage" :to="{ name: 'login' }" rounded variant="flat">Войти</v-btn>
         </template>
 
         <template v-else-if="smAndUp">
-          <v-btn :to="{name: 'my-classes'}" variant="text">Мои ученики</v-btn>
-          <v-btn :to="{name: 'my-diary'}" variant="text">Дневник</v-btn>
-          <v-btn :to="{name: 'my-standards'}" variant="text">Мои нормативы</v-btn>
-          <v-divider class="divider mb-2 mt-2" color="rgb(var(--v-theme-primary-darken-1))" vertical />
-          <v-btn :to="{name: 'profile'}" variant="text">Профиль</v-btn>
+          <v-btn
+            v-if="userStore.isTeacher"
+            :to="{ name: 'my-classes' }"
+            variant="text"
+            text="Мои классы"
+          />
+          <v-btn
+            v-if="userStore.isTeacher"
+            :to="{ name: 'my-diary' }"
+            variant="text"
+            text="Дневник"
+          />
+          <v-btn
+            v-if="userStore.isTeacher"
+            :to="{ name: 'my-standards' }"
+            variant="text"
+            text="Мои нормативы"
+          />
+          <v-divider
+            v-if="userStore.isTeacher"
+            class="divider mb-2 mt-2"
+            color="rgb(var(--v-theme-primary-darken-1))"
+            vertical
+          />
+          <v-btn
+            v-if="userStore.isStudent"
+            :to="{ name: 'student', params: { id: userStore.studentId } }"
+            variant="text"
+            text="Мои результаты"
+          />
+          <v-btn :to="{ name: 'profile' }" variant="text" text="Профиль" />
           <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
         </template>
 
         <!--        <v-btn v-else-if="!smAndUp" :to="infoButtonLink" class="info-button"-->
         <!--               icon="mdi-information-slab-circle-outline" />-->
       </div>
-
     </template>
   </v-app-bar>
 </template>
@@ -140,6 +151,4 @@ const mobileTitle = computed(() => {
 .divider {
   height: calc(100% - 15px);
 }
-
-
 </style>

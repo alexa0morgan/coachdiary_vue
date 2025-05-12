@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { getErrorMessage, post } from '@/utils'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { get, getErrorMessage, post } from '@/utils'
 import { toast } from 'vue-sonner'
 import PageFooter from '@/components/PageFooter.vue'
+import { useUserStore } from '@/stores/user'
 
-const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
+const pageType = ref<'signIn' | 'signUp' | 'restore' | 'studentSignUp'>('signIn')
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 
 const privacyPolicy = ref(false)
@@ -22,6 +22,10 @@ const passwordConfirmation = ref('')
 const passwordType = ref<'password' | 'text'>('password')
 const passwordConfirmationType = ref<'password' | 'text'>('password')
 
+const isLoading = ref(false)
+const invitationData = ref(null)
+const invitationCode = ref('')
+
 const isSendButtonDisabled = computed(() => {
   if (!/.@./.test(email.value)) {
     return true
@@ -30,8 +34,14 @@ const isSendButtonDisabled = computed(() => {
     return !password.value?.length
   }
   if (pageType.value === 'signUp') {
-    return !password.value?.length || !firstName.value?.length || !lastName.value?.length ||
-      !passwordConfirmation.value?.length || password.value !== passwordConfirmation.value || !privacyPolicy.value
+    return (
+      !password.value?.length ||
+      !firstName.value?.length ||
+      !lastName.value?.length ||
+      !passwordConfirmation.value?.length ||
+      password.value !== passwordConfirmation.value ||
+      !privacyPolicy.value
+    )
   }
   return false
 })
@@ -44,8 +54,7 @@ const title = computed(() => {
       return 'Восстановление пароля'
     case 'signIn':
     default:
-      return 'Вход в систему'
-
+      return 'Войти'
   }
 })
 const buttonText = computed(() => {
@@ -60,13 +69,10 @@ const buttonText = computed(() => {
   }
 })
 
-const isLoading = ref(false)
-
 async function sendData() {
   if (isSendButtonDisabled.value || isLoading.value) {
     return
   }
-
   isLoading.value = true
   try {
     let response
@@ -76,13 +82,15 @@ async function sendData() {
       response = await signUp()
     } else if (pageType.value === 'restore') {
       response = await restore()
+    } else if (pageType.value === 'studentSignUp') {
+      response = await studentSignUp()
     }
     if (response?.status === 'error' || response?.статус === 'ошибка') {
       toast.error(getErrorMessage(response))
     }
-
-  } catch {
+  } catch (e) {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    console.error(e)
   } finally {
     isLoading.value = false
   }
@@ -90,18 +98,17 @@ async function sendData() {
 
 async function signIn() {
   const requestData = { email: email.value, password: password.value }
-
-  const response = await post('/api/login/session_login/', requestData)
-
+  const response = await post('/api/login/', requestData)
   if (response.ok) {
-    userStore.login()
-    router.push({ name: 'app' })
-  } else {
+    await userStore.login()
+    await router.push({ name: 'app' })
     return response.json()
   }
 }
 
 async function signUp() {
+  let url = '/api/create-user/'
+
   const requestData = {
     email: email.value,
     password: password.value,
@@ -109,9 +116,15 @@ async function signUp() {
     first_name: firstName.value,
     last_name: lastName.value,
     patronymic: patronymic.value,
+    invite_code: ''
   }
 
-  const response = await post('/api/create-user/', requestData)
+  if (invitationCode.value) {
+    url = `/api/create-user/from-invitation/`
+    requestData.invite_code = invitationCode.value
+  }
+
+  const response = await post(url, requestData)
 
   if (response.ok) {
     pageType.value = 'signIn'
@@ -121,9 +134,31 @@ async function signUp() {
     lastName.value = ''
     patronymic.value = ''
     passwordConfirmation.value = ''
-    toast.success('Пользователь успешно создан')
+    invitationCode.value = ''
+    toast.success('Регистрация успешна. Проверьте вашу почту для подтверждения аккаунта.')
   } else {
     return response.json()
+  }
+}
+
+async function studentSignUp() {
+  pageType.value = 'signUp'
+  try {
+    const response = await get(`/api/create-user/from-invitation/${invitationCode.value}/`)
+    if (response.ok) {
+      const data = await response.json()
+      invitationData.value = data
+      firstName.value = data.student.first_name
+      lastName.value = data.student.last_name
+      patronymic.value = data.student.patronymic
+    } else {
+      toast.error(getErrorMessage(await response.json()))
+      invitationCode.value = ''
+      await router.push({ name: 'login' })
+      pageType.value = 'signIn'
+    }
+  } catch {
+    toast.error('Ошибка при получении данных приглашения')
   }
 }
 
@@ -131,6 +166,12 @@ async function restore() {
   alert('К сожалению, данная функция еще не доступна')
 }
 
+onMounted(async () => {
+  if (route.params.token) {
+    invitationCode.value = route.params.token as string
+    await studentSignUp()
+  }
+})
 </script>
 
 <template>
@@ -140,17 +181,8 @@ async function restore() {
       <form class="border-container" @submit.prevent="sendData">
         <v-text-field
           v-if="pageType === 'signUp'"
-          v-model="firstName"
-          :disabled="isLoading"
-          clearable
-          label="Имя"
-          persistent-clear
-          variant="outlined"
-        />
-        <v-text-field
-          v-if="pageType === 'signUp'"
           v-model="lastName"
-          :disabled="isLoading"
+          :disabled="isLoading || !!invitationCode"
           clearable
           label="Фамилия"
           persistent-clear
@@ -158,14 +190,24 @@ async function restore() {
         />
         <v-text-field
           v-if="pageType === 'signUp'"
+          v-model="firstName"
+          :disabled="isLoading || !!invitationCode"
+          clearable
+          label="Имя"
+          persistent-clear
+          variant="outlined"
+        />
+        <v-text-field
+          v-if="pageType === 'signUp'"
           v-model="patronymic"
-          :disabled="isLoading"
+          :disabled="isLoading || !!invitationCode"
           clearable
           label="Отчество"
           persistent-clear
           variant="outlined"
         />
         <v-text-field
+          v-if="pageType !== 'studentSignUp'"
           v-model="email"
           :disabled="isLoading"
           clearable
@@ -175,7 +217,7 @@ async function restore() {
           variant="outlined"
         />
         <v-text-field
-          v-if="pageType !== 'restore'"
+          v-if="pageType !== 'restore' && pageType !== 'studentSignUp'"
           v-model="password"
           :append-inner-icon="password ? 'mdi-eye' : undefined"
           :disabled="isLoading"
@@ -197,30 +239,74 @@ async function restore() {
           persistent-clear
           persistent-crear
           variant="outlined"
-          @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
+          @click:append-inner="
+            passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'
+          "
+        />
+
+        <v-text-field
+          v-if="pageType === 'studentSignUp'"
+          v-model="invitationCode"
+          :disabled="isLoading"
+          clearable
+          label="Код приглашения"
+          persistent-clear
+          variant="outlined"
         />
 
         <v-checkbox v-if="pageType === 'signUp'" v-model="privacyPolicy">
           <template #label>
             <span>
               Я соглашаюсь с
-              <RouterLink :to="{name: 'privacy-policy'}" target="_blank">
+              <RouterLink :to="{ name: 'privacy-policy' }" target="_blank">
                 политикой в отношении персональных данных
               </RouterLink>
             </span>
           </template>
         </v-checkbox>
 
-        <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
-               type="submit" />
+        <v-btn
+          :disabled="isSendButtonDisabled || isLoading"
+          :text="buttonText"
+          class="button"
+          rounded
+          type="submit"
+        />
       </form>
-      <div v-if="pageType==='signIn'">
-        <v-btn :disabled="isLoading" size="small" text="Регистрация" variant="text" @click="pageType = 'signUp'" />
-        <v-btn :disabled="isLoading" size="small" text="Восстановление пароля" variant="text" @click="pageType =
-        'restore'" />
+      <div v-if="pageType === 'signIn'">
+        <v-btn
+          :disabled="isLoading"
+          size="small"
+          text="Регистрация"
+          variant="text"
+          @click="pageType = 'signUp'"
+        />
+        <v-btn
+          :disabled="isLoading"
+          size="small"
+          text="Восстановление пароля"
+          variant="text"
+          @click="pageType = 'restore'"
+        />
+        <v-btn
+          :disabled="isLoading"
+          size="small"
+          text="Использовать код приглашения"
+          variant="text"
+          @click="pageType = 'studentSignUp'"
+        />
       </div>
-      <v-btn v-else :disabled="isLoading" size="small" text="Вернуться на страницу входа" variant="text"
-             @click="pageType = 'signIn'" />
+      <v-btn
+        v-else
+        :disabled="isLoading"
+        size="small"
+        text="Вернуться на страницу входа"
+        variant="text"
+        @click="
+          pageType = 'signIn'
+          invitationCode = ''
+        "
+      />
     </div>
   </div>
   <PageFooter />
@@ -253,6 +339,13 @@ async function restore() {
   color: black;
 }
 
+.user-type {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px;
+}
+
 .border-container {
   display: flex;
   flex-direction: column;
@@ -274,5 +367,4 @@ async function restore() {
     padding: 0;
   }
 }
-
 </style>

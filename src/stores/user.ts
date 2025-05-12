@@ -1,31 +1,58 @@
 import { defineStore } from 'pinia'
-import { get, post } from '@/utils'
+import { get, getErrorMessage, post } from '@/utils'
 import { useRoute, useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { toast } from 'vue-sonner'
 
 export const useUserStore = defineStore('user', () => {
   const route = useRoute()
   const router = useRouter()
   const isLoggedIn = ref(localStorage.getItem('isLoggedIn') === 'true')
+  const userType = ref(localStorage.getItem('userType') ?? 'guest')
+  const studentId = ref<number | null>(Number(localStorage.getItem('studentId')))
 
-  function login() {
+  const isStudent = computed(() => userType.value === 'student')
+  const isTeacher = computed(() => userType.value === 'teacher')
+
+  async function login() {
+    await fetchProfile()
     isLoggedIn.value = true
     localStorage.setItem('isLoggedIn', 'true')
   }
 
   async function logout() {
-    await post('/api/logout/')
-    isLoggedIn.value = false
-    localStorage.removeItem('isLoggedIn')
-    await router.push({ name: 'login' })
+    const response = await post('/api/logout/')
+    if (response.ok) {
+      isLoggedIn.value = false
+      userType.value = 'guest'
+      studentId.value = null
+      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('userType')
+      localStorage.removeItem('studentId')
+      await router.push({ name: 'login' })
+    } else {
+      toast.error(getErrorMessage(response))
+    }
   }
 
   async function fetchProfile() {
     try {
       const response = await get('/api/profile/')
-      if (!response.ok) {
+      if (response.ok) {
+        const data = await response.json()
+        userType.value = data.role
+        localStorage.setItem('userType', data.role)
+        if (data.role === 'student') {
+          studentId.value = data.id
+          localStorage.setItem('studentId', String(data.id))
+        }
+      } else {
         isLoggedIn.value = false
+        userType.value = 'guest'
+        studentId.value = null
         localStorage.removeItem('isLoggedIn')
+        localStorage.removeItem('userType')
+        localStorage.removeItem('studentId')
 
         if (route.fullPath.startsWith('/app')) {
           await router.push({ name: 'home' })
@@ -38,6 +65,9 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     isLoggedIn,
+    studentId,
+    isStudent,
+    isTeacher,
 
     login,
     logout,

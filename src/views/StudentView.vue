@@ -6,15 +6,22 @@ import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import StudentTable from '@/components/StudentTable.vue'
 import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 import { del, get, getErrorMessage, post, showConfirmDialog } from '@/utils'
-import type { StudentResponse, StudentStandard, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
+import type {
+  StudentResponse,
+  StudentStandard,
+  StudentStandardRequest,
+  StudentStandardResponse
+} from '@/types/types'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { toast } from 'vue-sonner'
 import { useDisplay } from 'vuetify'
 import { useUIStore } from '@/stores/ui'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const uiStore = useUIStore()
+const userStore = useUserStore()
 const { smAndUp } = useDisplay()
 const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
@@ -29,8 +36,9 @@ const fullName = computed(() => {
   return `${studentInfo.value.last_name} ${studentInfo.value.first_name} ${studentInfo.value.patronymic}`
 })
 
-const levelButtonText = computed(() => selectedLevelNumber.value != -1 ? (selectedLevelNumber.value + ' год обучения') :
-  'Года обучения')
+const levelButtonText = computed(() =>
+  selectedLevelNumber.value != -1 ? selectedLevelNumber.value + ' год обучения' : 'Года обучения'
+)
 
 const labels = computed(() => {
   if (!studentInfo.value) return []
@@ -54,7 +62,6 @@ const labels = computed(() => {
   ]
 })
 
-
 async function getStudentById(studentId: number) {
   try {
     const response = await get(`/api/students/${studentId}`)
@@ -71,7 +78,9 @@ async function getStudentById(studentId: number) {
 
 async function getStandardsByStudentId(studentId: number) {
   try {
-    const response = await get(`/api/students/${studentId}/standards/`, { level_number: selectedLevelNumber.value })
+    const response = await get(`/api/students/${studentId}/standards/`, {
+      level_number: selectedLevelNumber.value
+    })
     if (response.ok) {
       standardsInfo.value = await response.json()
       standards.value = standardsInfo.value.standards
@@ -109,8 +118,8 @@ async function deleteStudent() {
 async function saveStudentValue() {
   try {
     const request: StudentStandardRequest[] = standards.value
-      .filter(v => v.value != null && v.value)
-      .map(v => ({
+      .filter((v) => v.value != null && v.value)
+      .map((v) => ({
         student_id: studentId.value,
         standard_id: v.standard.id,
         value: v.standard.has_numeric_value ? v.value : v.grade,
@@ -142,13 +151,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-
   <TopPanel v-if="smAndUp" class="top-panel">
     <div class="top-panel-title">{{ fullName ?? 'Студент не найден' }}</div>
   </TopPanel>
 
   <div v-if="!smAndUp" class="top-panel-mobile">
-
     <BottomSheetWithButton :button-text="levelButtonText" sheet-title="Года обучения" eager>
       <template #default="{ toggle }">
         <LevelPanel
@@ -157,53 +164,63 @@ onUnmounted(() => {
           class="level-button-mobile"
           mobile
           color="secondary"
-          @update:model-value="toggle(); getStandardsByStudentId(studentId)" />
+          @update:model-value="
+            toggle()
+            getStandardsByStudentId(studentId)
+          "
+        />
       </template>
     </BottomSheetWithButton>
 
     <BottomSheetWithButton button-text="Информация" sheet-title="Информация" wrap-button>
       <template #default="{ toggle }">
-        <DataTableSideNav :data="labels"
-                          is-content-static-text
-                          page-type="student"
-                          class="info-panel-mobile"
-                          @delete="deleteStudent"
-                          @edit="editStudent"
-                          @update:model-value="toggle" />
+        <DataTableSideNav
+          :data="labels"
+          is-content-static-text
+          page-type="student"
+          class="info-panel-mobile"
+          @delete="deleteStudent"
+          @edit="editStudent"
+          @update:model-value="toggle"
+        />
       </template>
     </BottomSheetWithButton>
-
   </div>
 
-
   <div class="main">
-    <LevelPanel v-if="smAndUp"
-                v-model="selectedLevelNumber"
-                :class-number="studentInfo?.student_class.number ?? 0"
-                class="level-panel"
-                @update:model-value="getStandardsByStudentId(studentId)" />
+    <LevelPanel
+      v-if="smAndUp"
+      v-model="selectedLevelNumber"
+      :class-number="studentInfo?.student_class.number ?? 0"
+      class="level-panel"
+      @update:model-value="getStandardsByStudentId(studentId)"
+    />
 
     <div class="grid">
       <StudentTable
         :standards="standards"
         :summary-grade="standardsInfo.summary_grade"
+        :hide-save-button="!userStore.isTeacher"
+        :readonly-input="!userStore.isTeacher"
         class="table"
-        @save-data="saveStudentValue" />
+        @save-data="saveStudentValue"
+      />
 
-      <DataTableSideNav v-if="smAndUp"
-                        :data="labels"
-                        is-content-static-text
-                        page-type="student"
-                        title="Информация"
-                        class="info-panel"
-                        @delete="deleteStudent"
-                        @edit="editStudent" />
+      <DataTableSideNav
+        v-if="smAndUp"
+        :data="labels"
+        is-content-static-text
+        page-type="student"
+        title="Информация"
+        class="info-panel"
+        @delete="deleteStudent"
+        @edit="editStudent"
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
-
 .main {
   max-width: 1200px;
   margin: 10px auto 0;
@@ -250,5 +267,4 @@ onUnmounted(() => {
   gap: 10px;
   justify-content: center;
 }
-
 </style>
