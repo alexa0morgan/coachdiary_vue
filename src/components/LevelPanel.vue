@@ -1,36 +1,38 @@
 <script lang="ts" setup>
-
 defineProps<{
   classNumber: number;
   mobile?: boolean;
   color?: string;
-}>()
+}>();
 
 defineEmits<{
   levelChanged: [];
-}>()
+}>();
 
-const activeLevel = defineModel<number>({ default: -1, required: false })
+const activeLevel = defineModel<number>({ default: -1, required: false });
 </script>
 
 <template>
   <div class="inner-container">
     <div class="buttons-panel">
       <div v-if="!mobile" class="header">года обучения:</div>
-      <v-btn v-for="n in classNumber"
-             :key="n"
-             :text="n + ' год'"
-             :variant="activeLevel === n ? 'flat' : 'outlined'"
-             :color="color"
-             class="button"
-             @click="activeLevel = n; $emit('levelChanged')" />
+      <v-btn
+        v-for="n in classNumber"
+        :key="n"
+        :text="n + ' год'"
+        :variant="activeLevel === n ? 'flat' : 'outlined'"
+        :color="color"
+        class="button"
+        @click="
+          activeLevel = n;
+          $emit('levelChanged');
+        "
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
-
-
 .inner-container {
   display: flex;
   margin: 0 auto;
@@ -52,7 +54,7 @@ const activeLevel = defineModel<number>({ default: -1, required: false })
   gap: 5px;
   align-items: center;
   flex-wrap: wrap;
-  padding: 10px
+  padding: 10px;
 }
 
 .button {

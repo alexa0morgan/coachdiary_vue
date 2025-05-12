@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const useMyClassesStore = defineStore('myClasses', () => {
-  const activeClasses = ref<string[]>([])
+  const activeClasses = ref<string[]>([]);
 
-  return {activeClasses}
-})
+  return { activeClasses };
+});

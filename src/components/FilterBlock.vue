@@ -1,50 +1,59 @@
 <script lang="ts" setup>
-import type { FilterData, GenderNullable } from '@/types/types'
+import type { FilterData, GenderNullable } from '@/types/types';
 
-const filterData = defineModel<FilterData>({ required: true })
+const filterData = defineModel<FilterData>({ required: true });
 
 defineProps<{
-  mobile?: boolean
-}>()
+  mobile?: boolean;
+}>();
 
 const emit = defineEmits<{
-  accept: []
-}>()
+  accept: [];
+}>();
 
 function selectGender(gender: GenderNullable): void {
   if (filterData.value.gender === gender) {
-    filterData.value.gender = null
+    filterData.value.gender = null;
   } else {
-    filterData.value.gender = gender
+    filterData.value.gender = gender;
   }
 }
 
-const currentYear = new Date().getFullYear()
+const currentYear = new Date().getFullYear();
 
 function clearFilters(): void {
-  filterData.value.gender = null
-  filterData.value.grades = []
-  filterData.value.birthYearFrom = null
-  filterData.value.birthYearUntil = null
-  emit('accept')
+  filterData.value.gender = null;
+  filterData.value.grades = [];
+  filterData.value.birthYearFrom = null;
+  filterData.value.birthYearUntil = null;
+  emit('accept');
 }
-
 </script>
 
 <template>
-  <div class="filters-grid" :class="mobile? 'filters-grid-mobile' : ''">
-
+  <div class="filters-grid" :class="mobile ? 'filters-grid-mobile' : ''">
     <div class="filters">
-
       <div>
         <div class="title">Пол</div>
         <div class="filter-gender" :class="mobile ? 'flex-align-left' : ''">
-          <v-btn :active="filterData.gender === 'f'" :ripple="false" class="button" size="small"
-                 :text="mobile ? 'девочки' : 'Ж'" variant="outlined" @click="selectGender('f')" />
-          <v-btn :active="filterData.gender==='m'" :ripple="false" class="button" size="small"
-                 :text="mobile ? 'мальчики' : 'М'"
-                 variant="outlined"
-                 @click="selectGender('m')" />
+          <v-btn
+            :active="filterData.gender === 'f'"
+            :ripple="false"
+            class="button"
+            size="small"
+            :text="mobile ? 'девочки' : 'Ж'"
+            variant="outlined"
+            @click="selectGender('f')"
+          />
+          <v-btn
+            :active="filterData.gender === 'm'"
+            :ripple="false"
+            class="button"
+            size="small"
+            :text="mobile ? 'мальчики' : 'М'"
+            variant="outlined"
+            @click="selectGender('m')"
+          />
         </div>
       </div>
 
@@ -52,9 +61,15 @@ function clearFilters(): void {
 
       <div>
         <div class="title">Оценка</div>
-        <div :class="mobile? 'checkbox-group-mobile' : 'checkbox-group'">
-          <v-checkbox v-for="n in 4" :key="n" v-model="filterData.grades" :label="(n +1).toString()"
-                      :value="n+1" density="compact" />
+        <div :class="mobile ? 'checkbox-group-mobile' : 'checkbox-group'">
+          <v-checkbox
+            v-for="n in 4"
+            :key="n"
+            v-model="filterData.grades"
+            :label="(n + 1).toString()"
+            :value="n + 1"
+            density="compact"
+          />
           <v-checkbox v-model="filterData.grades" :value="null" density="compact" label="Нет" />
         </div>
       </div>
@@ -64,24 +79,46 @@ function clearFilters(): void {
       <div>
         <div class="title" :class="mobile ? '' : 'title-year'">Год рождения</div>
         <div class="filter-year" :class="mobile ? 'filter-year-mobile' : ''">
-          <v-text-field v-model.number="filterData.birthYearFrom" :max="currentYear - 2" density="compact" label="От"
-                        min="1900" type="number" />
-          <v-text-field v-model.number="filterData.birthYearUntil" :max="currentYear - 2" density="compact" label="До"
-                        min="1900" type="number" />
+          <v-text-field
+            v-model.number="filterData.birthYearFrom"
+            :max="currentYear - 2"
+            density="compact"
+            label="От"
+            min="1900"
+            type="number"
+          />
+          <v-text-field
+            v-model.number="filterData.birthYearUntil"
+            :max="currentYear - 2"
+            density="compact"
+            label="До"
+            min="1900"
+            type="number"
+          />
         </div>
       </div>
 
       <v-divider v-if="mobile" color="white" thickness="2" opacity="0.7" />
-
     </div>
 
     <div class="action-buttons" :class="mobile ? 'action-buttons-mobile' : ''">
-      <v-btn class="button action-button" color="error" size="small" text="Сбросить" variant="outlined"
-             @click="clearFilters" />
-      <v-btn class="button action-button" color="primary-darken-1" size="small" text="Принять" variant="outlined"
-             @click="emit('accept')" />
+      <v-btn
+        class="button action-button"
+        color="error"
+        size="small"
+        text="Сбросить"
+        variant="outlined"
+        @click="clearFilters"
+      />
+      <v-btn
+        class="button action-button"
+        color="primary-darken-1"
+        size="small"
+        text="Принять"
+        variant="outlined"
+        @click="emit('accept')"
+      />
     </div>
-
   </div>
 </template>
 
@@ -134,7 +171,7 @@ function clearFilters(): void {
 
 .title-year {
   font-size: 14px;
-  margin-bottom: 20px
+  margin-bottom: 20px;
 }
 
 .filter-gender {

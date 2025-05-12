@@ -1,20 +1,20 @@
-import './assets/main.css'
+import './assets/main.css';
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 
-import App from './App.vue'
-import router from './router'
+import App from './App.vue';
+import router from './router';
 
-import 'vuetify/styles'
-import '@mdi/font/css/materialdesignicons.css'
+import 'vuetify/styles';
+import '@mdi/font/css/materialdesignicons.css';
 
-import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
+import { autoAnimatePlugin } from '@formkit/auto-animate/vue';
 
-import { createVuetify } from 'vuetify'
-import { ru } from 'vuetify/locale'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+import { createVuetify } from 'vuetify';
+import { ru } from 'vuetify/locale';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
 
 const myCustomLightTheme = {
   dark: false,
@@ -32,7 +32,7 @@ const myCustomLightTheme = {
     error: '#B00020',
     info: '#2196F3',
     success: '#4CAF50',
-    warning: '#FB8C00'
+    warning: '#FB8C00',
   },
   variables: {
     'another-surface': '#dfd9e4',
@@ -41,7 +41,7 @@ const myCustomLightTheme = {
     'border-radius': '8px',
     'border-button-radius': '12px',
     'high-emphasis-opacity': 0.87,
-    'medium-emphasis-opacity': 0.60,
+    'medium-emphasis-opacity': 0.6,
     'disabled-opacity': 0.38,
     'idle-opacity': 0.04,
     'hover-opacity': 0.04,
@@ -53,46 +53,45 @@ const myCustomLightTheme = {
     'theme-kbd': '#212529',
     'theme-on-kbd': '#FFFFFF',
     'theme-code': '#F5F5F5',
-    'theme-on-code': '#000000'
-  }
-}
+    'theme-on-code': '#000000',
+  },
+};
 
 const vuetify = createVuetify({
   components,
   directives,
   locale: {
     locale: 'ru',
-    messages: { ru }
+    messages: { ru },
   },
   defaults: {
     VBtn: {
       variant: 'flat',
       class: 'font-weight-bold text-none',
-      color: 'primary'
+      color: 'primary',
     },
     VTextField: {
       variant: 'outlined',
-      hideDetails: true
+      hideDetails: true,
     },
     VRadioGroup: {
-      hideDetails: true
+      hideDetails: true,
     },
     VCheckbox: {
-      hideDetails: true
-    }
-
+      hideDetails: true,
+    },
   },
   theme: {
     defaultTheme: 'myCustomLightTheme',
-    themes: { myCustomLightTheme }
-  }
-})
+    themes: { myCustomLightTheme },
+  },
+});
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(vuetify)
-app.use(createPinia())
-app.use(router)
-app.use(autoAnimatePlugin)
+app.use(vuetify);
+app.use(createPinia());
+app.use(router);
+app.use(autoAnimatePlugin);
 
-app.mount('#app')
+app.mount('#app');

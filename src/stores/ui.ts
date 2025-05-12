@@ -1,12 +1,10 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const useUIStore = defineStore('ui', () => {
-
-  const mobileTitle = ref('')
+  const mobileTitle = ref('');
 
   return {
-    mobileTitle
-  }
-
-})
+    mobileTitle,
+  };
+});

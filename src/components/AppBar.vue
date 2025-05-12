@@ -1,30 +1,30 @@
 <script lang="ts" setup>
-import { useDisplay } from 'vuetify'
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { useUIStore } from '@/stores/ui'
+import { useDisplay } from 'vuetify';
+import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { useUserStore } from '@/stores/user';
+import { useUIStore } from '@/stores/ui';
 
-const userStore = useUserStore()
-const uiStore = useUIStore()
+const userStore = useUserStore();
+const uiStore = useUIStore();
 
-const { smAndUp, width } = useDisplay()
-const isMenuOpen = ref(false)
+const { smAndUp, width } = useDisplay();
+const isMenuOpen = ref(false);
 
-const route = useRoute()
-const isLoginPage = computed(() => route.name === 'login')
-const isLoggedInView = computed(() => route.path.startsWith('/app'))
+const route = useRoute();
+const isLoginPage = computed(() => route.name === 'login');
+const isLoggedInView = computed(() => route.path.startsWith('/app'));
 
 const logoLink = computed(() => {
-  if (route.path.startsWith('/app')) return { name: 'my-diary' }
-  return { name: 'home' }
-})
+  if (route.path.startsWith('/app')) return { name: 'my-diary' };
+  return { name: 'home' };
+});
 
 const mobileTitle = computed(() => {
-  if (uiStore.mobileTitle) return uiStore.mobileTitle
+  if (uiStore.mobileTitle) return uiStore.mobileTitle;
 
-  return route.meta.mobileTitle
-})
+  return route.meta.mobileTitle;
+});
 </script>
 
 <template>

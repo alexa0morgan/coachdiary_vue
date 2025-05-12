@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import type { Gender } from '@/types/types'
+import type { Gender } from '@/types/types';
 
 defineProps<{
   gender: Gender;
   high: number | null;
   middle: number | null;
   low: number | null;
-}>()
+}>();
 </script>
 
 <template>
@@ -14,24 +14,24 @@ defineProps<{
     <div class="gender-text">{{ gender === 'm' ? 'Мальчики' : 'Девочки' }}</div>
     <table class="table">
       <thead>
-      <tr>
-        <td>Ступень</td>
-        <td>Норма</td>
-      </tr>
+        <tr>
+          <td>Ступень</td>
+          <td>Норма</td>
+        </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>Высокая</td>
-        <td>{{ high }}</td>
-      </tr>
-      <tr>
-        <td>Средняя</td>
-        <td>{{ middle }}</td>
-      </tr>
-      <tr>
-        <td>Низкая</td>
-        <td>{{ low }}</td>
-      </tr>
+        <tr>
+          <td>Высокая</td>
+          <td>{{ high }}</td>
+        </tr>
+        <tr>
+          <td>Средняя</td>
+          <td>{{ middle }}</td>
+        </tr>
+        <tr>
+          <td>Низкая</td>
+          <td>{{ low }}</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -76,10 +76,9 @@ defineProps<{
 }
 
 @media (width <= 600px) {
-  .gender-text{
+  .gender-text {
     text-align: center;
     margin-bottom: 5px;
   }
 }
-
 </style>

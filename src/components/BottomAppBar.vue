@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 
-const route = useRoute()
-const userStore = useUserStore()
-const studentId = computed(() => userStore.studentId)
-const showPlusButton = computed(() => route.name === 'my-classes' || route.name === 'my-standards')
+const route = useRoute();
+const userStore = useUserStore();
+const studentId = computed(() => userStore.studentId);
+const showPlusButton = computed(() => route.name === 'my-classes' || route.name === 'my-standards');
 const plusButtonLink = computed(() => {
-  if (route.name === 'my-classes') return { name: 'create-student' }
-  if (route.name === 'my-standards') return { name: 'create-standard' }
-  return {}
-})
+  if (route.name === 'my-classes') return { name: 'create-student' };
+  if (route.name === 'my-standards') return { name: 'create-standard' };
+  return {};
+});
 </script>
 
 <template>

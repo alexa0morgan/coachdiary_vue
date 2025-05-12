@@ -1,118 +1,118 @@
-export type GenderNullable = Gender | null
-export type Gender = 'f' | 'm'
+export type GenderNullable = Gender | null;
+export type Gender = 'f' | 'm';
 
 export type StandardResponse = {
-  id: number,
-  name: string,
-  has_numeric_value: boolean
+  id: number;
+  name: string;
+  has_numeric_value: boolean;
   levels: {
-    id: number,
-    is_lower_better: boolean,
-    level_number: number,
-    low_value: number,
-    middle_value: number,
-    high_value: number,
-    gender: Gender,
-  }[]
-}
+    id: number;
+    is_lower_better: boolean;
+    level_number: number;
+    low_value: number;
+    middle_value: number;
+    high_value: number;
+    gender: Gender;
+  }[];
+};
 
 export type StandardRequest = {
-  name: string,
-  has_numeric_value: boolean
+  name: string;
+  has_numeric_value: boolean;
   levels: {
-    is_lower_better: boolean,
-    level_number: number,
-    low_value: number | null,
-    middle_value: number | null,
-    high_value: number | null,
-    gender: Gender,
-  }[]
-}
+    is_lower_better: boolean;
+    level_number: number;
+    low_value: number | null;
+    middle_value: number | null;
+    high_value: number | null;
+    gender: Gender;
+  }[];
+};
 
 export type StudentResponse = {
-  id: number,
-  first_name: string,
-  last_name: string,
-  patronymic: string,
-  full_name: string,
+  id: number;
+  first_name: string;
+  last_name: string;
+  patronymic: string;
+  full_name: string;
   student_class: {
-    id: number,
-    recruitment_year: number,
-    number: number,
-    class_name: string
-  },
-  birthday: string,
-  gender: Gender,
-  invitation_link: string
-}
+    id: number;
+    recruitment_year: number;
+    number: number;
+    class_name: string;
+  };
+  birthday: string;
+  gender: Gender;
+  invitation_link: string;
+};
 
 export type StudentRequest = {
-  first_name: string,
-  last_name: string,
-  patronymic: string,
+  first_name: string;
+  last_name: string;
+  patronymic: string;
   student_class: {
-    number: number,
-    class_name: string
-  },
-  birthday: string,
-  gender: Gender,
-}
+    number: number;
+    class_name: string;
+  };
+  birthday: string;
+  gender: Gender;
+};
 
 export type ClassRequest = {
-  id: number
-  class_name: string,
-  number: number,
-  recruitment_year: number
-}
+  id: number;
+  class_name: string;
+  number: number;
+  recruitment_year: number;
+};
 
 export type StudentsValueResponse = {
-  id: number,
-  first_name: string,
-  last_name: string,
-  patronymic: string,
-  full_name: string,
+  id: number;
+  first_name: string;
+  last_name: string;
+  patronymic: string;
+  full_name: string;
   student_class: {
-    number: number,
-    class_name: string
-  },
-  birthday: string,
-  gender: Gender,
-  value: number | null,
-  grade: number | null
-}
+    number: number;
+    class_name: string;
+  };
+  birthday: string;
+  gender: Gender;
+  value: number | null;
+  grade: number | null;
+};
 
 export type StudentValueRequest = {
-  student_id: number,
-  standard_id: number,
-  value: number | null
-}
+  student_id: number;
+  standard_id: number;
+  value: number | null;
+};
 
 export type FilterData = {
-  gender: GenderNullable,
-  grades: (number | null)[],
-  birthYearFrom: number | null,
-  birthYearUntil: number | null
-}
+  gender: GenderNullable;
+  grades: (number | null)[];
+  birthYearFrom: number | null;
+  birthYearUntil: number | null;
+};
 
 export type StudentStandardResponse = {
-  standards: StudentStandard[],
-  summary_grade: number
-}
+  standards: StudentStandard[];
+  summary_grade: number;
+};
 
 export type StudentStandardRequest = {
-  student_id: number,
-  standard_id: number,
-  value: number | null,
-  level_number: number,
-}
+  student_id: number;
+  standard_id: number;
+  value: number | null;
+  level_number: number;
+};
 
 export type StudentStandard = {
-      standard: {
-        id: number,
-        name: string,
-        has_numeric_value: boolean
-      },
-      grade: number | null,
-      value: number | null,
-      level_number: number
-    }
+  standard: {
+    id: number;
+    name: string;
+    has_numeric_value: boolean;
+  };
+  grade: number | null;
+  value: number | null;
+  level_number: number;
+};

@@ -1,11 +1,10 @@
 <script setup lang="ts">
-
-const isActive = defineModel<boolean>({ required: true })
+const isActive = defineModel<boolean>({ required: true });
 
 defineProps<{
   sheetTitle: string;
   eager?: boolean;
-}>()
+}>();
 </script>
 
 <template>

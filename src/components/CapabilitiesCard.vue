@@ -2,7 +2,7 @@
 defineProps<{
   icon: string;
   title: string;
-}>()
+}>();
 </script>
 
 <template>
@@ -38,7 +38,7 @@ defineProps<{
 }
 
 .description {
-  grid-column: 1/span 2;
+  grid-column: 1 / span 2;
   color: black;
 }
 
@@ -47,5 +47,4 @@ defineProps<{
     font-size: 16px;
   }
 }
-
 </style>

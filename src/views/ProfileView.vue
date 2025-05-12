@@ -1,27 +1,27 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
-import { get, getErrorMessage, patch, put } from '@/utils'
-import { toast } from 'vue-sonner'
-import { useUserStore } from '@/stores/user'
+import { computed, onMounted, ref } from 'vue';
+import { get, getErrorMessage, patch, put } from '@/utils';
+import { toast } from 'vue-sonner';
+import { useUserStore } from '@/stores/user';
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 
-const currentFirstName = ref('')
-const currentLastName = ref('')
-const currentPatronymic = ref('')
-const currentEmail = ref('')
+const currentFirstName = ref('');
+const currentLastName = ref('');
+const currentPatronymic = ref('');
+const currentEmail = ref('');
 
-const firstName = ref('')
-const lastName = ref('')
-const patronymic = ref('')
-const email = ref('')
-const password = ref('')
-const newPassword = ref('')
-const passwordConfirmation = ref('')
+const firstName = ref('');
+const lastName = ref('');
+const patronymic = ref('');
+const email = ref('');
+const password = ref('');
+const newPassword = ref('');
+const passwordConfirmation = ref('');
 
-const passwordType = ref<'password' | 'text'>('password')
-const newPasswordType = ref<'password' | 'text'>('password')
-const passwordConfirmationType = ref<'password' | 'text'>('password')
+const passwordType = ref<'password' | 'text'>('password');
+const newPasswordType = ref<'password' | 'text'>('password');
+const passwordConfirmationType = ref<'password' | 'text'>('password');
 
 const isSetNameButtonDisabled = computed(() => {
   return (
@@ -32,113 +32,113 @@ const isSetNameButtonDisabled = computed(() => {
     !firstName.value ||
     lastName.value?.trim().length === 0 ||
     !lastName.value
-  )
-})
+  );
+});
 
 const isSetEmailButtonDisabled = computed(() => {
-  return email.value?.trim() === currentEmail.value || email.value?.trim().length === 0
-})
+  return email.value?.trim() === currentEmail.value || email.value?.trim().length === 0;
+});
 
 const isSetPasswordButtonDisabled = computed(() => {
   return !(
     password.value?.trim().length &&
     newPassword.value?.trim().length &&
     newPassword.value?.trim() === passwordConfirmation.value?.trim()
-  )
-})
+  );
+});
 
 async function getData() {
   try {
-    const response = await get('/api/profile/')
+    const response = await get('/api/profile/');
     if (response.ok) {
-      const data = await response.json()
+      const data = await response.json();
 
-      currentFirstName.value = data.first_name
-      currentLastName.value = data.last_name
-      currentPatronymic.value = data.patronymic
-      currentEmail.value = data.email
-      firstName.value = currentFirstName.value
-      lastName.value = currentLastName.value
-      patronymic.value = currentPatronymic.value
-      email.value = currentEmail.value
+      currentFirstName.value = data.first_name;
+      currentLastName.value = data.last_name;
+      currentPatronymic.value = data.patronymic;
+      currentEmail.value = data.email;
+      firstName.value = currentFirstName.value;
+      lastName.value = currentLastName.value;
+      patronymic.value = currentPatronymic.value;
+      email.value = currentEmail.value;
     } else {
-      toast.error(getErrorMessage(await response.json()))
+      toast.error(getErrorMessage(await response.json()));
     }
   } catch {
-    toast.error('Произошла ошибка во время получения данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время получения данных, попробуйте еще раз');
   }
 }
 
 async function patchName() {
   if (isSetNameButtonDisabled.value) {
-    return
+    return;
   }
 
   try {
     const response = await patch('/api/profile/change_details/', {
       first_name: firstName.value,
       last_name: lastName.value,
-      patronymic: patronymic.value ?? ''
-    })
+      patronymic: patronymic.value ?? '',
+    });
     if (response.ok) {
-      await getData()
-      toast.success('Имя успешно изменено')
+      await getData();
+      toast.success('Имя успешно изменено');
     } else {
-      toast.error(getErrorMessage(await response.json()))
+      toast.error(getErrorMessage(await response.json()));
     }
   } catch {
-    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
   }
 }
 
 async function patchEmail() {
   if (isSetEmailButtonDisabled.value) {
-    return
+    return;
   }
 
   try {
     const response = await patch('/api/profile/change_email/', {
-      email: email.value
-    })
+      email: email.value,
+    });
     if (response.ok) {
-      await getData()
-      toast.success('Почта успешно изменена')
+      await getData();
+      toast.success('Почта успешно изменена');
     } else {
-      toast.error(getErrorMessage(await response.json()))
+      toast.error(getErrorMessage(await response.json()));
     }
   } catch {
-    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
   }
 }
 
 async function putPassword() {
   if (isSetPasswordButtonDisabled.value) {
-    return
+    return;
   }
 
   try {
     const requestData = {
       new_password: newPassword.value,
       confirm_new_password: passwordConfirmation.value,
-      current_password: password.value
-    }
-    const response = await put('/api/profile/change_password/', requestData)
+      current_password: password.value,
+    };
+    const response = await put('/api/profile/change_password/', requestData);
     if (response.ok) {
-      password.value = ''
-      newPassword.value = ''
-      passwordConfirmation.value = ''
-      toast.success('Пароль успешно изменен')
+      password.value = '';
+      newPassword.value = '';
+      passwordConfirmation.value = '';
+      toast.success('Пароль успешно изменен');
     } else {
-      toast.error(getErrorMessage(await response.json()))
+      toast.error(getErrorMessage(await response.json()));
     }
   } catch {
-    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
   }
 }
 
 onMounted(async () => {
-  await getData()
-})
+  await getData();
+});
 </script>
 
 <template>

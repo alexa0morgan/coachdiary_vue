@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import type { StudentStandard } from '@/types/types'
+import type { StudentStandard } from '@/types/types';
 
 const { standards, summaryGrade } = defineProps<{
-  standards: StudentStandard[]
-  summaryGrade: number
-  hideSaveButton?: boolean
-  readonlyInput?: boolean
-}>()
+  standards: StudentStandard[];
+  summaryGrade: number;
+  hideSaveButton?: boolean;
+  readonlyInput?: boolean;
+}>();
 
 const emit = defineEmits<{
-  saveData: []
-}>()
+  saveData: [];
+}>();
 
 const headers = [
   { title: 'норматив', value: 'standard.name', sortable: true },
   { title: 'результат', value: 'value', sortable: true, width: 100 },
-  { title: 'оценка', value: 'grade', sortable: true, width: 80 }
-]
+  { title: 'оценка', value: 'grade', sortable: true, width: 80 },
+];
 
 function getMarkColor(mark?: number): string {
   switch (mark) {
     case 2:
-      return 'mark-bad'
+      return 'mark-bad';
     case 3:
-      return 'mark-okay'
+      return 'mark-okay';
     case 4:
-      return 'mark-good'
+      return 'mark-good';
     case 5:
-      return 'mark-great'
+      return 'mark-great';
     default:
-      return ''
+      return '';
   }
 }
 </script>
@@ -78,8 +78,8 @@ function getMarkColor(mark?: number): string {
       </tr>
     </template>
     <template #footer.prepend>
-      <v-btn v-if="!hideSaveButton" class="button" color="primary" @click="emit('saveData')"
-        >Сохранить
+      <v-btn v-if="!hideSaveButton" class="button" color="primary" @click="emit('saveData')">
+        Сохранить
       </v-btn>
       <div class="space" />
     </template>
