@@ -6,7 +6,7 @@ import DataTableSideNav from '@/components/DataTableSideNav.vue'
 import StudentTable from '@/components/StudentTable.vue'
 import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue'
 import { del, get, getErrorMessage, post, showConfirmDialog } from '@/utils'
-import type { StudentResponse, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
+import type { StudentResponse, StudentStandard, StudentStandardRequest, StudentStandardResponse } from '@/types/types'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { toast } from 'vue-sonner'
@@ -18,6 +18,7 @@ const uiStore = useUIStore()
 const { smAndUp } = useDisplay()
 const studentId = computed(() => +route.params.id)
 const studentInfo = ref<StudentResponse>()
+const standards = ref<StudentStandard[]>([])
 const standardsInfo = ref<StudentStandardResponse>({
   summary_grade: -1,
   standards: []
@@ -73,6 +74,7 @@ async function getStandardsByStudentId(studentId: number) {
     const response = await get(`/api/students/${studentId}/standards/`, { level_number: selectedLevelNumber.value })
     if (response.ok) {
       standardsInfo.value = await response.json()
+      standards.value = standardsInfo.value.standards
     } else {
       toast.error(getErrorMessage(await response.json()))
     }
@@ -106,14 +108,14 @@ async function deleteStudent() {
 
 async function saveStudentValue() {
   try {
-    const request: StudentStandardRequest[] = standardsInfo.value ? standardsInfo.value.standards
+    const request: StudentStandardRequest[] = standards.value
       .filter(v => v.value != null && v.value)
       .map(v => ({
         student_id: studentId.value,
         standard_id: v.standard.id,
         value: v.standard.has_numeric_value ? v.value : v.grade,
         level_number: v.level_number
-      })) : []
+      }))
 
     const response = await post('/api/students/results/create/', request)
     if (response.ok) {
@@ -183,7 +185,8 @@ onUnmounted(() => {
 
     <div class="grid">
       <StudentTable
-        :data="standardsInfo "
+        :standards="standards"
+        :summary-grade="standardsInfo.summary_grade"
         class="table"
         @save-data="saveStudentValue" />
 

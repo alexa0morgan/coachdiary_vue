@@ -118,6 +118,9 @@ export function getErrorMessage(error: any): string {
   if ('Детали' in error) {
     return Object.values(flattenObject(error.Детали)).join(' ')
   }
+  if ('error' in error) {
+    return Object.values(flattenObject(error.error)).join(' ')
+  }
   return 'Неизвестная ошибка'
 }
 

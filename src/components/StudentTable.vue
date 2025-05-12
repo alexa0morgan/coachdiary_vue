@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { StudentStandardResponse } from '@/types/types'
+import type { StudentStandard } from '@/types/types'
 
-const { data } = defineProps<{
-  data: StudentStandardResponse
+const { standards, summaryGrade } = defineProps<{
+  standards: StudentStandard[],
+  summaryGrade: number
 }>()
 
 const emit = defineEmits<{
@@ -36,7 +37,7 @@ function getMarkColor(mark?: number): string {
   <v-data-table
     :fixed-header="true"
     :headers="headers"
-    :items="data.standards"
+    :items="standards"
     :itemsPerPageOptions="[10, 20, 30, { title: 'Все', value: -1 }]"
     :mobile="false"
     :show-current-page="true"
@@ -50,12 +51,14 @@ function getMarkColor(mark?: number): string {
         v-model="item.value" />
     </template>
     <template #item.grade="{item}">
-      <div v-if="item.standard.has_numeric_value" :class="getMarkColor(item.grade ?? 0)" class="mark">
+      <div v-if="item.standard.has_numeric_value"
+           :class="getMarkColor(item.grade ?? 0)"
+           class="mark">
         {{ item.grade }}
       </div>
       <v-text-field
         v-else
-        v-model="item.value"
+        v-model="item.grade"
         :class="getMarkColor(item.grade?? 0)" class="mark"
       />
     </template>
@@ -63,7 +66,7 @@ function getMarkColor(mark?: number): string {
       <tr class="total-rate">
         <td>Итого</td>
         <td></td>
-        <td>{{ data.summary_grade.toFixed(2) }}</td>
+        <td>{{ summaryGrade.toFixed(2) }}</td>
       </tr>
     </template>
     <template #footer.prepend>

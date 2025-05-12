@@ -143,7 +143,7 @@ async function getStudentsData() {
 
 
   try {
-    const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/', {
+    const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/list/', {
       'class_id[]': currentClasses,
       standard_id: selectedStandardId.value
     }).then(res => res.json())
@@ -183,7 +183,7 @@ async function saveStudentsValue() {
         value: student.value == null ? null : +student.value
       }))
 
-    const response = await post('/api/students/results/new/', request)
+    const response = await post('/api/students/results/create/', request)
 
     if (response.ok) {
       await getStudentsData()
