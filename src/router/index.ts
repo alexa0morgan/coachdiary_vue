@@ -12,6 +12,7 @@ import AboutSiteView from '@/views/AboutSiteView.vue';
 import AboutUsView from '@/views/AboutUsView.vue';
 import MyClassesView from '@/views/MyClassesView.vue';
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue';
+import InfoView from '@/views/InfoView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,6 +60,19 @@ const router = createRouter({
       name: 'reset-password',
       component: LoginView,
       props: true,
+      meta: { mobileTitle: 'Дневник Тренера' },
+    },
+    {
+      path: '/verify-email/:token',
+      name: 'verify-email',
+      component: InfoView,
+      props: true,
+      meta: { mobileTitle: 'Дневник Тренера' },
+    },
+    {
+      path: '/aa',
+      name: 'aa',
+      component: InfoView,
       meta: { mobileTitle: 'Дневник Тренера' },
     },
     {
