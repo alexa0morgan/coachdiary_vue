@@ -6,7 +6,7 @@ import { toast } from 'vue-sonner';
 import PageFooter from '@/components/PageFooter.vue';
 import { useUserStore } from '@/stores/user';
 
-const pageType = ref<'signIn' | 'signUp' | 'restore' | 'studentSignUp'>('signIn');
+const pageType = ref<'signIn' | 'signUp' | 'restore' | 'tokenSignUp' | 'reset-password'>('signIn');
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
@@ -24,9 +24,18 @@ const passwordConfirmationType = ref<'password' | 'text'>('password');
 
 const isLoading = ref(false);
 const invitationData = ref(null);
-const invitationCode = ref('');
+const invitationToken = ref('');
+
+const resetPasswordToken = ref('');
 
 const isSendButtonDisabled = computed(() => {
+  if (pageType.value === 'reset-password') {
+    return (
+      !password.value?.length ||
+      !passwordConfirmation.value?.length ||
+      password.value !== passwordConfirmation.value
+    );
+  }
   if (!/.@./.test(email.value)) {
     return true;
   }
@@ -43,6 +52,10 @@ const isSendButtonDisabled = computed(() => {
       !privacyPolicy.value
     );
   }
+  if (pageType.value === 'restore') {
+    return !email.value?.length;
+  }
+
   return false;
 });
 
@@ -52,6 +65,8 @@ const title = computed(() => {
       return 'Регистрация';
     case 'restore':
       return 'Восстановление пароля';
+    case 'reset-password':
+      return 'Сброс пароля';
     case 'signIn':
     default:
       return 'Войти';
@@ -63,6 +78,9 @@ const buttonText = computed(() => {
       return 'Зарегистрироваться';
     case 'restore':
       return 'Восстановить пароль';
+    case 'reset-password':
+      return 'Задать новый пароль';
+    case 'tokenSignUp':
     case 'signIn':
     default:
       return 'Войти';
@@ -82,15 +100,16 @@ async function sendData() {
       response = await signUp();
     } else if (pageType.value === 'restore') {
       response = await restore();
-    } else if (pageType.value === 'studentSignUp') {
+    } else if (pageType.value === 'reset-password') {
+      response = await resetPassword();
+    } else if (pageType.value === 'tokenSignUp') {
       response = await studentSignUp();
     }
-    if (response?.status === 'error' || response?.статус === 'ошибка') {
+    if (response?.status === 'error' || response?.status === 'ошибка') {
       toast.error(getErrorMessage(response));
     }
   } catch (e) {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
-    console.error(e);
   } finally {
     isLoading.value = false;
   }
@@ -102,8 +121,8 @@ async function signIn() {
   if (response.ok) {
     await userStore.login();
     await router.push({ name: 'app' });
-    return response.json();
   }
+  return response.json();
 }
 
 async function signUp() {
@@ -119,9 +138,9 @@ async function signUp() {
     invite_code: '',
   };
 
-  if (invitationCode.value) {
+  if (invitationToken.value) {
     url = `/api/create-user/from-invitation/`;
-    requestData.invite_code = invitationCode.value;
+    requestData.invite_code = invitationToken.value;
   }
 
   const response = await post(url, requestData);
@@ -134,7 +153,7 @@ async function signUp() {
     lastName.value = '';
     patronymic.value = '';
     passwordConfirmation.value = '';
-    invitationCode.value = '';
+    invitationToken.value = '';
     toast.success('Регистрация успешна. Проверьте вашу почту для подтверждения аккаунта.');
   } else {
     return response.json();
@@ -144,7 +163,7 @@ async function signUp() {
 async function studentSignUp() {
   pageType.value = 'signUp';
   try {
-    const response = await get(`/api/create-user/from-invitation/${invitationCode.value}/`);
+    const response = await get(`/api/create-user/from-invitation/${invitationToken.value}/`);
     if (response.ok) {
       const data = await response.json();
       invitationData.value = data;
@@ -153,7 +172,7 @@ async function studentSignUp() {
       patronymic.value = data.student.patronymic;
     } else {
       toast.error(getErrorMessage(await response.json()));
-      invitationCode.value = '';
+      invitationToken.value = '';
       await router.push({ name: 'login' });
       pageType.value = 'signIn';
     }
@@ -163,13 +182,50 @@ async function studentSignUp() {
 }
 
 async function restore() {
-  alert('К сожалению, данная функция еще не доступна');
+  const requestData = { email: email.value };
+  const response = await post('/api/reset-password/request_reset/', requestData);
+  if (response.ok) {
+    toast.success('Письмо с инструкциями по восстановлению пароля отправлено на указанную почту');
+    pageType.value = 'signIn';
+    email.value = '';
+    return response.json();
+  }
+}
+
+async function resetPassword() {
+  const requestData = {
+    token: resetPasswordToken.value,
+    new_password: password.value,
+    confirm_password: passwordConfirmation.value,
+  };
+  const response = await post('/api/reset-password/confirm_reset/', requestData);
+  if (response.ok) {
+    toast.success('Пароль успешно изменен');
+    pageType.value = 'signIn';
+    passwordConfirmation.value = '';
+    password.value = '';
+    resetPasswordToken.value = '';
+    await router.push({ name: 'login' });
+    return response.json();
+  } else {
+    toast.error(getErrorMessage(await response.json()));
+  }
 }
 
 onMounted(async () => {
   if (route.params.token) {
-    invitationCode.value = route.params.token as string;
-    await studentSignUp();
+    switch (route.name) {
+      case 'reset-password':
+        resetPasswordToken.value = route.params.token as string;
+        pageType.value = 'reset-password';
+        break;
+      case 'join':
+        invitationToken.value = route.params.token as string;
+        await studentSignUp();
+        break;
+      default:
+        break;
+    }
   }
 });
 </script>
@@ -182,7 +238,7 @@ onMounted(async () => {
         <v-text-field
           v-if="pageType === 'signUp'"
           v-model="lastName"
-          :disabled="isLoading || !!invitationCode"
+          :disabled="isLoading || !!invitationToken"
           clearable
           label="Фамилия"
           persistent-clear
@@ -191,7 +247,7 @@ onMounted(async () => {
         <v-text-field
           v-if="pageType === 'signUp'"
           v-model="firstName"
-          :disabled="isLoading || !!invitationCode"
+          :disabled="isLoading || !!invitationToken"
           clearable
           label="Имя"
           persistent-clear
@@ -200,14 +256,14 @@ onMounted(async () => {
         <v-text-field
           v-if="pageType === 'signUp'"
           v-model="patronymic"
-          :disabled="isLoading || !!invitationCode"
+          :disabled="isLoading || !!invitationToken"
           clearable
           label="Отчество"
           persistent-clear
           variant="outlined"
         />
         <v-text-field
-          v-if="pageType !== 'studentSignUp'"
+          v-if="pageType !== 'tokenSignUp' && pageType !== 'reset-password'"
           v-model="email"
           :disabled="isLoading"
           clearable
@@ -217,7 +273,7 @@ onMounted(async () => {
           variant="outlined"
         />
         <v-text-field
-          v-if="pageType !== 'restore' && pageType !== 'studentSignUp'"
+          v-if="pageType !== 'restore' && pageType !== 'tokenSignUp'"
           v-model="password"
           :append-inner-icon="password ? 'mdi-eye' : undefined"
           :disabled="isLoading"
@@ -229,7 +285,7 @@ onMounted(async () => {
           @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
         />
         <v-text-field
-          v-if="pageType === 'signUp'"
+          v-if="pageType === 'signUp' || pageType === 'reset-password'"
           v-model="passwordConfirmation"
           :append-inner-icon="passwordConfirmation ? 'mdi-eye' : undefined"
           :disabled="isLoading"
@@ -245,8 +301,8 @@ onMounted(async () => {
         />
 
         <v-text-field
-          v-if="pageType === 'studentSignUp'"
-          v-model="invitationCode"
+          v-if="pageType === 'tokenSignUp'"
+          v-model="invitationToken"
           :disabled="isLoading"
           clearable
           label="Код приглашения"
@@ -293,7 +349,7 @@ onMounted(async () => {
           size="small"
           text="Использовать код приглашения"
           variant="text"
-          @click="pageType = 'studentSignUp'"
+          @click="pageType = 'tokenSignUp'"
         />
       </div>
       <v-btn
@@ -304,7 +360,7 @@ onMounted(async () => {
         variant="text"
         @click="
           pageType = 'signIn';
-          invitationCode = '';
+          invitationToken = '';
         "
       />
     </div>

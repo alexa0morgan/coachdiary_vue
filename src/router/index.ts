@@ -55,6 +55,13 @@ const router = createRouter({
       meta: { mobileTitle: 'Дневник Тренера' },
     },
     {
+      path: '/reset-password/:token',
+      name: 'reset-password',
+      component: LoginView,
+      props: true,
+      meta: { mobileTitle: 'Дневник Тренера' },
+    },
+    {
       path: '/app',
       name: 'app',
       redirect: { name: 'my-diary' },

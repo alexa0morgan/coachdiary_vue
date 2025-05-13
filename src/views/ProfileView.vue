@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue';
 import { get, getErrorMessage, patch, put } from '@/utils';
 import { toast } from 'vue-sonner';
 import { useUserStore } from '@/stores/user';
+import router from '@/router';
 
 const userStore = useUserStore();
 
@@ -128,6 +129,8 @@ async function putPassword() {
       newPassword.value = '';
       passwordConfirmation.value = '';
       toast.success('Пароль успешно изменен');
+      userStore.clearLocalStorage();
+      await router.push({ name: 'login' });
     } else {
       toast.error(getErrorMessage(await response.json()));
     }
@@ -144,7 +147,7 @@ onMounted(async () => {
 <template>
   <div class="main">
     <div class="container rounded-lg">
-      <div class="text">Смена имени и почты</div>
+      <div class="title">Смена имени и почты</div>
       <form class="text-field mb-4" @submit.prevent="patchName">
         <div class="text-field-fio">
           <v-text-field
@@ -190,7 +193,12 @@ onMounted(async () => {
       </form>
     </div>
     <div class="container rounded-lg">
-      <div class="text">Смена пароля</div>
+      <div class="title">Смена пароля</div>
+      <div class="text">
+        Внимание. После смены пароля
+        <br />
+        необходимо будет снова войти в аккаунт
+      </div>
       <form class="text-field" @submit.prevent="putPassword">
         <v-text-field
           v-model="password"
@@ -234,7 +242,7 @@ onMounted(async () => {
       </form>
     </div>
     <div class="container rounded-lg">
-      <div class="text">Выйти из аккаунта</div>
+      <div class="title">Выйти из аккаунта</div>
       <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
     </div>
   </div>
@@ -267,12 +275,25 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.text {
+.title {
   font-size: 24px;
   color: black;
   text-transform: uppercase;
   font-weight: 600;
   margin-bottom: 24px;
+}
+
+.text {
+  font-size: 20px;
+  color: rgb(var(--v-theme-error));
+  margin-bottom: 24px;
+  margin-top: -10px;
+  --border-size: 0.4px;
+  text-shadow:
+    calc(-1 * var(--border-size)) calc(-1 * var(--border-size)) 0 black,
+    var(--border-size) calc(-1 * var(--border-size)) 0 black,
+    calc(-1 * var(--border-size)) var(--border-size) 0 black,
+    var(--border-size) var(--border-size) 0 black;
 }
 
 .button {

@@ -14,6 +14,15 @@ export const useUserStore = defineStore('user', () => {
   const isStudent = computed(() => userType.value === 'student');
   const isTeacher = computed(() => userType.value === 'teacher');
 
+  function clearLocalStorage() {
+    isLoggedIn.value = false;
+    userType.value = 'guest';
+    studentId.value = null;
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('studentId');
+  }
+
   async function login() {
     await fetchProfile();
     isLoggedIn.value = true;
@@ -23,12 +32,7 @@ export const useUserStore = defineStore('user', () => {
   async function logout() {
     const response = await post('/api/logout/');
     if (response.ok) {
-      isLoggedIn.value = false;
-      userType.value = 'guest';
-      studentId.value = null;
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userType');
-      localStorage.removeItem('studentId');
+      clearLocalStorage();
       await router.push({ name: 'login' });
     } else {
       toast.error(getErrorMessage(response));
@@ -47,13 +51,7 @@ export const useUserStore = defineStore('user', () => {
           localStorage.setItem('studentId', String(data.id));
         }
       } else {
-        isLoggedIn.value = false;
-        userType.value = 'guest';
-        studentId.value = null;
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('userType');
-        localStorage.removeItem('studentId');
-
+        clearLocalStorage();
         if (route.fullPath.startsWith('/app')) {
           await router.push({ name: 'home' });
         }
@@ -72,5 +70,6 @@ export const useUserStore = defineStore('user', () => {
     login,
     logout,
     fetchProfile,
+    clearLocalStorage,
   };
 });
