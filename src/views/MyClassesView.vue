@@ -1,89 +1,112 @@
 <script setup lang="ts">
+import TopPanel from '@/components/TopPanel.vue';
+import ClassesPanel from '@/components/ClassesPanel.vue';
+import { computed, ref } from 'vue';
+import type { ClassRequest, StudentResponse } from '@/types/types';
+import { useMyClassesStore } from '@/stores/myClasses';
+import { useDisplay } from 'vuetify';
+import { del, get, getErrorMessage, showConfirmDialog } from '@/utils';
+import router from '@/router';
+import { toast } from 'vue-sonner';
+import MyClassesStudent from '@/components/MyClassesStudent.vue';
 
-import TopPanel from '@/components/TopPanel.vue'
-import ClassesPanel from '@/components/ClassesPanel.vue'
-import { computed, ref } from 'vue'
-import type { ClassRequest, StudentResponse } from '@/types/types'
-import { useMyClassesStore } from '@/stores/myClasses'
-import { useDisplay } from 'vuetify'
-import { del, getErrorMessage, showConfirmDialog } from '@/utils'
-import router from '@/router'
-import { toast } from 'vue-sonner'
-
-let timer: number | null = null
+let timer: number | null = null;
 
 function search() {
   if (timer) {
-    clearTimeout(timer)
+    clearTimeout(timer);
   }
   timer = setTimeout(() => {
-    console.log('searching...')
-  }, 300)
+    console.log('searching...');
+  }, 300);
 }
 
-const { smAndUp } = useDisplay()
-const myClassesStore = useMyClassesStore()
-const activeLevelNumber = ref(-1)
-const studentsData = ref<StudentResponse[]>([])
-const classesData = ref<ClassRequest[]>([])
+const { smAndUp } = useDisplay();
+const myClassesStore = useMyClassesStore();
+const activeLevelNumber = ref(-1);
+const studentsData = ref<StudentResponse[]>([]);
+const classesData = ref<ClassRequest[]>([]);
 
 const groupedStudentsClasses = computed(() => {
   const students = studentsData.value.toSorted((a, b) => {
     if (a.student_class.number !== b.student_class.number) {
-      return a.student_class.number - b.student_class.number
+      return a.student_class.number - b.student_class.number;
     }
     if (a.student_class.class_name !== b.student_class.class_name) {
-      return a.student_class.class_name.localeCompare(b.student_class.class_name)
+      return a.student_class.class_name.localeCompare(b.student_class.class_name);
     }
-    let fullNameA = `${a.last_name} ${a.first_name} ${a.patronymic}`
-    let fullNameB = `${b.last_name} ${b.first_name} ${b.patronymic}`
-    return fullNameA.localeCompare(fullNameB)
-  })
-  const result: Record<number, Record<string, StudentResponse[]>> = {}
+    let fullNameA = `${a.last_name} ${a.first_name} ${a.patronymic}`;
+    let fullNameB = `${b.last_name} ${b.first_name} ${b.patronymic}`;
+    return fullNameA.localeCompare(fullNameB);
+  });
+  const result: Record<number, Record<string, StudentResponse[]>> = {};
   for (const student of students) {
     if (!result[student.student_class.number]) {
-      result[student.student_class.number] = {}
+      result[student.student_class.number] = {};
     }
     if (!result[student.student_class.number][student.student_class.class_name]) {
-      result[student.student_class.number][student.student_class.class_name] = []
+      result[student.student_class.number][student.student_class.class_name] = [];
     }
-    result[student.student_class.number][student.student_class.class_name].push(student)
+    result[student.student_class.number][student.student_class.class_name].push(student);
   }
 
-  return result
-})
+  return result;
+});
 
 function updateStudentsData(data: StudentResponse[], classNumber: number, letter: string) {
-  studentsData.value = data
-  activeLevelNumber.value = classNumber
+  studentsData.value = data;
+  activeLevelNumber.value = classNumber;
 }
 
 function getClassesData(data: ClassRequest[]) {
-  classesData.value = data
+  classesData.value = data;
+}
+
+async function getPDFQRCodes(number: number, name: string) {
+  const id = classesData.value.find(
+    (item) => item.number === number && item.class_name === name,
+  )?.id;
+  try {
+    const response = await get(`/api/students/generate_qr_codes_pdf/`, {
+      class_id: id,
+    });
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      window.URL.revokeObjectURL(url);
+
+      toast.success('QR-коды успешно скачаны');
+    } else {
+      toast.error(getErrorMessage(await response.json()));
+    }
+  } catch {
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  }
 }
 
 async function deleteClass(number: number, name: string) {
   await showConfirmDialog({
     title: 'Удаление класса',
-    text: 'Вы уверены, что хотите удалить весь класс?'
-  })
+    text: 'Вы уверены, что хотите удалить весь класс?',
+  });
 
-
-  const id = classesData.value.find((item) => item.number === number && item.class_name === name)?.id
+  const id = classesData.value.find(
+    (item) => item.number === number && item.class_name === name,
+  )?.id;
 
   try {
-    const response = await del(`/api/classes/${id}/`)
+    const response = await del(`/api/classes/${id}/`);
     if (response.ok) {
-      router.go(0)
-      toast.success('Класс успешно удален')
+      router.go(0);
+      toast.success('Класс успешно удален');
     } else {
-      toast.error(getErrorMessage(await response.json()))
+      toast.error(getErrorMessage(await response.json()));
     }
   } catch {
-    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
   }
 }
-
 </script>
 
 <template>
@@ -104,59 +127,77 @@ async function deleteClass(number: number, name: string) {
               hide-details
               @update:search="search"
             />-->
-    <ClassesPanel v-if="!smAndUp"
-                  @studentsData="updateStudentsData"
-                  @buttonClick="myClassesStore.activeClasses = []" />
+    <ClassesPanel
+      v-if="!smAndUp"
+      @studentsData="updateStudentsData"
+      @buttonClick="myClassesStore.activeClasses = []"
+    />
     <div v-if="smAndUp"></div>
     <template #right v-if="smAndUp">
-      <v-btn :to="{name: 'create-student'}" color="rgb(var(--v-theme-secondary))" icon="mdi-plus"
-             variant="outlined" />
+      <v-btn
+        :to="{ name: 'create-student' }"
+        color="rgb(var(--v-theme-secondary))"
+        icon="mdi-plus"
+        variant="outlined"
+      />
     </template>
   </TopPanel>
 
   <div class="classes-panel" v-if="smAndUp">
-    <ClassesPanel direction-column
-                  @studentsData="updateStudentsData"
-                  @classesData="getClassesData"
-                  @buttonClick="myClassesStore.activeClasses = []" />
+    <ClassesPanel
+      direction-column
+      @studentsData="updateStudentsData"
+      @classesData="getClassesData"
+      @buttonClick="myClassesStore.activeClasses = []"
+    />
   </div>
 
   <div class="container">
-
     <div class="students-container">
-
       <template
         v-for="(studentsClasses, activeLevelNumber) in groupedStudentsClasses"
-        :key="activeLevelNumber">
-        <v-expansion-panels
-          v-model="myClassesStore.activeClasses" multiple>
+        :key="activeLevelNumber"
+      >
+        <v-expansion-panels v-model="myClassesStore.activeClasses" multiple>
           <v-expansion-panel
             v-for="(students, klass) in studentsClasses"
             :key="klass"
-            :value="activeLevelNumber+klass"
+            :value="activeLevelNumber + klass"
           >
             <v-expansion-panel-title>
               <strong>{{ activeLevelNumber + klass }}</strong>
             </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="students-list" v-for="i in students.length" :key="students[i-1].id">
-                <div>{{ i }}</div>
-                <v-btn
-                  :to="{name: 'student', params: { id: students[i-1].id } }"
-                  class="button"
-                  variant="text">
-                  {{ students[i - 1].last_name + ' ' + students[i - 1].first_name + ' ' + students[i - 1].patronymic }}
-                </v-btn>
+
+            <v-expansion-panel-text class="expansion-panel-text">
+              <div class="students-list">
+                <div>№</div>
+                <div style="padding: 0 16px">ФИО</div>
+                <div v-if="smAndUp">Код приглашения</div>
+                <div v-else>Код</div>
+              </div>
+
+              <div class="students-list" v-for="i in students.length" :key="students[i - 1].id">
+                <MyClassesStudent :i="i" :student="students[i - 1]" />
               </div>
 
               <div class="action-buttons">
-                <v-btn size="small" color="error" variant="outlined" @click="deleteClass(+activeLevelNumber, klass)">
-                  Удалить
-                </v-btn>
+                <v-btn
+                  size="small"
+                  color="info"
+                  variant="outlined"
+                  text="Скачать qr коды приглашений"
+                  @click="getPDFQRCodes(+activeLevelNumber, klass)"
+                />
+                <v-btn
+                  size="small"
+                  color="error"
+                  variant="outlined"
+                  text="Удалить"
+                  @click="deleteClass(+activeLevelNumber, klass)"
+                />
                 <!--    <v-btn size="small" color="warning" variant="outlined">Архивировать</v-btn>
                         <v-btn size="small" color="info" variant="outlined">Перевести на след. год</v-btn>-->
               </div>
-
             </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -166,7 +207,6 @@ async function deleteClass(number: number, name: string) {
 </template>
 
 <style scoped>
-
 .top-panel {
   position: sticky;
   top: 64px;
@@ -202,13 +242,10 @@ async function deleteClass(number: number, name: string) {
 
 .students-list {
   display: grid;
-  grid-template-columns: 10px 1fr;
+  grid-template-columns: 20px 1fr 136px;
   gap: 10px;
   align-items: center;
-}
-
-.button {
-  justify-content: start;
+  margin-bottom: 5px;
 }
 
 .action-buttons {
@@ -229,6 +266,13 @@ async function deleteClass(number: number, name: string) {
     grid-template-columns: 0 1fr;
     margin: 10px;
   }
-}
 
+  .students-list {
+    grid-template-columns: 20px 1fr 80px;
+  }
+
+  .expansion-panel-text:deep(.v-expansion-panel-text__wrapper) {
+    padding: 8px 10px 16px;
+  }
+}
 </style>

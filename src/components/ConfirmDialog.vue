@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import { confirmDialogs } from '@/utils'
-import { computed } from 'vue'
+import { confirmDialogs } from '@/utils';
+import { computed } from 'vue';
 
-const lastDialog = computed(() => confirmDialogs.value.at(-1))
-
+const lastDialog = computed(() => confirmDialogs.value.at(-1));
 </script>
 
 <template>
   <v-dialog :model-value="!!lastDialog" max-width="340" persistent>
-    <v-card
-      :title="lastDialog?.title"
-      :text="lastDialog?.text"
-    >
+    <v-card :title="lastDialog?.title" :text="lastDialog?.text">
       <template #actions>
         <v-spacer />
 
@@ -27,6 +23,4 @@ const lastDialog = computed(() => confirmDialogs.value.at(-1))
   </v-dialog>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

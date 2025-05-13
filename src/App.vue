@@ -1,23 +1,29 @@
 <script lang="ts" setup>
-import { RouterView, useRoute } from 'vue-router'
-import AppBar from '@/components/AppBar.vue'
-import { useUserStore } from '@/stores/user'
-import BottomAppBar from '@/components/BottomAppBar.vue'
-import { useDisplay } from 'vuetify'
-import { computed } from 'vue'
-import { Toaster } from 'vue-sonner'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import { RouterView, useRoute } from 'vue-router';
+import AppBar from '@/components/AppBar.vue';
+import { useUserStore } from '@/stores/user';
+import BottomAppBar from '@/components/BottomAppBar.vue';
+import { useDisplay } from 'vuetify';
+import { computed } from 'vue';
+import { Toaster } from 'vue-sonner';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 
-useUserStore().fetchProfile()
+useUserStore().fetchProfile();
 
-const { smAndUp } = useDisplay()
-const route = useRoute()
-const isLoggedInView = computed(() => route.path.startsWith('/app'))
+const { smAndUp } = useDisplay();
+const route = useRoute();
+const isLoggedInView = computed(() => route.path.startsWith('/app'));
 </script>
 
 <template>
-  <Toaster rich-colors expand close-button visible-toasts="3" :position=" smAndUp ? 'bottom-right' : 'top-center' "
-           :offset="smAndUp ? 0 : '30px'" />
+  <Toaster
+    rich-colors
+    expand
+    close-button
+    visible-toasts="3"
+    :position="smAndUp ? 'bottom-right' : 'top-center'"
+    :offset="smAndUp ? 0 : '30px'"
+  />
   <v-app>
     <AppBar />
     <v-main>
@@ -28,6 +34,4 @@ const isLoggedInView = computed(() => route.path.startsWith('/app'))
   </v-app>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

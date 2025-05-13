@@ -1,7 +1,6 @@
 <script setup lang="ts">
-
-import BottomSheet from '@/components/BottomSheet.vue'
-import { ref } from 'vue'
+import BottomSheet from '@/components/BottomSheet.vue';
+import { ref } from 'vue';
 
 defineProps<{
   buttonText: string;
@@ -10,31 +9,33 @@ defineProps<{
   icon?: string;
   buttonColor?: string;
   eager?: boolean;
-}>()
+}>();
 
-const isSheetActive = ref(false)
+const isSheetActive = ref(false);
 
 function toggle() {
-  isSheetActive.value = !isSheetActive.value
+  isSheetActive.value = !isSheetActive.value;
 }
-
 </script>
 
 <template>
-
-  <v-btn v-if="icon"
-         class="button"
-         variant="outlined"
-         :icon="icon"
-         :color="buttonColor"
-         @click="toggle" />
-  <v-btn v-else
-         :text="buttonText"
-         :color="buttonColor"
-         :class="{wrapButton}"
-         class="button"
-         variant="outlined"
-         @click="toggle" />
+  <v-btn
+    v-if="icon"
+    class="button"
+    variant="outlined"
+    :icon="icon"
+    :color="buttonColor"
+    @click="toggle"
+  />
+  <v-btn
+    v-else
+    :text="buttonText"
+    :color="buttonColor"
+    :class="{ wrapButton }"
+    class="button"
+    variant="outlined"
+    @click="toggle"
+  />
 
   <BottomSheet v-model="isSheetActive" :sheet-title="sheetTitle" :eager>
     <slot :toggle="toggle" />

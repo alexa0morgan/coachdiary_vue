@@ -2,12 +2,12 @@
 defineProps<{
   src: string;
   mirrored?: boolean;
-}>()
+}>();
 </script>
 
 <template>
-  <div :class="{mirrored}" class="container">
-    <div class=" img-border rounded-xl">
+  <div :class="{ mirrored }" class="container">
+    <div class="img-border rounded-xl">
       <v-img :src alt="" class="img rounded-xl" cover />
     </div>
     <p class="text">
@@ -56,18 +56,18 @@ defineProps<{
 
 @media (max-width: 1200px) {
   .container {
-    gap: 50px
+    gap: 50px;
   }
 }
 
 @media (max-width: 950px) {
-
   .container {
     grid-template-rows: auto 1fr;
     grid-template-columns: 1fr;
   }
 
-  .mirrored .img-border, .img-border {
+  .mirrored .img-border,
+  .img-border {
     width: 100%;
     aspect-ratio: auto;
     order: 0;
@@ -86,8 +86,7 @@ defineProps<{
   }
 
   .container {
-    gap: 20px
+    gap: 20px;
   }
 }
-
 </style>

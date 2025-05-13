@@ -1,34 +1,59 @@
-import { defineStore } from 'pinia'
-import { get, post } from '@/utils'
-import { useRoute, useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { defineStore } from 'pinia';
+import { get, getErrorMessage, post } from '@/utils';
+import { useRoute, useRouter } from 'vue-router';
+import { computed, ref } from 'vue';
+import { toast } from 'vue-sonner';
 
 export const useUserStore = defineStore('user', () => {
-  const route = useRoute()
-  const router = useRouter()
-  const isLoggedIn = ref(localStorage.getItem('isLoggedIn') === 'true')
+  const route = useRoute();
+  const router = useRouter();
+  const isLoggedIn = ref(localStorage.getItem('isLoggedIn') === 'true');
+  const userType = ref(localStorage.getItem('userType') ?? 'guest');
+  const studentId = ref<number | null>(Number(localStorage.getItem('studentId')));
 
-  function login() {
-    isLoggedIn.value = true
-    localStorage.setItem('isLoggedIn', 'true')
+  const isStudent = computed(() => userType.value === 'student');
+  const isTeacher = computed(() => userType.value === 'teacher');
+
+  function clearLocalStorage() {
+    isLoggedIn.value = false;
+    userType.value = 'guest';
+    studentId.value = null;
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('studentId');
+  }
+
+  async function login() {
+    await fetchProfile();
+    isLoggedIn.value = true;
+    localStorage.setItem('isLoggedIn', 'true');
   }
 
   async function logout() {
-    await post('/api/logout/')
-    isLoggedIn.value = false
-    localStorage.removeItem('isLoggedIn')
-    await router.push({ name: 'login' })
+    const response = await post('/api/logout/');
+    if (response.ok) {
+      clearLocalStorage();
+      await router.push({ name: 'login' });
+    } else {
+      toast.error(getErrorMessage(response));
+    }
   }
 
   async function fetchProfile() {
     try {
-      const response = await get('/api/profile/')
-      if (!response.ok) {
-        isLoggedIn.value = false
-        localStorage.removeItem('isLoggedIn')
-
+      const response = await get('/api/profile/');
+      if (response.ok) {
+        const data = await response.json();
+        userType.value = data.role;
+        localStorage.setItem('userType', data.role);
+        if (data.role === 'student') {
+          studentId.value = data.id;
+          localStorage.setItem('studentId', String(data.id));
+        }
+      } else {
+        clearLocalStorage();
         if (route.fullPath.startsWith('/app')) {
-          await router.push({ name: 'home' })
+          await router.push({ name: 'home' });
         }
       }
     } catch {
@@ -38,9 +63,13 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     isLoggedIn,
+    studentId,
+    isStudent,
+    isTeacher,
 
     login,
     logout,
-    fetchProfile
-  }
-})
+    fetchProfile,
+    clearLocalStorage,
+  };
+});

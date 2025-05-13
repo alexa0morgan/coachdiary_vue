@@ -1,26 +1,22 @@
 <script setup lang="ts">
-import type { StudentStandardResponse } from '@/types/types';
-import { computed } from 'vue';
+import type { StudentStandard } from '@/types/types';
 
-const { data } = defineProps<{
-  data: StudentStandardResponse[];
+const { standards, summaryGrade } = defineProps<{
+  standards: StudentStandard[];
+  summaryGrade: number;
+  hideSaveButton?: boolean;
+  readonlyInput?: boolean;
 }>();
 
 const emit = defineEmits<{
-  saveData: []
+  saveData: [];
 }>();
 
 const headers = [
-  { title: 'норматив', value: 'Standard.Name', sortable: true },
-  { title: 'результат', value: 'Value', sortable: true, width: 100 },
-  { title: 'оценка', value: 'Grade', sortable: true, width: 80 }
+  { title: 'норматив', value: 'standard.name', sortable: true },
+  { title: 'результат', value: 'value', sortable: true, width: 100 },
+  { title: 'оценка', value: 'grade', sortable: true, width: 80 },
 ];
-
-const totalRate = computed(() => {
-  const array = data.map((item) => item.Grade);
-  return array.length !== 0 ? +((array.reduce((acc: any, c: any) => acc + c, 0) / array.length).toFixed(3)) : '';
-});
-
 
 function getMarkColor(mark?: number): string {
   switch (mark) {
@@ -36,45 +32,55 @@ function getMarkColor(mark?: number): string {
       return '';
   }
 }
-
 </script>
 
 <template>
   <v-data-table
     :fixed-header="true"
     :headers="headers"
-    :items="data"
+    :items="standards"
     :itemsPerPageOptions="[10, 20, 30, { title: 'Все', value: -1 }]"
     :mobile="false"
     :show-current-page="true"
     :sort-by="[{ key: 'number', order: 'asc' }]"
     class="table"
     item-key="id"
-    no-data-text="Нет данных о нормативах на данном уровне">
-    <template #item.Value="{item}">
+    no-data-text="Нет данных о нормативах на данном уровне"
+  >
+    <template #item.value="{ item }">
       <v-text-field
-        v-if="item.Standard.Has_numeric_value"
-        v-model="item.Value" />
+        v-if="item.standard.has_numeric_value"
+        v-model="item.value"
+        :readonly="readonlyInput"
+      />
     </template>
-    <template #item.Grade="{item}">
-      <div v-if="item.Standard.Has_numeric_value" :class="getMarkColor(item.Grade ?? 0)" class="mark">
-        {{ item.Grade }}
+    <template #item.grade="{ item }">
+      <div
+        v-if="item.standard.has_numeric_value"
+        :class="getMarkColor(item.grade ?? 0)"
+        class="mark"
+      >
+        {{ item.grade }}
       </div>
       <v-text-field
         v-else
-        v-model="item.Value"
-        :class="getMarkColor(item.Grade?? 0)" class="mark"
+        v-model="item.grade"
+        :readonly="readonlyInput"
+        :class="getMarkColor(item.grade ?? 0)"
+        class="mark"
       />
     </template>
     <template #body.append>
       <tr class="total-rate">
         <td>Итого</td>
         <td></td>
-        <td>{{ totalRate }}</td>
+        <td>{{ summaryGrade.toFixed(2) }}</td>
       </tr>
     </template>
     <template #footer.prepend>
-      <v-btn class="button" color="primary" @click="emit('saveData')">Сохранить</v-btn>
+      <v-btn v-if="!hideSaveButton" class="button" color="primary" @click="emit('saveData')">
+        Сохранить
+      </v-btn>
       <div class="space" />
     </template>
   </v-data-table>
@@ -97,7 +103,7 @@ function getMarkColor(mark?: number): string {
 }
 
 .space {
-  flex: 1
+  flex: 1;
 }
 
 .table:deep(.v-data-table-header__content) {

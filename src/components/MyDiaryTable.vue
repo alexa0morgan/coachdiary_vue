@@ -1,22 +1,19 @@
 <script lang="ts" setup>
+import type { VDataTable } from 'vuetify/components';
+import type { StudentsValueResponse } from '@/types/types';
+import { computed } from 'vue';
+import { useDisplay } from 'vuetify';
 
-import type { VDataTable } from 'vuetify/components'
-import type { StudentsValueResponse } from '@/types/types'
-import { computed } from 'vue'
-import { useDisplay } from 'vuetify'
-
-
-const { smAndUp } = useDisplay()
+const { smAndUp } = useDisplay();
 
 const { data, standardType } = defineProps<{
-  data: StudentsValueResponse[]
-  standardType: 'physical' | 'technical'
-}>()
+  data: StudentsValueResponse[];
+  standardType: 'physical' | 'technical';
+}>();
 
 const emit = defineEmits<{
-  saveData: []
-}>()
-
+  saveData: [];
+}>();
 
 const headers = computed<VDataTable['$props']['headers']>(() => {
   if (standardType === 'physical') {
@@ -25,55 +22,51 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
       { title: 'ФИО', value: 'full_name', sortable: true },
       { title: 'Пол', value: 'gender', width: 70 },
       { title: 'Результат', value: 'value', sortable: true, width: 100 },
-      { title: 'Оценка', value: 'grade', sortable: true, width: 80 }
-    ]
+      { title: 'Оценка', value: 'grade', sortable: true, width: 80 },
+    ];
   } else {
     return [
       { title: 'Класс', value: 'student_class.class_name', width: 50, sortable: false },
       { title: 'ФИО', value: 'full_name', sortable: true },
       { title: 'Пол', value: 'gender', width: 70 },
-      { title: 'Оценка', value: 'value', sortable: true, width: 80 }
-    ]
+      { title: 'Оценка', value: 'value', sortable: true, width: 80 },
+    ];
   }
-
-})
-
+});
 
 function getMarkColor(mark?: number): string {
   switch (mark) {
     case 2:
-      return 'mark-bad'
+      return 'mark-bad';
     case 3:
-      return 'mark-okay'
+      return 'mark-okay';
     case 4:
-      return 'mark-good'
+      return 'mark-good';
     case 5:
-      return 'mark-great'
+      return 'mark-great';
     default:
-      return ''
+      return '';
   }
 }
 
 const sortedData = computed(() => {
   return data.toSorted((a, b) => {
     if (a.student_class.number !== b.student_class.number) {
-      return a.student_class.number - b.student_class.number
+      return a.student_class.number - b.student_class.number;
     }
     if (a.student_class.class_name !== b.student_class.class_name) {
-      return a.student_class.class_name.localeCompare(b.student_class.class_name)
+      return a.student_class.class_name.localeCompare(b.student_class.class_name);
     }
-    return a.full_name.localeCompare(b.full_name)
-  })
-})
-
+    return a.full_name.localeCompare(b.full_name);
+  });
+});
 
 function getStudentName(student: StudentsValueResponse) {
   if (smAndUp.value) {
-    return student.last_name + ' ' + student.first_name + ' ' + student.patronymic
+    return student.last_name + ' ' + student.first_name + ' ' + student.patronymic;
   }
-  return student.last_name + ' ' + student.first_name[0] + '. ' + student.patronymic[0] + '.'
+  return student.last_name + ' ' + student.first_name[0] + '. ' + student.patronymic[0] + '.';
 }
-
 </script>
 
 <template>
@@ -89,32 +82,35 @@ function getStudentName(student: StudentsValueResponse) {
     item-key="name"
     no-data-text="Чтобы появились ученики, выберите Класс, потом Норматив"
   >
-    <template #item.student_class.class_name="{item}">
+    <template #item.student_class.class_name="{ item }">
       {{ item.student_class.number + item.student_class.class_name }}
     </template>
-    <template #item.full_name="{item}">
-      <v-btn :to="{name: 'student', params: { id: item.id } }" class="button" variant="tonal">
+    <template #item.full_name="{ item }">
+      <v-btn :to="{ name: 'student', params: { id: item.id } }" class="button" variant="tonal">
         {{ getStudentName(item) }}
       </v-btn>
     </template>
-    <template #item.gender="{item}">
+    <template #item.gender="{ item }">
       <div class="gender">
         {{ item.gender === 'f' ? 'Ж' : 'М' }}
         <v-icon
           :class="{
-          female: item.gender === 'f',
-          male: item.gender === 'm'
-        }"
-          class="gender-icon">
+            female: item.gender === 'f',
+            male: item.gender === 'm',
+          }"
+          class="gender-icon"
+        >
           {{ item.gender === 'f' ? 'mdi-gender-female' : 'mdi-gender-male' }}
         </v-icon>
       </div>
     </template>
-    <template #item.value="{item}">
-      <v-text-field v-model="item.value" :class="standardType === 'technical' ? getMarkColor(item.grade ?? 0) +
-      ' mark' : ''"/>
+    <template #item.value="{ item }">
+      <v-text-field
+        v-model="item.value"
+        :class="standardType === 'technical' ? getMarkColor(item.grade ?? 0) + ' mark' : ''"
+      />
     </template>
-    <template #item.grade=" {item} ">
+    <template #item.grade="{ item }">
       <div :class="getMarkColor(item.grade ?? 0)" class="mark">{{ item.grade }}</div>
     </template>
     <template #footer.prepend>
@@ -125,7 +121,6 @@ function getStudentName(student: StudentsValueResponse) {
 </template>
 
 <style scoped>
-
 .gender {
   display: flex;
   align-items: center;

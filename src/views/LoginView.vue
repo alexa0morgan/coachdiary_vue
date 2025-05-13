@@ -1,107 +1,133 @@
 <script lang="ts" setup>
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { get, getErrorMessage, post } from '@/utils';
+import { toast } from 'vue-sonner';
+import PageFooter from '@/components/PageFooter.vue';
+import { useUserStore } from '@/stores/user';
 
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { getErrorMessage, post } from '@/utils'
-import { toast } from 'vue-sonner'
-import PageFooter from '@/components/PageFooter.vue'
+const pageType = ref<'signIn' | 'signUp' | 'restore' | 'tokenSignUp' | 'reset-password'>('signIn');
+const router = useRouter();
+const route = useRoute();
+const userStore = useUserStore();
 
-const pageType = ref<'signIn' | 'signUp' | 'restore'>('signIn')
-const router = useRouter()
-const userStore = useUserStore()
+const privacyPolicy = ref(false);
+const firstName = ref('');
+const lastName = ref('');
+const patronymic = ref('');
+const email = ref('');
+const password = ref('');
+const passwordConfirmation = ref('');
 
-const privacyPolicy = ref(false)
-const firstName = ref('')
-const lastName = ref('')
-const patronymic = ref('')
-const email = ref('')
-const password = ref('')
-const passwordConfirmation = ref('')
+const passwordType = ref<'password' | 'text'>('password');
+const passwordConfirmationType = ref<'password' | 'text'>('password');
 
-const passwordType = ref<'password' | 'text'>('password')
-const passwordConfirmationType = ref<'password' | 'text'>('password')
+const isLoading = ref(false);
+const invitationData = ref(null);
+const invitationToken = ref('');
+
+const resetPasswordToken = ref('');
 
 const isSendButtonDisabled = computed(() => {
+  if (pageType.value === 'reset-password') {
+    return (
+      !password.value?.length ||
+      !passwordConfirmation.value?.length ||
+      password.value !== passwordConfirmation.value
+    );
+  }
   if (!/.@./.test(email.value)) {
-    return true
+    return true;
   }
   if (pageType.value === 'signIn') {
-    return !password.value?.length
+    return !password.value?.length;
   }
   if (pageType.value === 'signUp') {
-    return !password.value?.length || !firstName.value?.length || !lastName.value?.length ||
-      !passwordConfirmation.value?.length || password.value !== passwordConfirmation.value || !privacyPolicy.value
+    return (
+      !password.value?.length ||
+      !firstName.value?.length ||
+      !lastName.value?.length ||
+      !passwordConfirmation.value?.length ||
+      password.value !== passwordConfirmation.value ||
+      !privacyPolicy.value
+    );
   }
-  return false
-})
+  if (pageType.value === 'restore') {
+    return !email.value?.length;
+  }
+
+  return false;
+});
 
 const title = computed(() => {
   switch (pageType.value) {
     case 'signUp':
-      return 'Регистрация'
+      return 'Регистрация';
     case 'restore':
-      return 'Восстановление пароля'
+      return 'Восстановление пароля';
+    case 'reset-password':
+      return 'Сброс пароля';
     case 'signIn':
     default:
-      return 'Вход в систему'
-
+      return 'Войти';
   }
-})
+});
 const buttonText = computed(() => {
   switch (pageType.value) {
     case 'signUp':
-      return 'Зарегистрироваться'
+      return 'Зарегистрироваться';
     case 'restore':
-      return 'Восстановить пароль'
+      return 'Восстановить пароль';
+    case 'reset-password':
+      return 'Задать новый пароль';
+    case 'tokenSignUp':
     case 'signIn':
     default:
-      return 'Войти'
+      return 'Войти';
   }
-})
-
-const isLoading = ref(false)
+});
 
 async function sendData() {
   if (isSendButtonDisabled.value || isLoading.value) {
-    return
+    return;
   }
-
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    let response
+    let response;
     if (pageType.value === 'signIn') {
-      response = await signIn()
+      response = await signIn();
     } else if (pageType.value === 'signUp') {
-      response = await signUp()
+      response = await signUp();
     } else if (pageType.value === 'restore') {
-      response = await restore()
+      response = await restore();
+    } else if (pageType.value === 'reset-password') {
+      response = await resetPassword();
+    } else if (pageType.value === 'tokenSignUp') {
+      response = await studentSignUp();
     }
-    if (response?.status === 'error' || response?.статус === 'ошибка') {
-      toast.error(getErrorMessage(response))
+    if (response?.status === 'error' || response?.status === 'ошибка') {
+      toast.error(getErrorMessage(response));
     }
-
-  } catch {
-    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+  } catch (e) {
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 async function signIn() {
-  const requestData = { email: email.value, password: password.value }
-
-  const response = await post('/api/login/session_login/', requestData)
-
+  const requestData = { email: email.value, password: password.value };
+  const response = await post('/api/login/', requestData);
   if (response.ok) {
-    userStore.login()
-    router.push({ name: 'app' })
-  } else {
-    return response.json()
+    await userStore.login();
+    await router.push({ name: 'app' });
   }
+  return response.json();
 }
 
 async function signUp() {
+  let url = '/api/create-user/';
+
   const requestData = {
     email: email.value,
     password: password.value,
@@ -109,28 +135,99 @@ async function signUp() {
     first_name: firstName.value,
     last_name: lastName.value,
     patronymic: patronymic.value,
+    invite_code: '',
+  };
+
+  if (invitationToken.value) {
+    url = `/api/create-user/from-invitation/`;
+    requestData.invite_code = invitationToken.value;
   }
 
-  const response = await post('/api/create-user/', requestData)
+  const response = await post(url, requestData);
 
   if (response.ok) {
-    pageType.value = 'signIn'
-    email.value = ''
-    password.value = ''
-    firstName.value = ''
-    lastName.value = ''
-    patronymic.value = ''
-    passwordConfirmation.value = ''
-    toast.success('Пользователь успешно создан')
+    pageType.value = 'signIn';
+    email.value = '';
+    password.value = '';
+    firstName.value = '';
+    lastName.value = '';
+    patronymic.value = '';
+    passwordConfirmation.value = '';
+    invitationToken.value = '';
+    toast.success('Регистрация успешна. Проверьте вашу почту для подтверждения аккаунта.');
   } else {
-    return response.json()
+    return response.json();
+  }
+}
+
+async function studentSignUp() {
+  pageType.value = 'signUp';
+  try {
+    const response = await get(`/api/create-user/from-invitation/${invitationToken.value}/`);
+    if (response.ok) {
+      const data = await response.json();
+      invitationData.value = data;
+      firstName.value = data.student.first_name;
+      lastName.value = data.student.last_name;
+      patronymic.value = data.student.patronymic;
+    } else {
+      toast.error(getErrorMessage(await response.json()));
+      invitationToken.value = '';
+      await router.push({ name: 'login' });
+      pageType.value = 'signIn';
+    }
+  } catch {
+    toast.error('Ошибка при получении данных приглашения');
   }
 }
 
 async function restore() {
-  alert('К сожалению, данная функция еще не доступна')
+  const requestData = { email: email.value };
+  const response = await post('/api/reset-password/request_reset/', requestData);
+  if (response.ok) {
+    toast.success('Письмо с инструкциями по восстановлению пароля отправлено на указанную почту');
+    pageType.value = 'signIn';
+    email.value = '';
+    return response.json();
+  }
 }
 
+async function resetPassword() {
+  const requestData = {
+    token: resetPasswordToken.value,
+    new_password: password.value,
+    confirm_password: passwordConfirmation.value,
+  };
+  const response = await post('/api/reset-password/confirm_reset/', requestData);
+  if (response.ok) {
+    toast.success('Пароль успешно изменен');
+    pageType.value = 'signIn';
+    passwordConfirmation.value = '';
+    password.value = '';
+    resetPasswordToken.value = '';
+    await router.push({ name: 'login' });
+    return response.json();
+  } else {
+    toast.error(getErrorMessage(await response.json()));
+  }
+}
+
+onMounted(async () => {
+  if (route.params.token) {
+    switch (route.name) {
+      case 'reset-password':
+        resetPasswordToken.value = route.params.token as string;
+        pageType.value = 'reset-password';
+        break;
+      case 'join':
+        invitationToken.value = route.params.token as string;
+        await studentSignUp();
+        break;
+      default:
+        break;
+    }
+  }
+});
 </script>
 
 <template>
@@ -140,17 +237,8 @@ async function restore() {
       <form class="border-container" @submit.prevent="sendData">
         <v-text-field
           v-if="pageType === 'signUp'"
-          v-model="firstName"
-          :disabled="isLoading"
-          clearable
-          label="Имя"
-          persistent-clear
-          variant="outlined"
-        />
-        <v-text-field
-          v-if="pageType === 'signUp'"
           v-model="lastName"
-          :disabled="isLoading"
+          :disabled="isLoading || !!invitationToken"
           clearable
           label="Фамилия"
           persistent-clear
@@ -158,14 +246,24 @@ async function restore() {
         />
         <v-text-field
           v-if="pageType === 'signUp'"
+          v-model="firstName"
+          :disabled="isLoading || !!invitationToken"
+          clearable
+          label="Имя"
+          persistent-clear
+          variant="outlined"
+        />
+        <v-text-field
+          v-if="pageType === 'signUp'"
           v-model="patronymic"
-          :disabled="isLoading"
+          :disabled="isLoading || !!invitationToken"
           clearable
           label="Отчество"
           persistent-clear
           variant="outlined"
         />
         <v-text-field
+          v-if="pageType !== 'tokenSignUp' && pageType !== 'reset-password'"
           v-model="email"
           :disabled="isLoading"
           clearable
@@ -175,7 +273,7 @@ async function restore() {
           variant="outlined"
         />
         <v-text-field
-          v-if="pageType !== 'restore'"
+          v-if="pageType !== 'restore' && pageType !== 'tokenSignUp'"
           v-model="password"
           :append-inner-icon="password ? 'mdi-eye' : undefined"
           :disabled="isLoading"
@@ -187,7 +285,7 @@ async function restore() {
           @click:append-inner="passwordType = passwordType === 'password' ? 'text' : 'password'"
         />
         <v-text-field
-          v-if="pageType === 'signUp'"
+          v-if="pageType === 'signUp' || pageType === 'reset-password'"
           v-model="passwordConfirmation"
           :append-inner-icon="passwordConfirmation ? 'mdi-eye' : undefined"
           :disabled="isLoading"
@@ -197,30 +295,74 @@ async function restore() {
           persistent-clear
           persistent-crear
           variant="outlined"
-          @click:append-inner="passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'"
+          @click:append-inner="
+            passwordConfirmationType = passwordConfirmationType === 'password' ? 'text' : 'password'
+          "
+        />
+
+        <v-text-field
+          v-if="pageType === 'tokenSignUp'"
+          v-model="invitationToken"
+          :disabled="isLoading"
+          clearable
+          label="Код приглашения"
+          persistent-clear
+          variant="outlined"
         />
 
         <v-checkbox v-if="pageType === 'signUp'" v-model="privacyPolicy">
           <template #label>
             <span>
               Я соглашаюсь с
-              <RouterLink :to="{name: 'privacy-policy'}" target="_blank">
+              <RouterLink :to="{ name: 'privacy-policy' }" target="_blank">
                 политикой в отношении персональных данных
               </RouterLink>
             </span>
           </template>
         </v-checkbox>
 
-        <v-btn :disabled="isSendButtonDisabled || isLoading" :text="buttonText" class="button" rounded
-               type="submit" />
+        <v-btn
+          :disabled="isSendButtonDisabled || isLoading"
+          :text="buttonText"
+          class="button"
+          rounded
+          type="submit"
+        />
       </form>
-      <div v-if="pageType==='signIn'">
-        <v-btn :disabled="isLoading" size="small" text="Регистрация" variant="text" @click="pageType = 'signUp'" />
-        <v-btn :disabled="isLoading" size="small" text="Восстановление пароля" variant="text" @click="pageType =
-        'restore'" />
+      <div v-if="pageType === 'signIn'">
+        <v-btn
+          :disabled="isLoading"
+          size="small"
+          text="Регистрация"
+          variant="text"
+          @click="pageType = 'signUp'"
+        />
+        <v-btn
+          :disabled="isLoading"
+          size="small"
+          text="Восстановление пароля"
+          variant="text"
+          @click="pageType = 'restore'"
+        />
+        <v-btn
+          :disabled="isLoading"
+          size="small"
+          text="Использовать код приглашения"
+          variant="text"
+          @click="pageType = 'tokenSignUp'"
+        />
       </div>
-      <v-btn v-else :disabled="isLoading" size="small" text="Вернуться на страницу входа" variant="text"
-             @click="pageType = 'signIn'" />
+      <v-btn
+        v-else
+        :disabled="isLoading"
+        size="small"
+        text="Вернуться на страницу входа"
+        variant="text"
+        @click="
+          pageType = 'signIn';
+          invitationToken = '';
+        "
+      />
     </div>
   </div>
   <PageFooter />
@@ -253,6 +395,13 @@ async function restore() {
   color: black;
 }
 
+.user-type {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px;
+}
+
 .border-container {
   display: flex;
   flex-direction: column;
@@ -274,5 +423,4 @@ async function restore() {
     padding: 0;
   }
 }
-
 </style>

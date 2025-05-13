@@ -1,29 +1,34 @@
 <script lang="ts" setup>
+import TopPanel from '@/components/TopPanel.vue';
+import FieldSet from '@/components/FieldSet.vue';
+import { useRoute, useRouter } from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { get, getErrorMessage, post, put } from '@/utils';
+import type { Gender, GenderNullable, StudentRequest, StudentResponse } from '@/types/types';
+import { toast } from 'vue-sonner';
 
-import TopPanel from '@/components/TopPanel.vue'
-import FieldSet from '@/components/FieldSet.vue'
-import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
-import { get, getErrorMessage, post, put } from '@/utils'
-import type { Gender, GenderNullable, StudentRequest, StudentResponse } from '@/types/types'
-import { toast } from 'vue-sonner'
+const route = useRoute();
+const router = useRouter();
+const pageType = ref(route.name as 'create-student' | 'update-student');
 
-const route = useRoute()
-const router = useRouter()
-const pageType = ref(route.name as 'create-student' | 'update-student')
-
-const firstName = ref('')
-const lastName = ref('')
-const patronymic = ref('')
-const genderType = ref<GenderNullable>(null)
-const birthdayDate = ref('') //2024-05-08
-const classNumber = ref(-1)
-const className = ref('')
+const firstName = ref('');
+const lastName = ref('');
+const patronymic = ref('');
+const genderType = ref<GenderNullable>(null);
+const birthdayDate = ref(''); //2024-05-08
+const classNumber = ref(-1);
+const className = ref('');
 
 const isSaveButtonDisabled = computed(() => {
-  return !firstName.value || !lastName.value || !genderType.value || !birthdayDate.value || classNumber.value === -1 ||
+  return (
+    !firstName.value ||
+    !lastName.value ||
+    !genderType.value ||
+    !birthdayDate.value ||
+    classNumber.value === -1 ||
     !className.value
-})
+  );
+});
 
 async function createOrUpdateStudent() {
   try {
@@ -33,51 +38,54 @@ async function createOrUpdateStudent() {
       patronymic: patronymic.value,
       student_class: {
         number: classNumber.value,
-        class_name: className.value
+        class_name: className.value,
       },
       birthday: birthdayDate.value,
-      gender: genderType.value as Gender
-    }
-    const currentId = pageType.value === 'update-student' ? `${route.params.id}/` : ''
-    const currentMethod = pageType.value === 'update-student' ? put : post
+      gender: genderType.value as Gender,
+    };
+    const currentId = pageType.value === 'update-student' ? `${route.params.id}/` : '';
+    const currentMethod = pageType.value === 'update-student' ? put : post;
 
-    const response = await currentMethod(`/api/students/` + currentId, requestData)
+    const response = await currentMethod(`/api/students/` + currentId, requestData);
 
     if (response.ok && pageType.value === 'create-student') {
-      toast.success('Ученик успешно создан')
-      firstName.value = ''
-      lastName.value = ''
-      patronymic.value = ''
-      genderType.value = null
-      birthdayDate.value = ''
+      toast.success('Ученик успешно создан');
+      firstName.value = '';
+      lastName.value = '';
+      patronymic.value = '';
+      genderType.value = null;
+      birthdayDate.value = '';
     } else if (response.ok && pageType.value == 'update-student') {
-      toast.success('Данные о ученике успешно обновлены')
-      router.push({ name: 'student', params: { id: route.params.id } })
+      toast.success('Данные о ученике успешно обновлены');
+      router.push({ name: 'student', params: { id: route.params.id } });
     } else {
-      toast.error(getErrorMessage(await response.json()))
+      toast.error(getErrorMessage(await response.json()));
     }
-
   } catch (e) {
-    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз')
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
   }
 }
 
 onMounted(async () => {
   if (pageType.value === 'update-student') {
-    const data: StudentResponse = await get(`/api/students/${route.params.id}/`).then(res => res.json())
-    firstName.value = data.first_name
-    lastName.value = data.last_name
-    patronymic.value = data.patronymic
-    genderType.value = data.gender
-    birthdayDate.value = data.birthday
-    classNumber.value = data.student_class.number
-    className.value = data.student_class.class_name
+    const data: StudentResponse = await get(`/api/students/${route.params.id}/`).then((res) =>
+      res.json(),
+    );
+    firstName.value = data.first_name;
+    lastName.value = data.last_name;
+    patronymic.value = data.patronymic;
+    genderType.value = data.gender;
+    birthdayDate.value = data.birthday;
+    classNumber.value = data.student_class.number;
+    className.value = data.student_class.class_name;
   }
-})
+});
 </script>
 
 <template>
-  <TopPanel class="top-panel">{{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}</TopPanel>
+  <TopPanel class="top-panel">
+    {{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}
+  </TopPanel>
   <div class="container">
     <div class="names">
       <v-text-field v-model="lastName" class="text-field" label="Фамилия" />
@@ -100,21 +108,30 @@ onMounted(async () => {
       <div>
         <p class="levels-text">Уровень</p>
         <v-radio-group v-model="classNumber" class="radio-group" height="100px">
-          <v-radio v-for="n in 11" :key="n" :label="n.toString()" :value="n"
-                   density="compact" />
+          <v-radio v-for="n in 11" :key="n" :label="n.toString()" :value="n" density="compact" />
         </v-radio-group>
       </div>
-      <v-text-field :model-value="className" class="text-field class-name" label="Буква"
-                    @update:model-value="className=$event.toUpperCase()" />
+      <v-text-field
+        :model-value="className"
+        class="text-field class-name"
+        label="Буква"
+        @update:model-value="className = $event.toUpperCase()"
+      />
     </FieldSet>
 
-    <v-btn :disabled="isSaveButtonDisabled" class="button" color="primary" rounded text="Сохранить"
-           @click="createOrUpdateStudent" />
+    <v-btn
+      :disabled="isSaveButtonDisabled"
+      class="button"
+      color="primary"
+      rounded
+      text="Сохранить"
+      @click="createOrUpdateStudent"
+    />
   </div>
 </template>
 
 <style scoped>
-.container{
+.container {
   max-width: 800px;
   margin: 20px auto;
   padding: 30px;
@@ -124,7 +141,7 @@ onMounted(async () => {
   gap: 20px 100px;
 }
 
-.names{
+.names {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
@@ -146,7 +163,7 @@ onMounted(async () => {
   --v-field-border-opacity: 0.5;
 }
 
-.text-field :deep(.v-label:not(:has(+input:empty))) {
+.text-field :deep(.v-label:not(:has(+ input:empty))) {
   opacity: 1;
   color: black;
 }
@@ -191,11 +208,11 @@ onMounted(async () => {
 }
 
 @media (width <= 800px) {
-  .container{
+  .container {
     gap: 20px 30px;
   }
 
-  .class{
+  .class {
     grid-template-columns: 1fr 100px;
   }
 }
@@ -213,7 +230,7 @@ onMounted(async () => {
     padding: 10px 20px;
   }
 
-  .names{
+  .names {
     grid-template-columns: 1fr;
     gap: 15px;
   }
@@ -221,6 +238,5 @@ onMounted(async () => {
   .button {
     grid-column: 1;
   }
-
 }
 </style>

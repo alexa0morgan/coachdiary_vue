@@ -1,6 +1,4 @@
-<script lang="ts" setup>
-
-</script>
+<script lang="ts" setup></script>
 
 <template>
   <div class="top-panel">
@@ -36,5 +34,4 @@
   text-transform: uppercase;
   font-weight: bold;
 }
-
 </style>
