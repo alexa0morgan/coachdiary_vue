@@ -1,8 +1,12 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+defineProps<{
+  directionColumn?: boolean;
+}>();
+</script>
 
 <template>
   <div class="top-panel">
-    <div class="inner-container">
+    <div :class="{ directionColumn }" class="inner-container">
       <slot />
       <slot name="right" />
     </div>
@@ -31,7 +35,10 @@
   align-items: center;
   color: rgb(var(--v-theme-secondary));
   font-size: 24px;
-  text-transform: uppercase;
   font-weight: bold;
+}
+
+.directionColumn {
+  flex-direction: column;
 }
 </style>

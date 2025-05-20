@@ -17,10 +17,15 @@ const emit = defineEmits<{
 }>();
 
 const route = useRoute();
+
 const router = useRouter();
 const classesData = ref<ClassRequest[]>([]);
 
-const activeLevelNumber = ref(+route.query.classNumber! || -1);
+const activeLevelNumber = defineModel<number>({
+  default: -1,
+  required: false,
+});
+
 const className = ref((route.query.letter as string) || '');
 
 const fullClassName = computed(() =>
@@ -45,7 +50,6 @@ async function getStudentsData(classNumber: number, letter: string, emitButtonCl
   className.value = letter;
   await router.replace({
     query: {
-      ...route.query,
       classNumber: classNumber,
       letter: letter,
     },
@@ -76,7 +80,11 @@ async function getStudentsData(classNumber: number, letter: string, emitButtonCl
 }
 
 onMounted(async () => {
+  if (route.query.classNumber) {
+    activeLevelNumber.value = +route.query.classNumber;
+  }
   classesData.value = await get('/api/classes/').then((res) => res.json());
+
   emit('classesData', classesData.value);
   if (activeLevelNumber.value !== -1) {
     await getStudentsData(activeLevelNumber.value, className.value);
