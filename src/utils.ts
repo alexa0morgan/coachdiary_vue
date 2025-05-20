@@ -38,15 +38,17 @@ export function get(
 
 export function post(
   url: string,
-  data?: Record<string | number, unknown> | unknown[],
+  data?: Record<string | number, unknown> | unknown[] | FormData,
+  contentType?: string,
 ): Promise<Response> {
+  const isFormData = data instanceof FormData;
   return fetch(location.origin + url, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': contentType ?? 'application/json' }),
       'X-CSRFToken': getCookie('csrftoken') ?? '',
     },
-    body: data ? JSON.stringify(data) : undefined,
+    body: isFormData ? data : data ? JSON.stringify(data) : undefined,
     credentials: 'include',
   });
 }
