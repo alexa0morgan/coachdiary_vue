@@ -495,5 +495,9 @@ onMounted(async () => {
   .text-field-fio {
     flex-direction: column;
   }
+
+  .text {
+    font-size: 18px;
+  }
 }
 </style>

@@ -209,6 +209,7 @@ onUnmounted(() => {
       <DataTableSideNav
         v-if="smAndUp"
         :data="labels"
+        :has-action-buttons="userStore.isTeacher"
         is-content-static-text
         page-type="student"
         title="Информация"
