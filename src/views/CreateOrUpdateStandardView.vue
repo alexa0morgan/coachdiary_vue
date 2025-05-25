@@ -132,6 +132,7 @@ async function createOrUpdateStandard() {
       standardName.value = '';
       standardType.value = null;
       levelNumbers.value = [];
+      evaluationType.value = null;
       setLevelsWithZeroes();
     } else if (response.ok && pageType.value === 'update-standard') {
       toast.success('Данные о нормативе успешно обновлены');

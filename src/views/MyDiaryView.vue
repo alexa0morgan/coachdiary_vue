@@ -14,20 +14,25 @@ import type {
   StudentValueRequest,
 } from '@/types/types';
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { get, getErrorMessage, post } from '@/utils';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 import { useDisplay } from 'vuetify';
+import SideNavButtons from '@/components/SideNavButtons.vue';
 
 const router = useRouter();
 const route = useRoute();
 const { smAndUp, width } = useDisplay();
 const w800 = computed(() => width.value <= 800);
 
-const activeLevelNumber = ref(+route.query.classNumber! || -1);
+const pageType = ref<'single' | 'multiple'>(
+  (route.query.pageType as 'single' | 'multiple') || 'single',
+);
+const activeClassNumber = ref(+route.query.classNumber! || -1);
 const className = ref((route.query.letter as string) || '');
-const selectedStandardId = ref(+route.query.standard! || -1);
+const selectedStandardId = ref(-1);
+const selectedStandardIds = ref<number[]>([]);
 
 const classesData = ref<ClassRequest[]>([]);
 const standardsData = ref<StandardResponse[]>([]);
@@ -41,16 +46,29 @@ const filters = ref<FilterData>({
 let studentsValueData: StudentsValueResponse[] = [];
 let studentsData: StudentResponse[] = [];
 
-const standardButtonText = computed(
-  () => standards.value.find((v) => v.id === selectedStandardId.value)?.label ?? 'Нормативы',
-);
+const standardButtonText = computed(() => {
+  if (pageType.value === 'single') {
+    return standards.value.find((v) => v.id === selectedStandardId.value)?.label ?? 'Нормативы';
+  } else {
+    if (selectedStandardIds.value.length <= 1) {
+      return 'Выберите минимум 2 норматива';
+    }
+    return (
+      standards.value
+        .filter((v) => selectedStandardIds.value.includes(v.id))
+        .map((v) => v.label)
+        .sort((a, b) => a.localeCompare(b))
+        .join(', ') ?? 'Нормативы'
+    );
+  }
+});
 const classButtonText = computed(() => {
-  if (activeLevelNumber.value === 12) {
-    return 'Все классы';
-  } else if (activeLevelNumber.value === -1) {
+  if (activeClassNumber.value === 12) {
+    return 'Все';
+  } else if (activeClassNumber.value === -1) {
     return 'Классы';
   } else {
-    return activeLevelNumber.value + className.value;
+    return activeClassNumber.value + className.value;
   }
 });
 
@@ -65,9 +83,9 @@ const selectedStandardType = computed<'physical' | 'technical'>(() => {
 const standards = computed(() => {
   let result = standardsData.value;
 
-  if (activeLevelNumber.value !== 12) {
+  if (activeClassNumber.value !== 12) {
     result = result.filter((standard) =>
-      standard.levels.some((level) => level.level_number === activeLevelNumber.value),
+      standard.levels.some((level) => level.level_number === activeClassNumber.value),
     );
   }
   return result
@@ -78,12 +96,36 @@ const standards = computed(() => {
     }));
 });
 
+function initSelectedStandards() {
+  const standard = route.query.standard;
+  if (Array.isArray(standard)) {
+    selectedStandardIds.value = standard.map(Number);
+    selectedStandardId.value = -1;
+  } else if (standard !== undefined && standard !== '' && standard !== null) {
+    selectedStandardId.value = +standard;
+    selectedStandardIds.value = [];
+  } else {
+    selectedStandardId.value = -1;
+    selectedStandardIds.value = [];
+  }
+}
+
+function sortSelectedStandardIds() {
+  const standardsById = new Map(standardsData.value.map((s) => [s.id, s.name]));
+
+  selectedStandardIds.value.sort((a, b) => {
+    const nameA = standardsById.get(a) || '';
+    const nameB = standardsById.get(b) || '';
+    return nameA.localeCompare(nameB);
+  });
+}
+
 function updateClassesData(classes: ClassRequest[]) {
   classesData.value = classes;
 }
 
 function updateStudentsData(students: StudentResponse[], classNumber: number, letter: string) {
-  activeLevelNumber.value = classNumber;
+  activeClassNumber.value = classNumber;
   className.value = letter;
   studentsData = students;
   filteredData.value = [];
@@ -95,8 +137,16 @@ function updateStudentsData(students: StudentResponse[], classNumber: number, le
     birthYearUntil: null,
   };
 
-  if (!standards.value.some((v) => v.id === selectedStandardId.value))
+  if (
+    pageType.value === 'single' &&
+    !standards.value.some((v) => v.id === selectedStandardId.value)
+  )
     selectedStandardId.value = -1;
+  if (
+    pageType.value === 'multiple' &&
+    !standards.value.some((v) => selectedStandardIds.value.includes(v.id))
+  )
+    selectedStandardIds.value = [];
 
   getStudentsData();
 }
@@ -105,19 +155,20 @@ function setQuery() {
   router.replace({
     query: {
       ...route.query,
-      standard: selectedStandardId.value,
+      standard: pageType.value === 'single' ? selectedStandardId.value : selectedStandardIds.value,
+      pageType: pageType.value,
     },
   });
 }
 
 async function getStudentsData() {
   setQuery();
-  if (selectedStandardId.value === -1) return;
+  if (selectedStandardId.value === -1 && selectedStandardIds.value.length <= 1) return;
 
   let currentClasses: number[];
   let currentStudentsData: StudentResponse[];
 
-  if (activeLevelNumber.value === 12) {
+  if (activeClassNumber.value === 12) {
     const standardsLevels = standardsData.value.reduce(
       (acc, v) => {
         acc[v.id] = v.levels.map((level) => level.level_number);
@@ -126,9 +177,17 @@ async function getStudentsData() {
       {} as Record<number, number[]>,
     );
 
-    currentClasses = classesData.value
-      .filter((klass) => standardsLevels[selectedStandardId.value].includes(klass.number))
-      .map((klass) => klass.id);
+    if (pageType.value === 'single') {
+      currentClasses = classesData.value
+        .filter((klass) => standardsLevels[selectedStandardId.value].includes(klass.number))
+        .map((klass) => klass.id);
+    } else {
+      currentClasses = classesData.value
+        .filter((klass) =>
+          selectedStandardIds.value.every((id) => standardsLevels[id].includes(klass.number)),
+        )
+        .map((klass) => klass.id);
+    }
 
     currentStudentsData = studentsData.filter((student) =>
       currentClasses.includes(student.student_class.id),
@@ -137,7 +196,7 @@ async function getStudentsData() {
     currentClasses = classesData.value
       .filter(
         (klass) =>
-          klass.number === activeLevelNumber.value &&
+          klass.number === activeClassNumber.value &&
           (className.value ? klass.class_name === className.value : true),
       )
       .map((klass) => klass.id);
@@ -147,7 +206,8 @@ async function getStudentsData() {
   try {
     const currentStudentsValue: StudentsValueResponse[] = await get('/api/students/results/list/', {
       'class_id[]': currentClasses,
-      standard_id: selectedStandardId.value,
+      'standard_id[]':
+        pageType.value === 'single' ? selectedStandardId.value : selectedStandardIds.value,
     }).then((res) => res.json());
 
     studentsValueData = currentStudentsData.map((student) => {
@@ -155,12 +215,19 @@ async function getStudentsData() {
       return (
         result ?? {
           ...student,
-          value: null,
-          grade: null,
+          standards_details: [
+            {
+              grade: null,
+              value: null,
+              standard_id: selectedStandardId.value,
+            },
+          ],
+          average_value: null,
+          average_grade: null,
         }
       );
     });
-    filteredData.value = studentsValueData;
+    acceptFilters();
   } catch {
     toast.error('Ошибка при получении данных, попробуйте позже');
   }
@@ -170,7 +237,9 @@ function acceptFilters() {
   filteredData.value = studentsValueData.filter(
     (student) =>
       (filters.value.gender ? student.gender === filters.value.gender : true) &&
-      (filters.value.grades.length ? filters.value.grades.includes(student.grade) : true) &&
+      (filters.value.grades.length
+        ? filters.value.grades.includes(Math.round(student.average_grade ?? 0))
+        : true) &&
       (filters.value.birthYearFrom
         ? +student.birthday.slice(0, 4) >= filters.value.birthYearFrom
         : true) &&
@@ -183,11 +252,11 @@ function acceptFilters() {
 async function saveStudentsValue() {
   try {
     const request: StudentValueRequest[] = filteredData.value
-      .filter((v) => v.value != null && v.value)
+      .filter((v) => v.average_value != null && v.average_value)
       .map((student) => ({
         student_id: student.id,
         standard_id: selectedStandardId.value,
-        value: student.value == null ? null : +student.value,
+        value: student.average_value == null ? null : +student.average_value,
       }));
 
     const response = await post('/api/students/results/create/', request);
@@ -205,10 +274,8 @@ async function saveStudentsValue() {
 
 onMounted(async () => {
   standardsData.value = await get('/api/standards/').then((res) => res.json());
-
-  if (activeLevelNumber.value !== -1 && selectedStandardId.value !== -1) {
-    await getStudentsData();
-  }
+  initSelectedStandards();
+  nextTick();
 });
 </script>
 
@@ -259,16 +326,37 @@ onMounted(async () => {
         </BottomSheetWithButton>
       </keep-alive>
 
-      <BottomSheetWithButton :button-text="standardButtonText" sheet-title="Нормативы" wrap-button>
+      <BottomSheetWithButton
+        :button-text="standardButtonText"
+        sheet-title="Нормативы"
+        wrap-button
+        :width="width - 180 + 'px'"
+      >
         <template #default="{ toggle }">
+          <SideNavButtons
+            v-model="pageType"
+            :types="{ first: 'single', second: 'multiple' }"
+            :labels="{ first: 'Один', second: 'Несколько' }"
+            @typeChanged="
+              selectedStandardId = -1;
+              selectedStandardIds = [];
+              filteredData = [];
+            "
+          />
           <DataTableSideNav
-            v-model="selectedStandardId"
+            v-model:selected-id="selectedStandardId"
+            v-model:selected-ids="selectedStandardIds"
             :data="standards"
             :has-action-buttons="false"
+            :multiple-select="pageType === 'multiple'"
             class="data-table-side-nav-mobile"
-            @update:model-value="
+            @update:selected-id="
               getStudentsData();
               toggle();
+            "
+            @update:selected-ids="
+              sortSelectedStandardIds();
+              getStudentsData();
             "
           />
         </template>
@@ -296,19 +384,38 @@ onMounted(async () => {
     <MyDiaryTable
       :data="filteredData"
       :standard-type="selectedStandardType"
+      :page-type
       class="table"
       @saveData="saveStudentsValue"
     />
-
-    <DataTableSideNav
-      v-if="smAndUp"
-      v-model="selectedStandardId"
-      :data="standards"
-      :has-action-buttons="false"
-      class="data-table-side-nav"
-      title="Нормативы"
-      @update:model-value="getStudentsData"
-    />
+    <div>
+      <SideNavButtons
+        v-if="smAndUp"
+        v-model="pageType"
+        :types="{ first: 'single', second: 'multiple' }"
+        :labels="{ first: 'Один', second: 'Несколько' }"
+        @typeChanged="
+          selectedStandardId = -1;
+          selectedStandardIds = [];
+          filteredData = [];
+        "
+      />
+      <DataTableSideNav
+        v-if="smAndUp"
+        v-model:selected-id="selectedStandardId"
+        v-model:selected-ids="selectedStandardIds"
+        :data="standards"
+        :has-action-buttons="false"
+        :multiple-select="pageType === 'multiple'"
+        class="data-table-side-nav"
+        title="Нормативы"
+        @update:selected-id="getStudentsData"
+        @update:selected-ids="
+          sortSelectedStandardIds();
+          getStudentsData();
+        "
+      />
+    </div>
   </div>
 </template>
 
@@ -326,7 +433,7 @@ onMounted(async () => {
 }
 
 .data-table-side-nav {
-  height: calc(100dvh - 180px);
+  height: calc(100dvh - 200px);
 }
 
 .table {
@@ -347,13 +454,8 @@ onMounted(async () => {
 }
 
 .filters-block-mobile,
-:is(.filters-block-mobile, .data-table-side-nav-mobile) :deep(.v-btn) {
+:is(.filters-block-mobile) :deep(.v-btn) {
   color: white !important;
-}
-
-.data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {
-  color: rgb(var(--v-theme-primary)) !important;
-  border: 1px solid white !important;
 }
 
 @media (width <= 950px) {

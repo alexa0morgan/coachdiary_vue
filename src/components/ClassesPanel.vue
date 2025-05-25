@@ -50,6 +50,7 @@ async function getStudentsData(classNumber: number, letter: string, emitButtonCl
   className.value = letter;
   await router.replace({
     query: {
+      ...route.query,
       classNumber: classNumber,
       letter: letter,
     },

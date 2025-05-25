@@ -10,8 +10,9 @@ import type { StandardResponse } from '@/types/types';
 import router from '@/router';
 import { toast } from 'vue-sonner';
 import { useDisplay } from 'vuetify';
+import SideNavButtons from '@/components/SideNavButtons.vue';
 
-const { smAndUp } = useDisplay();
+const { smAndUp, width } = useDisplay();
 
 const selectedLevelNumber = ref(-1);
 const pageType = ref<'standards' | 'technical'>('standards');
@@ -174,39 +175,26 @@ onMounted(async () => {
       </template>
     </BottomSheetWithButton>
 
-    <BottomSheetWithButton :button-text="standardButtonText" sheet-title="Нормативы" wrap-button>
+    <BottomSheetWithButton
+      :button-text="standardButtonText"
+      sheet-title="Нормативы"
+      wrap-button
+      :width="width - 200 + 'px'"
+    >
       <template #default="{ toggle }">
-        <div class="side-nav-buttons">
-          <v-btn
-            :active="pageType === 'standards'"
-            class="button side-nav-button-mobile"
-            size="small"
-            text="Физические"
-            variant="outlined"
-            @click="
-              pageType = 'standards';
-              setFirst({ level: false });
-            "
-          />
-          <v-btn
-            :active="pageType === 'technical'"
-            class="button side-nav-button-mobile"
-            size="small"
-            text="Технические"
-            variant="outlined"
-            @click="
-              pageType = 'technical';
-              setFirst({ level: false });
-            "
-          />
-        </div>
+        <SideNavButtons
+          v-model="pageType"
+          :types="{ first: 'standards', second: 'technical' }"
+          :labels="{ first: 'Физические', second: 'Технические' }"
+          @typeChanged="setFirst({ level: false })"
+        />
         <DataTableSideNav
-          v-model="selectedStandardId"
+          v-model:selected-id="selectedStandardId"
           :data="simplifiedStandards"
           :is-standard-type-technical="pageType === 'technical'"
           :has-action-buttons="false"
           class="data-table-side-nav-mobile"
-          @update:model-value="toggle"
+          @update:selected-id="toggle"
         />
       </template>
     </BottomSheetWithButton>
@@ -215,6 +203,13 @@ onMounted(async () => {
   <div v-auto-animate :class="{ 'technical-grid': pageType === 'technical' }" class="grid">
     <div v-if="pageType === 'standards'" class="standards-tables">
       <template v-if="currentStandardLevels">
+        <div class="standards-tables-title">
+          {{
+            currentStandardLevels[0].is_lower_better
+              ? 'Низкие значения лучше'
+              : 'Высокие значения лучше'
+          }}
+        </div>
         <StandardsTable
           v-for="level in currentStandardLevels"
           :key="level.id"
@@ -253,32 +248,14 @@ onMounted(async () => {
     </div>
 
     <div v-if="smAndUp">
-      <div class="side-nav-buttons">
-        <v-btn
-          :active="pageType === 'standards'"
-          class="button side-nav-button"
-          size="small"
-          text="Физические"
-          variant="outlined"
-          @click="
-            pageType = 'standards';
-            setFirst({ level: false });
-          "
-        />
-        <v-btn
-          :active="pageType === 'technical'"
-          class="button side-nav-button"
-          size="small"
-          text="Технические"
-          variant="outlined"
-          @click="
-            pageType = 'technical';
-            setFirst({ level: false });
-          "
-        />
-      </div>
+      <SideNavButtons
+        v-model="pageType"
+        :types="{ first: 'standards', second: 'technical' }"
+        :labels="{ first: 'Физические', second: 'Технические' }"
+        @typeChanged="setFirst({ level: false })"
+      />
       <DataTableSideNav
-        v-model="selectedStandardId"
+        v-model:selected-id="selectedStandardId"
         :data="simplifiedStandards"
         :is-standard-type-technical="pageType === 'technical'"
         :title="pageType === 'standards' ? 'Физические' : 'Технические'"
@@ -299,9 +276,12 @@ onMounted(async () => {
   max-width: 1200px;
   margin: 40px auto 0;
 
+  @media (max-width: 1230px) {
+    padding: 0 10px;
+  }
+
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
-    padding: 0 10px;
     margin: 25px 0;
   }
 }
@@ -310,15 +290,18 @@ onMounted(async () => {
   grid-template-columns: 1fr;
 }
 
+.standards-tables-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin-left: 12px;
+  margin-bottom: -10px;
+  align-self: center;
+}
+
 .standards-tables {
   display: flex;
   flex-direction: column;
-  gap: 50px;
-  margin-top: 30px;
-
-  @media (width <= 600px) {
-    margin-top: 0;
-  }
+  gap: 40px;
 }
 
 .buttons-panel {
@@ -336,36 +319,12 @@ onMounted(async () => {
   border: 1px solid rgb(var(--v-theme-secondary)) !important;
 }
 
-.side-nav-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.side-nav-button.v-btn--variant-outlined {
-  border-width: 2px !important;
-}
-
-.side-nav-button.v-btn--active {
-  background-color: rgb(var(--v-theme-surface));
-}
-
-.side-nav-button-mobile {
-  color: white !important;
-}
-
 .data-table-side-nav {
   height: calc(100vh - 220px);
-}
 
-.data-table-side-nav-mobile :deep(.v-btn) {
-  color: white !important;
-}
-
-.data-table-side-nav-mobile :deep(.v-btn.v-btn--active) {
-  color: rgb(var(--v-theme-primary)) !important;
-  border: 1px solid white !important;
+  @media (width <= 1030px) {
+    height: calc(100vh - 250px);
+  }
 }
 
 .top-panel-mobile {
