@@ -36,6 +36,9 @@ const isSendButtonDisabled = computed(() => {
       password.value !== passwordConfirmation.value
     );
   }
+  if (pageType.value === 'tokenSignUp') {
+    return !invitationToken.value?.length;
+  }
   if (!/.@./.test(email.value)) {
     return true;
   }

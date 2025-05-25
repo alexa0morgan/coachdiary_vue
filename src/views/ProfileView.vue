@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
-import { get, getErrorMessage, patch, put } from '@/utils';
+import { get, getErrorMessage, patch, post, put } from '@/utils';
 import { toast } from 'vue-sonner';
 import { useUserStore } from '@/stores/user';
 import router from '@/router';
@@ -23,6 +23,9 @@ const passwordConfirmation = ref('');
 const passwordType = ref<'password' | 'text'>('password');
 const newPasswordType = ref<'password' | 'text'>('password');
 const passwordConfirmationType = ref<'password' | 'text'>('password');
+
+const isImporting = ref(false);
+const isEmailVerified = ref(true);
 
 const isSetNameButtonDisabled = computed(() => {
   return (
@@ -53,7 +56,6 @@ async function getData() {
     const response = await get('/api/profile/');
     if (response.ok) {
       const data = await response.json();
-
       currentFirstName.value = data.first_name;
       currentLastName.value = data.last_name;
       currentPatronymic.value = data.patronymic;
@@ -62,6 +64,7 @@ async function getData() {
       lastName.value = currentLastName.value;
       patronymic.value = currentPatronymic.value;
       email.value = currentEmail.value;
+      isEmailVerified.value = data.is_email_verified;
     } else {
       toast.error(getErrorMessage(await response.json()));
     }
@@ -139,6 +142,69 @@ async function putPassword() {
   }
 }
 
+async function exportData() {
+  try {
+    const response = await get('/api/teacher/export_data/');
+    if (response.ok) {
+      const data = await response.json();
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      toast.error(getErrorMessage(await response.json()));
+    }
+  } catch (e) {
+    toast.error('Произошла ошибка во время экспорта данных, попробуйте еще раз');
+  }
+}
+
+async function importData() {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.json';
+  fileInput.onchange = async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      const file = target.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      isImporting.value = true;
+      try {
+        const response = await post('/api/teacher/import_data/', formData, '');
+        const data = await response.json();
+        if (response.ok) {
+          toast.success(data.message);
+        } else {
+          toast.error(getErrorMessage(data));
+        }
+      } catch (error) {
+        toast.error('Произошла ошибка во время импорта данных, попробуйте еще раз');
+      } finally {
+        isImporting.value = false;
+      }
+    }
+  };
+  fileInput.click();
+}
+
+async function resendVerificationEmail() {
+  try {
+    const response = await get('/api/resend-confirmation/');
+    if (response.ok) {
+      toast.success('Письмо для подтверждения отправлено на вашу почту');
+    } else {
+      toast.error(getErrorMessage(await response.json()));
+    }
+  } catch {
+    toast.error('Не удалось отправить письмо, попробуйте позже');
+  }
+}
+
 onMounted(async () => {
   await getData();
 });
@@ -147,7 +213,10 @@ onMounted(async () => {
 <template>
   <div class="main">
     <div class="container rounded-lg">
-      <div class="title">Смена имени и почты</div>
+      <div class="title">
+        <v-icon color="primary">mdi-account</v-icon>
+        Смена имени и почты
+      </div>
       <form class="text-field mb-4" @submit.prevent="patchName">
         <div class="text-field-fio">
           <v-text-field
@@ -183,18 +252,34 @@ onMounted(async () => {
       </form>
       <form class="text-field" @submit.prevent="patchEmail">
         <v-text-field v-model="email" clearable persistent-clear label="Почта" type="email" />
-        <v-btn
-          :disabled="isSetEmailButtonDisabled"
-          class="button"
-          rounded
-          text="Изменить"
-          type="submit"
-        />
+        <div class="text-field-email">
+          <div v-if="!isEmailVerified" class="verify-email-block">
+            <span class="verify-email-text red">Почта не подтверждена</span>
+            <v-btn
+              variant="text"
+              size="small"
+              text="Отправить письмо повторно"
+              class="button-email"
+              @click="resendVerificationEmail"
+            />
+          </div>
+          <span v-else class="verify-email-text green">Почта подтверждена</span>
+          <v-btn
+            :disabled="isSetEmailButtonDisabled"
+            class="button"
+            rounded
+            text="Изменить"
+            type="submit"
+          />
+        </div>
       </form>
     </div>
     <div class="container rounded-lg">
-      <div class="title">Смена пароля</div>
-      <div class="text">
+      <div class="title">
+        <v-icon color="primary">mdi-lock</v-icon>
+        Смена пароля
+      </div>
+      <div class="text-red text">
         Внимание. После смены пароля
         <br />
         необходимо будет снова войти в аккаунт
@@ -242,10 +327,41 @@ onMounted(async () => {
       </form>
     </div>
     <div class="container rounded-lg">
+      <div class="title">
+        <v-icon class="mr-2" color="primary">mdi-database-export</v-icon>
+        Импорт и экспорт данных
+      </div>
+      <div class="text">
+        Вы можете экспортировать и импортировать все свои данные в формате JSON. Это может быть
+        полезно, если вы хотите перенести свои данные на другой аккаунт или поделиться ими с кем-то
+      </div>
+      <div class="exp-imp-buttons">
+        <v-btn color="primary" variant="outlined" rounded @click="exportData">
+          <v-icon left>mdi-download</v-icon>
+          Экспортировать
+        </v-btn>
+        <v-btn color="primary" variant="outlined" rounded @click="importData">
+          <v-icon left>mdi-upload</v-icon>
+          Импортировать
+        </v-btn>
+      </div>
+    </div>
+
+    <div class="container rounded-lg">
       <div class="title">Выйти из аккаунта</div>
       <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
     </div>
   </div>
+  <v-overlay :model-value="isImporting" persistent class="import-overlay">
+    <div class="import-overlay-content rounded-lg">
+      <v-progress-circular indeterminate size="64" color="primary" />
+      <div class="import-overlay-text">
+        Пожалуйста, подождите, идет импорт данных...
+        <br />
+        Не закрывайте страницу, процесс займет до минуты.
+      </div>
+    </div>
+  </v-overlay>
 </template>
 
 <style scoped>
@@ -265,16 +381,6 @@ onMounted(async () => {
   text-align: center;
 }
 
-.text-field {
-  display: grid;
-  gap: 10px;
-}
-
-.text-field-fio {
-  display: flex;
-  gap: 10px;
-}
-
 .title {
   font-size: 24px;
   color: black;
@@ -285,9 +391,12 @@ onMounted(async () => {
 
 .text {
   font-size: 20px;
-  color: rgb(var(--v-theme-error));
   margin-bottom: 24px;
   margin-top: -10px;
+}
+
+.text-red {
+  color: rgb(var(--v-theme-error));
   --border-size: 0.4px;
   text-shadow:
     calc(-1 * var(--border-size)) calc(-1 * var(--border-size)) 0 black,
@@ -298,6 +407,79 @@ onMounted(async () => {
 
 .button {
   justify-self: flex-end;
+}
+
+.text-field {
+  display: grid;
+  gap: 10px;
+}
+
+.text-field-fio {
+  display: flex;
+  gap: 10px;
+}
+
+.text-field-email {
+  display: flex;
+  justify-content: space-between;
+}
+
+.verify-email-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.verify-email-text {
+  font-size: 14px;
+}
+
+.verify-email-text.red {
+  color: rgb(var(--v-theme-error));
+  font-size: 14px;
+}
+
+.verify-email-text.green {
+  color: rgb(var(--v-theme-success));
+}
+
+.button-email {
+  padding: 0 !important;
+}
+
+.exp-imp-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.import-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.import-overlay-content {
+  width: 100%;
+  max-width: 800px;
+  background: rgb(var(--v-theme-surface));
+  padding: 50px 80px;
+  text-align: center;
+}
+
+.import-overlay-text {
+  margin-top: 24px;
+  font-size: 20px;
+  color: black;
+  text-align: center;
+}
+
+.import-overlay-content :deep(.v-progress-circular__overlay) {
+  animation:
+    progress-circular-dash 4s ease-in-out infinite,
+    progress-circular-rotate 4s linear infinite;
 }
 
 @media (max-width: 800px) {
@@ -312,6 +494,10 @@ onMounted(async () => {
 
   .text-field-fio {
     flex-direction: column;
+  }
+
+  .text {
+    font-size: 18px;
   }
 }
 </style>

@@ -77,8 +77,13 @@ export type StudentsValueResponse = {
   };
   birthday: string;
   gender: Gender;
-  value: number | null;
-  grade: number | null;
+  standards_details: {
+    grade: number | null;
+    value: number | null;
+    standard_id: number;
+  }[];
+  average_value: number | null;
+  average_grade: number | null;
 };
 
 export type StudentValueRequest = {

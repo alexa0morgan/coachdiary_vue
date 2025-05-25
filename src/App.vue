@@ -22,7 +22,7 @@ const isLoggedInView = computed(() => route.path.startsWith('/app'));
     close-button
     visible-toasts="3"
     :position="smAndUp ? 'bottom-right' : 'top-center'"
-    :offset="smAndUp ? 0 : '30px'"
+    :offset="'30px'"
   />
   <v-app>
     <AppBar />

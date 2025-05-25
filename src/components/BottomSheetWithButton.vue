@@ -9,6 +9,7 @@ defineProps<{
   icon?: string;
   buttonColor?: string;
   eager?: boolean;
+  width?: string;
 }>();
 
 const isSheetActive = ref(false);
@@ -32,6 +33,7 @@ function toggle() {
     :text="buttonText"
     :color="buttonColor"
     :class="{ wrapButton }"
+    :width
     class="button"
     variant="outlined"
     @click="toggle"
@@ -54,6 +56,6 @@ function toggle() {
 .wrapButton {
   min-height: 36px;
   height: auto !important;
-  max-width: min-content;
+  min-width: 0;
 }
 </style>

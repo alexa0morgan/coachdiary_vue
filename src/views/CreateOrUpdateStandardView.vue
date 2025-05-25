@@ -132,6 +132,7 @@ async function createOrUpdateStandard() {
       standardName.value = '';
       standardType.value = null;
       levelNumbers.value = [];
+      evaluationType.value = null;
       setLevelsWithZeroes();
     } else if (response.ok && pageType.value === 'update-standard') {
       toast.success('Данные о нормативе успешно обновлены');
@@ -329,11 +330,11 @@ onMounted(async () => {
 <style scoped>
 .grid {
   max-width: 1000px;
-  margin: 20px auto;
-  padding: 30px;
+  margin: 16px auto;
+  padding: 18px 30px;
   display: grid;
   grid-template-columns: 200px 1fr auto;
-  gap: 30px 50px;
+  gap: 20px 50px;
   align-items: stretch;
   background: rgb(var(--v-theme-surface));
 }

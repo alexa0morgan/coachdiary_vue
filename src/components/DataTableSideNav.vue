@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-const { hasActionButtons = true } = defineProps<{
+const { multipleSelect = false, hasActionButtons = true } = defineProps<{
   title?: string;
   data: {
     label: string;
     id: number;
   }[];
   isStandardTypeTechnical?: boolean;
+  multipleSelect?: boolean;
   isContentStaticText?: boolean;
   hasActionButtons?: boolean;
   hasDeleteMenu?: boolean;
-  mobile?: boolean;
 }>();
 
 defineEmits<{
@@ -17,10 +17,33 @@ defineEmits<{
   delete: [inAllLevels: boolean];
 }>();
 
-const selectedId = defineModel<number>({ default: -1, required: false });
+const selectedId = defineModel<number>('selectedId', {
+  default: -1,
+  required: false,
+});
+const selectedIds = defineModel<number[]>('selectedIds', {
+  default: [],
+  required: false,
+});
 
-function onSelect(id: number): void {
-  selectedId.value = id;
+function isActive(itemId: number): boolean {
+  if (multipleSelect) {
+    return Array.isArray(selectedIds.value) && selectedIds.value.includes(itemId);
+  } else {
+    return selectedId.value === itemId;
+  }
+}
+
+function handleItemClick(itemId: number): void {
+  if (multipleSelect && Array.isArray(selectedIds.value)) {
+    if (selectedIds.value.includes(itemId)) {
+      selectedIds.value = selectedIds.value.filter((id) => id !== itemId);
+    } else {
+      selectedIds.value = [...selectedIds.value, itemId];
+    }
+  } else {
+    selectedId.value = itemId;
+  }
 }
 </script>
 
@@ -32,25 +55,21 @@ function onSelect(id: number): void {
         <v-btn
           v-for="item in data"
           :key="item.id"
-          :active="selectedId === item.id"
+          :active="isActive(item.id)"
           :ripple="false"
           :text="item.label"
           block
           class="button"
           size="small"
           variant="outlined"
-          @click="onSelect(item.id)"
+          @click="handleItemClick(item.id)"
         />
       </template>
       <template v-else>
         <div v-for="item in data" :key="item.id" class="static-text">{{ item.label }}</div>
       </template>
     </div>
-    <div
-      v-if="hasActionButtons"
-      class="action-buttons"
-      :class="mobile ? 'action-buttons-mobile' : ''"
-    >
+    <div v-if="hasActionButtons && !multipleSelect" class="action-buttons">
       <v-btn
         class="button action-button"
         color="primary-darken-1"
@@ -161,11 +180,6 @@ function onSelect(id: number): void {
   font-size: 12px;
 }
 
-.action-buttons-mobile {
-  flex-direction: row;
-  justify-content: space-between;
-}
-
 .static-text {
   font-size: 16px;
   border: 1px solid rgb(var(--v-theme-primary));
@@ -176,5 +190,21 @@ function onSelect(id: number): void {
   padding: 1px 16px;
   letter-spacing: 1px;
   line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .action-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .button {
+    color: white !important;
+  }
+
+  .button.v-btn--active {
+    color: rgb(var(--v-theme-primary)) !important;
+    border: 1px solid white !important;
+  }
 }
 </style>

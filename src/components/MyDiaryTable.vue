@@ -4,49 +4,75 @@ import type { StudentsValueResponse } from '@/types/types';
 import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
 
-const { smAndUp } = useDisplay();
-
-const { data, standardType } = defineProps<{
+const {
+  data,
+  standardType,
+  pageType = 'single',
+} = defineProps<{
   data: StudentsValueResponse[];
   standardType: 'physical' | 'technical';
+  pageType?: 'single' | 'multiple';
 }>();
 
 const emit = defineEmits<{
   saveData: [];
 }>();
 
+const { smAndUp } = useDisplay();
+let text =
+  "Чтобы появились ученики, выберите Класс, потом Норматив.<br><br>Если выбран режим 'Несколько' и классы 'Все', а ученики не показываются, значит для выбранных нормативов нет учеников.";
+
+function results(
+  standardsDetails: {
+    grade: number | null;
+    value: number | null;
+    standard_id: number;
+  }[],
+): string {
+  return standardsDetails.map((value) => value.value).join(', ');
+}
+
 const headers = computed<VDataTable['$props']['headers']>(() => {
+  if (pageType === 'multiple') {
+    return [
+      { title: 'Класс', value: 'student_class.class_name', width: 50 },
+      { title: 'ФИО', value: 'full_name', sortable: true },
+      { title: 'Пол', value: 'gender', width: 45 },
+      { title: 'Средняя оценка', value: 'average_grade', sortable: true, width: 80 },
+      { title: 'Значения', value: 'average_value', sortable: true, width: 80 },
+    ];
+  }
   if (standardType === 'physical') {
     return [
-      { title: 'Класс', value: 'student_class.class_name', width: 50, sortable: false },
+      { title: 'Класс', value: 'student_class.class_name', width: 50 },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'Пол', value: 'gender', width: 70 },
-      { title: 'Результат', value: 'value', sortable: true, width: 100 },
-      { title: 'Оценка', value: 'grade', sortable: true, width: 80 },
+      { title: 'Пол', value: 'gender', width: 45 },
+      { title: 'Результат', value: 'average_value', sortable: true, width: 100 },
+      { title: 'Оценка', value: 'average_grade', sortable: true, width: 80 },
     ];
   } else {
     return [
-      { title: 'Класс', value: 'student_class.class_name', width: 50, sortable: false },
+      { title: 'Класс', value: 'student_class.class_name', width: 50 },
       { title: 'ФИО', value: 'full_name', sortable: true },
-      { title: 'Пол', value: 'gender', width: 70 },
-      { title: 'Оценка', value: 'value', sortable: true, width: 80 },
+      { title: 'Пол', value: 'gender', width: 45 },
+      { title: 'Оценка', value: 'average_value', sortable: true, width: 80 },
     ];
   }
 });
 
-function getMarkColor(mark?: number): string {
-  switch (mark) {
-    case 2:
-      return 'mark-bad';
-    case 3:
-      return 'mark-okay';
-    case 4:
-      return 'mark-good';
-    case 5:
-      return 'mark-great';
-    default:
-      return '';
+function getMarkColor(mark: number): string {
+  if (mark <= 1) {
+    return '';
+  } else if (mark <= 2) {
+    return 'mark-bad';
+  } else if (mark <= 3) {
+    return 'mark-okay';
+  } else if (mark <= 4) {
+    return 'mark-good';
+  } else if (mark <= 5) {
+    return 'mark-great';
   }
+  return '';
 }
 
 const sortedData = computed(() => {
@@ -77,11 +103,36 @@ function getStudentName(student: StudentsValueResponse) {
     :itemsPerPageOptions="[10, 20, 30, 100, { title: 'Все', value: -1 }]"
     :mobile="false"
     :show-current-page="true"
+    :sort-by="
+      pageType === 'multiple'
+        ? [
+            { key: 'average_grade', order: 'desc' },
+            { key: 'average_value', order: 'desc' },
+          ]
+        : []
+    "
     multi-sort
     class="table"
     item-key="name"
-    no-data-text="Чтобы появились ученики, выберите Класс, потом Норматив"
   >
+    <template #no-data>
+      <div>
+        <br />
+        <p>
+          Чтобы появились ученики, выберите
+          <b>Класс</b>
+          , потом
+          <b>Норматив</b>
+          .
+        </p>
+        <br />
+        <p v-if="pageType === 'multiple'">
+          Если выбраны все классы, а ученики не показываются, значит
+          <b>для выбранных нормативов нет учеников</b>
+          .
+        </p>
+      </div>
+    </template>
     <template #item.student_class.class_name="{ item }">
       {{ item.student_class.number + item.student_class.class_name }}
     </template>
@@ -104,16 +155,20 @@ function getStudentName(student: StudentsValueResponse) {
         </v-icon>
       </div>
     </template>
-    <template #item.value="{ item }">
+    <template #item.average_value="{ item }">
       <v-text-field
-        v-model="item.value"
-        :class="standardType === 'technical' ? getMarkColor(item.grade ?? 0) + ' mark' : ''"
+        v-if="pageType === 'single'"
+        v-model="item.average_value"
+        :class="standardType === 'technical' ? getMarkColor(item.average_grade ?? 0) + ' mark' : ''"
       />
+      <div v-else>{{ results(item.standards_details) }}</div>
     </template>
-    <template #item.grade="{ item }">
-      <div :class="getMarkColor(item.grade ?? 0)" class="mark">{{ item.grade }}</div>
+    <template #item.average_grade="{ item }">
+      <div :class="getMarkColor(item.average_grade ?? 0)" class="mark">
+        {{ item.average_grade ? Math.round(item.average_grade * 100) / 100 : '' }}
+      </div>
     </template>
-    <template #footer.prepend>
+    <template #footer.prepend v-if="pageType !== 'multiple'">
       <v-btn color="primary" @click="emit('saveData')">Сохранить</v-btn>
       <div class="space" />
     </template>

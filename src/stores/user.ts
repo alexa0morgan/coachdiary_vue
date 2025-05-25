@@ -50,6 +50,9 @@ export const useUserStore = defineStore('user', () => {
           studentId.value = data.id;
           localStorage.setItem('studentId', String(data.id));
         }
+        if (!data.is_email_verified) {
+          toast.error('Пожалуйста, подтвердите почту, чтобы получить доступ ко всем функциям');
+        }
       } else {
         clearLocalStorage();
         if (route.fullPath.startsWith('/app')) {

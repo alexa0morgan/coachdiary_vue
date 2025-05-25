@@ -178,7 +178,6 @@ onUnmounted(() => {
           :data="labels"
           is-content-static-text
           page-type="student"
-          class="info-panel-mobile"
           @delete="deleteStudent"
           @edit="editStudent"
           @update:model-value="toggle"
@@ -209,6 +208,7 @@ onUnmounted(() => {
       <DataTableSideNav
         v-if="smAndUp"
         :data="labels"
+        :has-action-buttons="userStore.isTeacher"
         is-content-static-text
         page-type="student"
         title="Информация"
@@ -249,10 +249,6 @@ onUnmounted(() => {
 
 .level-panel {
   margin-bottom: 10px;
-}
-
-.info-panel-mobile :deep(.v-btn) {
-  color: white !important;
 }
 
 .top-panel-mobile {
