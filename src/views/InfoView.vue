@@ -12,7 +12,7 @@ let emailToken = '';
 async function verfyEmail() {
   try {
     loading.value = true;
-    const response = await get('/api/verify-email/' + emailToken + '/');
+    const response = await get('/api/email/verify-email/' + emailToken + '/');
     if (response.ok) {
       success.value = true;
       emailToken = '';

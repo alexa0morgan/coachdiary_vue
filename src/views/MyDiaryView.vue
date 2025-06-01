@@ -252,7 +252,7 @@ function acceptFilters() {
 async function saveStudentsValue() {
   try {
     const request: StudentValueRequest[] = filteredData.value
-      .filter((v) => v.average_value != null && v.average_value)
+      .filter((v) => v.average_value !== null)
       .map((student) => ({
         student_id: student.id,
         standard_id: selectedStandardId.value,

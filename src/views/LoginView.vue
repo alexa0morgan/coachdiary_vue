@@ -186,7 +186,7 @@ async function studentSignUp() {
 
 async function restore() {
   const requestData = { email: email.value };
-  const response = await post('/api/reset-password/request_reset/', requestData);
+  const response = await post('/api/email/reset-password/request_reset/', requestData);
   if (response.ok) {
     toast.success('Письмо с инструкциями по восстановлению пароля отправлено на указанную почту');
     pageType.value = 'signIn';
@@ -201,7 +201,7 @@ async function resetPassword() {
     new_password: password.value,
     confirm_password: passwordConfirmation.value,
   };
-  const response = await post('/api/reset-password/confirm_reset/', requestData);
+  const response = await post('/api/email/reset-password/confirm_reset/', requestData);
   if (response.ok) {
     toast.success('Пароль успешно изменен');
     pageType.value = 'signIn';
