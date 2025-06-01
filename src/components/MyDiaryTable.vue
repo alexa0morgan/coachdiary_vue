@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { VDataTable } from 'vuetify/components';
-import type { StudentsValueResponse } from '@/types/types';
-import { computed } from 'vue';
+import type { StudentsValueResponse, StudentValueRequest } from '@/types/types';
+import { computed, ref } from 'vue';
 import { useDisplay } from 'vuetify';
+import { toast } from 'vue-sonner';
 
 const {
   data,
@@ -15,22 +16,11 @@ const {
 }>();
 
 const emit = defineEmits<{
-  saveData: [];
+  saveData: [changedData: StudentValueRequest[]];
 }>();
 
 const { smAndUp } = useDisplay();
-let text =
-  "Чтобы появились ученики, выберите Класс, потом Норматив.<br><br>Если выбран режим 'Несколько' и классы 'Все', а ученики не показываются, значит для выбранных нормативов нет учеников.";
-
-function results(
-  standardsDetails: {
-    grade: number | null;
-    value: number | null;
-    standard_id: number;
-  }[],
-): string {
-  return standardsDetails.map((value) => value.value).join(', ');
-}
+const changedValues = ref<StudentValueRequest[]>([]);
 
 const headers = computed<VDataTable['$props']['headers']>(() => {
   if (pageType === 'multiple') {
@@ -60,6 +50,28 @@ const headers = computed<VDataTable['$props']['headers']>(() => {
   }
 });
 
+const sortedData = computed(() => {
+  return data.toSorted((a, b) => {
+    if (a.student_class.number !== b.student_class.number) {
+      return a.student_class.number - b.student_class.number;
+    }
+    if (a.student_class.class_name !== b.student_class.class_name) {
+      return a.student_class.class_name.localeCompare(b.student_class.class_name);
+    }
+    return a.full_name.localeCompare(b.full_name);
+  });
+});
+
+function results(
+  standardsDetails: {
+    grade: number | null;
+    value: number | null;
+    standard_id: number;
+  }[],
+): string {
+  return standardsDetails.map((value) => value.value).join(', ');
+}
+
 function getMarkColor(mark: number): string {
   if (mark <= 1) {
     return '';
@@ -75,23 +87,45 @@ function getMarkColor(mark: number): string {
   return '';
 }
 
-const sortedData = computed(() => {
-  return data.toSorted((a, b) => {
-    if (a.student_class.number !== b.student_class.number) {
-      return a.student_class.number - b.student_class.number;
-    }
-    if (a.student_class.class_name !== b.student_class.class_name) {
-      return a.student_class.class_name.localeCompare(b.student_class.class_name);
-    }
-    return a.full_name.localeCompare(b.full_name);
-  });
-});
+function validateValueByStandardType(value: string | number | null) {
+  if (value === null || value === '') return true;
+
+  if (standardType === 'technical' && +value > 5) {
+    return 'Значение не должно превышать 5';
+  }
+
+  return true;
+}
 
 function getStudentName(student: StudentsValueResponse) {
   if (smAndUp.value) {
     return student.last_name + ' ' + student.first_name + ' ' + student.patronymic;
   }
   return student.last_name + ' ' + student.first_name[0] + '. ' + student.patronymic[0] + '.';
+}
+
+function trackValueChange(studentId: number, standardId: number, value: number | null) {
+  if (validateValueByStandardType(value) !== true) {
+    toast.info('Значения не должны привышать 5');
+    return;
+  }
+
+  if (value === +'') value = null;
+
+  const existingIndex = changedValues.value.findIndex(
+    (item) => item.student_id === studentId && item.standard_id === standardId,
+  );
+
+  if (existingIndex !== -1) {
+    changedValues.value[existingIndex].value = value;
+  } else {
+    changedValues.value.push({ student_id: studentId, standard_id: standardId, value });
+  }
+}
+
+function saveData() {
+  emit('saveData', changedValues.value);
+  changedValues.value = [];
 }
 </script>
 
@@ -159,7 +193,13 @@ function getStudentName(student: StudentsValueResponse) {
       <v-text-field
         v-if="pageType === 'single'"
         v-model="item.average_value"
+        type="number"
+        :max="standardType === 'technical' ? 5 : undefined"
+        :rules="[validateValueByStandardType]"
         :class="standardType === 'technical' ? getMarkColor(item.average_grade ?? 0) + ' mark' : ''"
+        @update:model-value="
+          trackValueChange(item.id, item.standards_details[0].standard_id, item.average_value)
+        "
       />
       <div v-else>{{ results(item.standards_details) }}</div>
     </template>
@@ -169,7 +209,7 @@ function getStudentName(student: StudentsValueResponse) {
       </div>
     </template>
     <template #footer.prepend v-if="pageType !== 'multiple'">
-      <v-btn color="primary" @click="emit('saveData')">Сохранить</v-btn>
+      <v-btn color="primary" @click="saveData">Сохранить</v-btn>
       <div class="space" />
     </template>
   </v-data-table>
