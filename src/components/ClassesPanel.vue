@@ -38,6 +38,7 @@ const classes = computed(() =>
       if (!(v.number in acc)) {
         acc[v.number] = [] as string[];
       }
+
       acc[v.number].push(v.class_name);
       return acc;
     },
@@ -48,13 +49,23 @@ const classes = computed(() =>
 async function getStudentsData(classNumber: number, letter: string, emitButtonClick = false) {
   activeLevelNumber.value = classNumber;
   className.value = letter;
-  await router.replace({
-    query: {
-      ...route.query,
-      classNumber: classNumber,
-      letter: letter,
-    },
-  });
+
+  if (route.name === 'my-diary') {
+    await router.replace({
+      query: {
+        ...route.query,
+        classNumber: classNumber,
+        letter: letter,
+      },
+    });
+  } else if (route.name === 'my-classes') {
+    await router.replace({
+      query: {
+        classNumber: classNumber,
+        letter: letter,
+      },
+    });
+  }
 
   if (emitButtonClick) {
     emit('buttonClick');

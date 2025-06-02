@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { StudentStandard } from '@/types/types';
+import { ref } from 'vue';
+
+type StudentStandardValue = { standard_id: number; level_number: number; value: number | null };
 
 const { standards, summaryGrade } = defineProps<{
   standards: StudentStandard[];
@@ -9,28 +12,59 @@ const { standards, summaryGrade } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  saveData: [];
+  saveData: [changedData: StudentStandardValue[]];
 }>();
 
 const headers = [
-  { title: 'норматив', value: 'standard.name', sortable: true },
-  { title: 'результат', value: 'value', sortable: true, width: 100 },
-  { title: 'оценка', value: 'grade', sortable: true, width: 80 },
+  { title: 'Норматив', value: 'standard.name', sortable: true },
+  { title: 'Результат', value: 'value', sortable: true, width: 100 },
+  { title: 'Оценка', value: 'grade', sortable: true, width: 80 },
 ];
 
-function getMarkColor(mark?: number): string {
-  switch (mark) {
-    case 2:
-      return 'mark-bad';
-    case 3:
-      return 'mark-okay';
-    case 4:
-      return 'mark-good';
-    case 5:
-      return 'mark-great';
-    default:
-      return '';
+const changedValues = ref<StudentStandardValue[]>([]);
+
+function getMarkColor(mark: number): string {
+  if (mark <= 1) {
+    return '';
+  } else if (mark <= 2) {
+    return 'mark-bad';
+  } else if (mark <= 3) {
+    return 'mark-okay';
+  } else if (mark <= 4) {
+    return 'mark-good';
+  } else if (mark <= 5) {
+    return 'mark-great';
   }
+  return '';
+}
+
+function validateValueByStandardType(value: string | number | null) {
+  if (value === null || value === '') return true;
+
+  if (+value > 5) {
+    return 'Значение не должно превышать 5';
+  }
+
+  return true;
+}
+
+function trackValueChange(standardId: number, value: number | null, levelNumber: number) {
+  if (value === +'') value = null;
+
+  const existingIndex = changedValues.value.findIndex(
+    (item) => item.level_number === levelNumber && item.standard_id === standardId,
+  );
+
+  if (existingIndex !== -1) {
+    changedValues.value[existingIndex].value = value;
+  } else {
+    changedValues.value.push({ level_number: levelNumber, standard_id: standardId, value });
+  }
+}
+
+function saveData() {
+  emit('saveData', changedValues.value);
+  changedValues.value = [];
 }
 </script>
 
@@ -42,7 +76,6 @@ function getMarkColor(mark?: number): string {
     :itemsPerPageOptions="[10, 20, 30, { title: 'Все', value: -1 }]"
     :mobile="false"
     :show-current-page="true"
-    :sort-by="[{ key: 'number', order: 'asc' }]"
     class="table"
     item-key="id"
     no-data-text="Нет данных о нормативах на данном уровне"
@@ -51,7 +84,9 @@ function getMarkColor(mark?: number): string {
       <v-text-field
         v-if="item.standard.has_numeric_value"
         v-model="item.value"
+        type="number"
         :readonly="readonlyInput"
+        @update:model-value="trackValueChange(item.standard.id, item.value, item.level_number)"
       />
     </template>
     <template #item.grade="{ item }">
@@ -65,9 +100,13 @@ function getMarkColor(mark?: number): string {
       <v-text-field
         v-else
         v-model="item.grade"
+        type="number"
+        class="mark"
+        max="5"
+        :rules="[validateValueByStandardType]"
         :readonly="readonlyInput"
         :class="getMarkColor(item.grade ?? 0)"
-        class="mark"
+        @update:model-value="trackValueChange(item.standard.id, item.grade, item.level_number)"
       />
     </template>
     <template #body.append>
@@ -78,7 +117,7 @@ function getMarkColor(mark?: number): string {
       </tr>
     </template>
     <template #footer.prepend>
-      <v-btn v-if="!hideSaveButton" class="button" color="primary" @click="emit('saveData')">
+      <v-btn v-if="!hideSaveButton" class="button" color="primary" @click="saveData">
         Сохранить
       </v-btn>
       <div class="space" />

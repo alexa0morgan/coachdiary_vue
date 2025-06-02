@@ -249,17 +249,9 @@ function acceptFilters() {
   );
 }
 
-async function saveStudentsValue() {
+async function saveStudentsValue(changedData: StudentValueRequest[]) {
   try {
-    const request: StudentValueRequest[] = filteredData.value
-      .filter((v) => v.average_value != null && v.average_value)
-      .map((student) => ({
-        student_id: student.id,
-        standard_id: selectedStandardId.value,
-        value: student.average_value == null ? null : +student.average_value,
-      }));
-
-    const response = await post('/api/students/results/create/', request);
+    const response = await post('/api/students/results/create/', changedData);
 
     if (response.ok) {
       await getStudentsData();

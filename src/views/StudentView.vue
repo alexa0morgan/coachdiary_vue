@@ -83,7 +83,9 @@ async function getStandardsByStudentId(studentId: number) {
     });
     if (response.ok) {
       standardsInfo.value = await response.json();
-      standards.value = standardsInfo.value.standards;
+      standards.value = standardsInfo.value.standards.sort((a, b) =>
+        a.standard.name.localeCompare(b.standard.name),
+      );
     } else {
       toast.error(getErrorMessage(await response.json()));
     }
@@ -115,16 +117,16 @@ async function deleteStudent() {
   }
 }
 
-async function saveStudentValue() {
+async function saveStudentValue(
+  changedValues: { standard_id: number; level_number: number; value: number | null }[],
+) {
   try {
-    const request: StudentStandardRequest[] = standards.value
-      .filter((v) => v.value != null && v.value)
-      .map((v) => ({
-        student_id: studentId.value,
-        standard_id: v.standard.id,
-        value: v.standard.has_numeric_value ? v.value : v.grade,
-        level_number: v.level_number,
-      }));
+    const request: StudentStandardRequest[] = changedValues.map((v) => ({
+      student_id: studentId.value,
+      standard_id: v.standard_id,
+      value: v.value,
+      level_number: v.level_number,
+    }));
 
     const response = await post('/api/students/results/create/', request);
     if (response.ok) {

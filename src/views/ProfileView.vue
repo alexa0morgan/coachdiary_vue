@@ -144,7 +144,7 @@ async function putPassword() {
 
 async function exportData() {
   try {
-    const response = await get('/api/teacher/export_data/');
+    const response = await get('/api/profile/export_data/');
     if (response.ok) {
       const data = await response.json();
       const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -175,7 +175,7 @@ async function importData() {
 
       isImporting.value = true;
       try {
-        const response = await post('/api/teacher/import_data/', formData, '');
+        const response = await post('/api/profile/import_data/', formData, '');
         const data = await response.json();
         if (response.ok) {
           toast.success(data.message);
@@ -194,7 +194,7 @@ async function importData() {
 
 async function resendVerificationEmail() {
   try {
-    const response = await get('/api/resend-confirmation/');
+    const response = await get('/api/email/resend-confirmation/');
     if (response.ok) {
       toast.success('Письмо для подтверждения отправлено на вашу почту');
     } else {
@@ -215,7 +215,7 @@ onMounted(async () => {
     <div class="container rounded-lg">
       <div class="title">
         <v-icon color="primary">mdi-account</v-icon>
-        Смена имени и почты
+        {{ userStore.isStudent ? 'Ученик' : 'Учитель' }}
       </div>
       <form class="text-field mb-4" @submit.prevent="patchName">
         <div class="text-field-fio">
@@ -326,7 +326,7 @@ onMounted(async () => {
         />
       </form>
     </div>
-    <div class="container rounded-lg">
+    <div v-if="userStore.isTeacher" class="container rounded-lg">
       <div class="title">
         <v-icon class="mr-2" color="primary">mdi-database-export</v-icon>
         Импорт и экспорт данных

@@ -5,7 +5,7 @@ import { computed, onMounted, ref } from 'vue';
 import type { ClassRequest, StudentResponse } from '@/types/types';
 import { useMyClassesStore } from '@/stores/myClasses';
 import { useDisplay } from 'vuetify';
-import { del, get, getErrorMessage, showConfirmDialog } from '@/utils';
+import { del, get, getErrorMessage, post, showConfirmDialog } from '@/utils';
 import router from '@/router';
 import { toast } from 'vue-sonner';
 import MyClassesStudent from '@/components/MyClassesStudent.vue';
@@ -75,12 +75,10 @@ async function search(searchValue: string) {
       if (response.ok) {
         studentsData.value = (await response.json()) as StudentResponse[];
         setTimeout(() => {
-          const allClassesIds = Object.entries(groupedStudentsClasses.value).flatMap(
+          myClassesStore.activeClasses = Object.entries(groupedStudentsClasses.value).flatMap(
             ([levelNumber, classes]) =>
               Object.keys(classes).map((className) => levelNumber + className),
           );
-
-          myClassesStore.activeClasses = allClassesIds;
         }, 0);
       } else {
         toast.error(getErrorMessage(await response.json()));
@@ -137,6 +135,25 @@ async function deleteClass(number: number, name: string) {
   }
 }
 
+async function transferToNextYear() {
+  await showConfirmDialog({
+    title: 'Перевод на следующий год',
+    text: 'Это действие переведет все классы на следующий год (сохраняя букву) и удаляет выпущенные 11 классы. Вы уверены, что хотите сделать перевод?',
+  });
+
+  try {
+    const response = await post('/api/classes/promote/');
+    if (response.ok) {
+      router.go(0);
+      toast.success('Все классы успешно переведены на следующий год');
+    } else {
+      toast.error(getErrorMessage(await response.json()));
+    }
+  } catch {
+    toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  }
+}
+
 onMounted(async () => {
   if (myClassesStore.search) {
     await search(myClassesStore.search);
@@ -162,6 +179,14 @@ onMounted(async () => {
             myClassesStore.activeClasses = [];
           "
         />
+        <v-btn
+          size="small"
+          color="secondary"
+          variant="outlined"
+          text="Перевести на следующий год"
+          class="transfer-button"
+          @click="transferToNextYear"
+        />
       </template>
     </BottomSheetWithButton>
     <v-combobox
@@ -178,11 +203,19 @@ onMounted(async () => {
       hide-details
       @update:search="search"
     />
-
+    <template #left v-if="smAndUp">
+      <v-btn
+        size="small"
+        color="secondary"
+        variant="outlined"
+        text="Перевести на следующий год"
+        @click="transferToNextYear"
+      />
+    </template>
     <template #right v-if="smAndUp">
       <v-btn
         :to="{ name: 'create-student' }"
-        color="rgb(var(--v-theme-secondary))"
+        color="secondary"
         icon="mdi-plus"
         variant="outlined"
       />
@@ -302,11 +335,18 @@ onMounted(async () => {
   width: 100%;
 }
 
-@media (max-width: 600px) {
+.transfer-button {
+  margin-top: 50px;
+  width: 100%;
+}
+
+@media (width <= 900px) {
   .top-panel {
     padding-left: 8px;
   }
+}
 
+@media (max-width: 600px) {
   .students-container {
     width: 100%;
   }
