@@ -7,6 +7,7 @@ defineProps<{
 <template>
   <div class="top-panel">
     <div :class="{ directionColumn }" class="inner-container">
+      <slot name="left" />
       <slot />
       <slot name="right" />
     </div>

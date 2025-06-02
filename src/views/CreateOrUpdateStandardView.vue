@@ -207,12 +207,7 @@ onMounted(async () => {
       title="Параметр оценивания"
       class="evaluation-type"
     >
-      <v-radio-group
-        v-model="evaluationType"
-        :disabled="pageType === 'update-standard'"
-        row
-        @update:model-value="setLevelsWithZeroes"
-      >
+      <v-radio-group v-model="evaluationType" :disabled="pageType === 'update-standard'" row>
         <v-radio label="Больше-лучше" value="higher-is-better" />
         <v-radio label="Меньше-лучше" value="lower-is-better" />
       </v-radio-group>

@@ -555,7 +555,7 @@ const domain = 'https://coachdiary.ru';
 
 .card {
   background-color: rgb(var(--v-theme-surface));
-  border: 1px solid rgb(var(--v-theme-another-surface));
+  border: 1px solid rgb(var(--v-theme-theme-surface-bright));
   border-radius: var(--v-border-radius);
   padding: 20px;
   margin-top: 20px;

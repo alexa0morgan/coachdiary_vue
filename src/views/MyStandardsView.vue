@@ -193,7 +193,6 @@ onMounted(async () => {
           :data="simplifiedStandards"
           :is-standard-type-technical="pageType === 'technical'"
           :has-action-buttons="false"
-          class="data-table-side-nav-mobile"
           @update:selected-id="toggle"
         />
       </template>

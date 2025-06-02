@@ -129,7 +129,7 @@ function handleItemClick(itemId: number): void {
   font-weight: bold;
   margin: 5px 18px 15px;
   padding: 0 0 3px;
-  border-bottom: 1px solid rgb(var(--v-another-surface));
+  border-bottom: 1px solid rgb(var(--v-theme-surface-bright));
 }
 
 .data {

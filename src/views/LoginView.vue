@@ -386,7 +386,7 @@ onMounted(async () => {
   color: rgb(var(--v-theme-primary));
   padding: 50px 80px;
   background: rgb(var(--v-theme-surface));
-  border: 1px solid rgb(var(--v-another-surface));
+  border: 1px solid rgb(var(--v-theme-surface-bright));
 }
 
 .container :deep(.v-btn__content) {
@@ -408,8 +408,8 @@ onMounted(async () => {
 .border-container {
   display: flex;
   flex-direction: column;
-  border-bottom: 2px solid rgb(var(--v-another-surface));
-  border-top: 2px solid rgb(var(--v-another-surface));
+  border-bottom: 2px solid rgb(var(--v-theme-surface-bright));
+  border-top: 2px solid rgb(var(--v-theme-surface-bright));
   margin: 20px 0;
   padding: 20px 15px;
   gap: 16px;
