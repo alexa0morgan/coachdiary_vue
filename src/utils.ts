@@ -132,6 +132,9 @@ export function getErrorMessage(error: any): string {
   if ('error' in error) {
     return Object.values(flattenObject(error.error)).join(' ');
   }
+  if ('new_password' in error) {
+    return Object.values(flattenObject(error.new_password)).join(' ');
+  }
   return 'Неизвестная ошибка';
 }
 

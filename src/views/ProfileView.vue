@@ -7,6 +7,7 @@ import router from '@/router';
 
 const userStore = useUserStore();
 
+const userId = ref(-1);
 const currentFirstName = ref('');
 const currentLastName = ref('');
 const currentPatronymic = ref('');
@@ -56,6 +57,7 @@ async function getData() {
     const response = await get('/api/profile/');
     if (response.ok) {
       const data = await response.json();
+      userId.value = data.id;
       currentFirstName.value = data.first_name;
       currentLastName.value = data.last_name;
       currentPatronymic.value = data.patronymic;
@@ -98,6 +100,15 @@ async function patchName() {
 async function patchEmail() {
   if (isSetEmailButtonDisabled.value) {
     return;
+  } else if (
+    (userId.value === 1 || userId.value === 2) &&
+    userStore.isTeacher &&
+    import.meta.env.DEBUG === 'FALSE'
+  ) {
+    toast.error(
+      'Это тестовый аккаунт, для проверки работоспособности приложения, на нем нельзя менять почту',
+    );
+    return;
   }
 
   try {
@@ -117,6 +128,15 @@ async function patchEmail() {
 
 async function putPassword() {
   if (isSetPasswordButtonDisabled.value) {
+    return;
+  } else if (
+    (userId.value === 1 || userId.value === 2) &&
+    userStore.isTeacher &&
+    import.meta.env.DEBUG === 'FALSE'
+  ) {
+    toast.error(
+      'Это тестовый аккаунт, для проверки работоспособности приложения, на нем нельзя менять пароль',
+    );
     return;
   }
 

@@ -70,9 +70,10 @@ const router = createRouter({
       meta: { mobileTitle: 'Дневник Тренера' },
     },
     {
-      path: '/aa',
-      name: 'aa',
+      path: '/info/:error',
+      name: 'info',
       component: InfoView,
+      props: true,
       meta: { mobileTitle: 'Дневник Тренера' },
     },
     {
