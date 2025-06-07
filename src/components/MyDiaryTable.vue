@@ -106,7 +106,7 @@ function getStudentName(student: StudentsValueResponse) {
 
 function trackValueChange(studentId: number, standardId: number, value: number | null) {
   if (validateValueByStandardType(value) !== true) {
-    toast.info('Значения не должны привышать 5');
+    toast.info('Значения не должны превышать 5');
     return;
   }
 
