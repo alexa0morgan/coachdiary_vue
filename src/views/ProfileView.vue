@@ -4,6 +4,7 @@ import { get, getErrorMessage, patch, post, put } from '@/utils';
 import { toast } from 'vue-sonner';
 import { useUserStore } from '@/stores/user';
 import router from '@/router';
+import LoadingOverlay from '@/components/LoadingOverlay.vue';
 
 const userStore = useUserStore();
 
@@ -30,6 +31,7 @@ const isEmailVerified = ref(true);
 
 const isSetNameButtonDisabled = computed(() => {
   return (
+    isLoading.value ||
     (firstName.value?.trim() === currentFirstName.value &&
       lastName.value?.trim() === currentLastName.value &&
       patronymic.value?.trim() === currentPatronymic.value) ||
@@ -41,14 +43,19 @@ const isSetNameButtonDisabled = computed(() => {
 });
 
 const isSetEmailButtonDisabled = computed(() => {
-  return email.value?.trim() === currentEmail.value || email.value?.trim().length === 0;
+  return (
+    isLoading.value ||
+    email.value?.trim() === currentEmail.value ||
+    email.value?.trim().length === 0
+  );
 });
 
 const isSetPasswordButtonDisabled = computed(() => {
   return !(
-    password.value?.trim().length &&
-    newPassword.value?.trim().length &&
-    newPassword.value?.trim() === passwordConfirmation.value?.trim()
+    isLoading.value ||
+    (password.value?.trim().length &&
+      newPassword.value?.trim().length &&
+      newPassword.value?.trim() === passwordConfirmation.value?.trim())
   );
 });
 
@@ -81,6 +88,7 @@ async function patchName() {
   }
 
   try {
+    isLoading.value = true;
     const response = await patch('/api/profile/change_details/', {
       first_name: firstName.value,
       last_name: lastName.value,
@@ -94,6 +102,8 @@ async function patchName() {
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -112,6 +122,7 @@ async function patchEmail() {
   }
 
   try {
+    isLoading.value = true;
     const response = await patch('/api/profile/change_email/', {
       email: email.value,
     });
@@ -123,6 +134,8 @@ async function patchEmail() {
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -141,6 +154,7 @@ async function putPassword() {
   }
 
   try {
+    isLoading.value = true;
     const requestData = {
       new_password: newPassword.value,
       confirm_new_password: passwordConfirmation.value,
@@ -159,10 +173,12 @@ async function putPassword() {
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
-async function exportData() {
+async function exportDataJSON() {
   try {
     const response = await get('/api/profile/export_data/');
     if (response.ok) {
@@ -182,7 +198,7 @@ async function exportData() {
   }
 }
 
-async function importData() {
+async function importDataJSON() {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = '.json';
@@ -192,9 +208,8 @@ async function importData() {
       const file = target.files[0];
       const formData = new FormData();
       formData.append('file', file);
-
-      isImporting.value = true;
       try {
+        isImporting.value = true;
         const response = await post('/api/profile/import_data/', formData, '');
         const data = await response.json();
         if (response.ok) {
@@ -242,12 +257,14 @@ onMounted(async () => {
           <v-text-field
             v-model="firstName"
             :readonly="userStore.isStudent"
+            :disabled="isLoading"
             :clearable="!userStore.isStudent"
             persistent-clear
             label="Имя"
           />
           <v-text-field
             v-model="lastName"
+            :disabled="isLoading"
             :readonly="userStore.isStudent"
             :clearable="!userStore.isStudent"
             persistent-clear
@@ -255,6 +272,7 @@ onMounted(async () => {
           />
           <v-text-field
             v-model="patronymic"
+            :disabled="isLoading"
             :readonly="userStore.isStudent"
             :clearable="!userStore.isStudent"
             persistent-clear
@@ -271,7 +289,14 @@ onMounted(async () => {
         />
       </form>
       <form class="text-field" @submit.prevent="patchEmail">
-        <v-text-field v-model="email" clearable persistent-clear label="Почта" type="email" />
+        <v-text-field
+          v-model="email"
+          :disabled="isLoading"
+          clearable
+          persistent-clear
+          label="Почта"
+          type="email"
+        />
         <div class="text-field-email">
           <div v-if="!isEmailVerified" class="verify-email-block">
             <span class="verify-email-text red">Почта не подтверждена</span>
@@ -307,6 +332,7 @@ onMounted(async () => {
       <form class="text-field" @submit.prevent="putPassword">
         <v-text-field
           v-model="password"
+          :disabled="isLoading"
           :append-inner-icon="password ? 'mdi-eye' : undefined"
           :type="passwordType"
           clearable
@@ -317,6 +343,7 @@ onMounted(async () => {
 
         <v-text-field
           v-model="newPassword"
+          :disabled="isLoading"
           :append-inner-icon="newPassword ? 'mdi-eye' : undefined"
           :type="newPasswordType"
           clearable
@@ -328,6 +355,7 @@ onMounted(async () => {
         />
         <v-text-field
           v-model="passwordConfirmation"
+          :disabled="isLoading"
           :append-inner-icon="passwordConfirmation ? 'mdi-eye' : undefined"
           :type="passwordConfirmationType"
           clearable
@@ -356,11 +384,11 @@ onMounted(async () => {
         полезно, если вы хотите перенести свои данные на другой аккаунт или поделиться ими с кем-то
       </div>
       <div class="exp-imp-buttons">
-        <v-btn color="primary" variant="outlined" rounded @click="exportData">
+        <v-btn color="primary" variant="outlined" rounded @click="exportDataJSON">
           <v-icon left>mdi-download</v-icon>
           Экспортировать
         </v-btn>
-        <v-btn color="primary" variant="outlined" rounded @click="importData">
+        <v-btn color="primary" variant="outlined" rounded @click="importDataJSON">
           <v-icon left>mdi-upload</v-icon>
           Импортировать
         </v-btn>
@@ -372,16 +400,7 @@ onMounted(async () => {
       <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
     </div>
   </div>
-  <v-overlay :model-value="isImporting" persistent class="import-overlay">
-    <div class="import-overlay-content rounded-lg">
-      <v-progress-circular indeterminate size="64" color="primary" />
-      <div class="import-overlay-text">
-        Пожалуйста, подождите, идет импорт данных...
-        <br />
-        Не закрывайте страницу, процесс займет до минуты.
-      </div>
-    </div>
-  </v-overlay>
+  <LoadingOverlay v-model="isImporting" task="импорт данных" />
 </template>
 
 <style scoped>
@@ -426,7 +445,7 @@ onMounted(async () => {
 }
 
 .button {
-  justify-self: flex-end;
+  justify-self: end;
 }
 
 .text-field {
@@ -472,34 +491,6 @@ onMounted(async () => {
   display: flex;
   gap: 10px;
   justify-content: center;
-}
-
-.import-overlay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.import-overlay-content {
-  width: 100%;
-  max-width: 800px;
-  background: rgb(var(--v-theme-surface));
-  padding: 50px 80px;
-  text-align: center;
-}
-
-.import-overlay-text {
-  margin-top: 24px;
-  font-size: 20px;
-  color: black;
-  text-align: center;
-}
-
-.import-overlay-content :deep(.v-progress-circular__overlay) {
-  animation:
-    progress-circular-dash 4s ease-in-out infinite,
-    progress-circular-rotate 4s linear infinite;
 }
 
 @media (max-width: 800px) {

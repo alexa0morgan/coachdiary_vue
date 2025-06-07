@@ -9,10 +9,12 @@ const {
   data,
   standardType,
   pageType = 'single',
+  isLoading = false,
 } = defineProps<{
   data: StudentsValueResponse[];
   standardType: 'physical' | 'technical';
   pageType?: 'single' | 'multiple';
+  isLoading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -194,6 +196,7 @@ function saveData() {
         v-if="pageType === 'single'"
         v-model="item.average_value"
         type="number"
+        :disabled="isLoading"
         :max="standardType === 'technical' ? 5 : undefined"
         :rules="[validateValueByStandardType]"
         :class="standardType === 'technical' ? getMarkColor(item.average_grade ?? 0) + ' mark' : ''"

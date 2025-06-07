@@ -1,21 +1,32 @@
 <script lang="ts" setup>
 defineProps<{
   directionColumn?: boolean;
+  isLoading?: boolean;
 }>();
 </script>
 
 <template>
-  <div class="top-panel">
-    <div :class="{ directionColumn }" class="inner-container">
-      <slot name="left" />
-      <slot />
-      <slot name="right" />
+  <div>
+    <div class="background">
+      <div :class="{ directionColumn }" class="inner-container">
+        <slot name="left" />
+        <slot />
+        <slot name="right" />
+      </div>
     </div>
+    <div v-if="!isLoading" style="height: 6px" />
+    <v-progress-linear
+      v-else
+      color="primary-lighten-2"
+      indeterminate
+      height="6"
+      bg-color="primary"
+    />
   </div>
 </template>
 
 <style scoped>
-.top-panel {
+.background {
   display: flex;
   justify-content: stretch;
   align-items: center;

@@ -10,12 +10,15 @@ import router from '@/router';
 import { toast } from 'vue-sonner';
 import MyClassesStudent from '@/components/MyClassesStudent.vue';
 import BottomSheetWithButton from '@/components/BottomSheetWithButton.vue';
+import LoadingOverlay from '@/components/LoadingOverlay.vue';
 
 const { smAndUp } = useDisplay();
 const myClassesStore = useMyClassesStore();
 const activeLevelNumber = ref(-1);
 const studentsData = ref<StudentResponse[]>([]);
 const classesData = ref<ClassRequest[]>([]);
+const isLoading = ref(false);
+const loadingText = ref('Загрузка классов и учеников...');
 let timer: number | null = null;
 
 const groupedStudentsClasses = computed(() => {
@@ -94,6 +97,8 @@ async function getPDFQRCodes(number: number, name: string) {
     (item) => item.number === number && item.class_name === name,
   )?.id;
   try {
+    isLoading.value = true;
+    loadingText.value = 'генерация QR-кодов';
     const response = await get(`/api/students/generate_qr_codes_pdf/`, {
       class_id: id,
     });
@@ -109,6 +114,8 @@ async function getPDFQRCodes(number: number, name: string) {
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -142,6 +149,8 @@ async function transferToNextYear() {
   });
 
   try {
+    isLoading.value = true;
+    loadingText.value = 'перевод классов на следующий год';
     const response = await post('/api/classes/promote/');
     if (response.ok) {
       router.go(0);
@@ -151,6 +160,8 @@ async function transferToNextYear() {
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -281,6 +292,7 @@ onMounted(async () => {
       </template>
     </div>
   </div>
+  <LoadingOverlay v-model="isLoading" :task="loadingText" />
 </template>
 
 <style scoped>
@@ -288,7 +300,6 @@ onMounted(async () => {
   position: sticky;
   top: 64px;
   z-index: 1000;
-  padding-left: 84px;
 }
 
 .search {
@@ -338,12 +349,6 @@ onMounted(async () => {
 .transfer-button {
   margin-top: 50px;
   width: 100%;
-}
-
-@media (width <= 900px) {
-  .top-panel {
-    padding-left: 8px;
-  }
 }
 
 @media (max-width: 600px) {

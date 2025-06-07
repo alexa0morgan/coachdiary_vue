@@ -11,6 +11,7 @@ import { toast } from 'vue-sonner';
 const route = useRoute();
 const { mobile } = useDisplay();
 const pageType = ref(route.name as 'create-standard' | 'update-standard');
+const isLoading = ref(false);
 
 const standardName = ref('');
 const standardType = ref<'physical' | 'technical' | null>(null);
@@ -42,6 +43,7 @@ const isPreviousLevelButtonDisabled = computed(() => {
 
 const isSaveButtonDisabled = computed(() => {
   return (
+    isLoading.value ||
     !standardName.value ||
     !standardType.value ||
     levelNumbers.value.length === 0 ||
@@ -96,6 +98,7 @@ function toPreviousLevel() {
 
 async function createOrUpdateStandard() {
   try {
+    isLoading.value = true;
     const requestData: StandardRequest = {
       name: standardName.value,
       has_numeric_value: standardType.value === 'physical',
@@ -141,6 +144,8 @@ async function createOrUpdateStandard() {
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -177,14 +182,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TopPanel class="top-panel">
+  <TopPanel :is-loading class="top-panel">
     {{ pageType === 'create-standard' ? 'Создание норматива' : 'Обновление норматива' }}
   </TopPanel>
   <div v-auto-animate class="grid">
     <FieldSet title="Тип">
       <v-radio-group
         v-model="standardType"
-        :disabled="pageType === 'update-standard'"
+        :disabled="pageType === 'update-standard' || isLoading"
         row
         @update:model-value="setLevelsWithZeroes"
       >
@@ -198,6 +203,7 @@ onMounted(async () => {
       :class="
         standardType === 'technical' || standardType === null ? 'standard-name-technical' : ''
       "
+      :disabled="isLoading"
       class="standard-name"
       label="Название"
     />
@@ -207,7 +213,11 @@ onMounted(async () => {
       title="Параметр оценивания"
       class="evaluation-type"
     >
-      <v-radio-group v-model="evaluationType" :disabled="pageType === 'update-standard'" row>
+      <v-radio-group
+        v-model="evaluationType"
+        :disabled="pageType === 'update-standard' || isLoading"
+        row
+      >
         <v-radio label="Больше-лучше" value="higher-is-better" />
         <v-radio label="Меньше-лучше" value="lower-is-better" />
       </v-radio-group>
@@ -227,6 +237,7 @@ onMounted(async () => {
           :label="n.toString()"
           :value="n"
           :key="n"
+          :disabled="isLoading"
           density="compact"
         />
       </div>
@@ -240,6 +251,7 @@ onMounted(async () => {
               <div class="standards-table-title">Девочки</div>
               <v-text-field
                 v-model.number="levels[currentLevel].girls.high"
+                :disabled="isLoading"
                 density="comfortable"
                 label="Высокая ступень"
                 min="0"
@@ -247,6 +259,7 @@ onMounted(async () => {
               />
               <v-text-field
                 v-model.number="levels[currentLevel].girls.middle"
+                :disabled="isLoading"
                 class="standard-input"
                 density="comfortable"
                 label="Средняя ступень"
@@ -255,6 +268,7 @@ onMounted(async () => {
               />
               <v-text-field
                 v-model.number="levels[currentLevel].girls.low"
+                :disabled="isLoading"
                 class="standard-input"
                 density="comfortable"
                 label="Низкая ступень"
@@ -266,6 +280,7 @@ onMounted(async () => {
               <div class="standards-table-title">Мальчики</div>
               <v-text-field
                 v-model.number="levels[currentLevel].boys.high"
+                :disabled="isLoading"
                 density="comfortable"
                 label="Высокая ступень"
                 min="0"
@@ -273,6 +288,7 @@ onMounted(async () => {
               />
               <v-text-field
                 v-model.number="levels[currentLevel].boys.middle"
+                :disabled="isLoading"
                 class="standard-input"
                 density="comfortable"
                 label="Средняя ступень"
@@ -281,6 +297,7 @@ onMounted(async () => {
               />
               <v-text-field
                 v-model.number="levels[currentLevel].boys.low"
+                :disabled="isLoading"
                 class="standard-input"
                 density="comfortable"
                 label="Низкая ступень"
@@ -292,7 +309,7 @@ onMounted(async () => {
 
           <div class="pagination">
             <v-btn
-              :disabled="isPreviousLevelButtonDisabled"
+              :disabled="isPreviousLevelButtonDisabled || isLoading"
               :text="mobile ? '' : 'Предыдущий уровень'"
               prepend-icon="mdi-arrow-left"
               variant="text"
@@ -300,7 +317,7 @@ onMounted(async () => {
             />
             <div>{{ currentLevel }} ур</div>
             <v-btn
-              :disabled="isNextLevelButtonDisabled"
+              :disabled="isNextLevelButtonDisabled || isLoading"
               :text="mobile ? '' : 'Следующий уровень'"
               append-icon="mdi-arrow-right"
               variant="text"

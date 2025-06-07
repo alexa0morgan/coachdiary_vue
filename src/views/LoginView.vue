@@ -312,7 +312,7 @@ onMounted(async () => {
           variant="outlined"
         />
 
-        <v-checkbox v-if="pageType === 'signUp'" v-model="privacyPolicy">
+        <v-checkbox v-if="pageType === 'signUp'" v-model="privacyPolicy" :disabled="isLoading">
           <template #label>
             <span>
               Я соглашаюсь с

@@ -10,6 +10,7 @@ import { toast } from 'vue-sonner';
 const route = useRoute();
 const router = useRouter();
 const pageType = ref(route.name as 'create-student' | 'update-student');
+const isLoading = ref(false);
 
 const firstName = ref('');
 const lastName = ref('');
@@ -21,6 +22,7 @@ const className = ref('');
 
 const isSaveButtonDisabled = computed(() => {
   return (
+    isLoading.value ||
     !firstName.value ||
     !lastName.value ||
     !genderType.value ||
@@ -32,6 +34,7 @@ const isSaveButtonDisabled = computed(() => {
 
 async function createOrUpdateStudent() {
   try {
+    isLoading.value = true;
     const requestData: StudentRequest = {
       first_name: firstName.value,
       last_name: lastName.value,
@@ -63,6 +66,8 @@ async function createOrUpdateStudent() {
     }
   } catch (e) {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -83,36 +88,53 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TopPanel class="top-panel">
+  <TopPanel :is-loading class="top-panel">
     {{ pageType === 'create-student' ? 'Создание ученика' : 'Обновление ученика' }}
   </TopPanel>
   <div class="container">
     <div class="names">
-      <v-text-field v-model="lastName" class="text-field" label="Фамилия" />
-      <v-text-field v-model="firstName" class="text-field" label="Имя" />
-      <v-text-field v-model="patronymic" class="text-field" label="Отчество" />
+      <v-text-field v-model="lastName" :disabled="isLoading" class="text-field" label="Фамилия" />
+      <v-text-field v-model="firstName" :disabled="isLoading" class="text-field" label="Имя" />
+      <v-text-field
+        v-model="patronymic"
+        :disabled="isLoading"
+        class="text-field"
+        label="Отчество"
+      />
     </div>
 
     <div class="left">
       <FieldSet title="Пол">
-        <v-radio-group v-model="genderType">
+        <v-radio-group v-model="genderType" :disabled="isLoading">
           <v-radio label="Женский" value="f" />
           <v-radio label="Мужской" value="m" />
         </v-radio-group>
       </FieldSet>
 
-      <v-text-field v-model="birthdayDate" class="text-field" label="Дата рождения" type="date" />
+      <v-text-field
+        v-model="birthdayDate"
+        :disabled="isLoading"
+        class="text-field"
+        label="Дата рождения"
+        type="date"
+      />
     </div>
 
     <FieldSet class="class" title="Класс">
       <div>
         <p class="levels-text">Уровень</p>
-        <v-radio-group v-model="classNumber" class="radio-group" height="100px">
+        <v-radio-group
+          v-model="classNumber"
+          :disabled="isLoading"
+          class="radio-group"
+          height="100px"
+        >
           <v-radio v-for="n in 11" :key="n" :label="n.toString()" :value="n" density="compact" />
         </v-radio-group>
       </div>
       <v-text-field
-        :model-value="className"
+        v-model="className"
+        :disabled="isLoading"
         class="text-field class-name"
         label="Буква"
         @update:model-value="className = $event.toUpperCase()"
