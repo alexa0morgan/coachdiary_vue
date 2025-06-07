@@ -5,8 +5,13 @@ import { toast } from 'vue-sonner';
 import { useUserStore } from '@/stores/user';
 import router from '@/router';
 import LoadingOverlay from '@/components/LoadingOverlay.vue';
+import FieldSet from '@/components/FieldSet.vue';
 
 const userStore = useUserStore();
+const pageType = ref<'personal-info' | 'security' | ''>('');
+const isLoading = ref(false);
+const isImporting = ref(false);
+const isEmailVerified = ref(true);
 
 const userId = ref(-1);
 const currentFirstName = ref('');
@@ -26,8 +31,9 @@ const passwordType = ref<'password' | 'text'>('password');
 const newPasswordType = ref<'password' | 'text'>('password');
 const passwordConfirmationType = ref<'password' | 'text'>('password');
 
-const isImporting = ref(false);
-const isEmailVerified = ref(true);
+const exportIncludesNorms = ref(false);
+const exportIncludesResults = ref(false);
+const exportIncludesStandards = ref(false);
 
 const isSetNameButtonDisabled = computed(() => {
   return (
@@ -56,6 +62,13 @@ const isSetPasswordButtonDisabled = computed(() => {
     (password.value?.trim().length &&
       newPassword.value?.trim().length &&
       newPassword.value?.trim() === passwordConfirmation.value?.trim())
+  );
+});
+
+const isSetExportButtonDisabled = computed(() => {
+  return (
+    isLoading.value ||
+    (!exportIncludesNorms.value && !exportIncludesResults.value && !exportIncludesStandards.value)
   );
 });
 
@@ -178,16 +191,37 @@ async function putPassword() {
   }
 }
 
-async function exportDataJSON() {
+async function exportData(type: 'xlsx' | 'json') {
+  let url = '';
+  let params = {};
+  if (type === 'json') {
+    url = '/api/profile/export_data/';
+  } else if (type === 'xlsx') {
+    url = '/api/profile/export_xlsx/';
+    params = {
+      include_norms: exportIncludesNorms.value,
+      include_results: exportIncludesResults.value,
+      include_standards: exportIncludesStandards.value,
+    };
+  }
+
   try {
-    const response = await get('/api/profile/export_data/');
+    const response = await get(url, params);
     if (response.ok) {
-      const data = await response.json();
-      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      let blob = new Blob();
+      let filename = 'couchdiary-data';
+      if (type === 'json') {
+        const data = await response.json();
+        blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        filename += '.json';
+      } else if (type === 'xlsx') {
+        blob = await response.blob();
+        filename += '.xlsx';
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'data.json';
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     } else {
@@ -384,13 +418,43 @@ onMounted(async () => {
         полезно, если вы хотите перенести свои данные на другой аккаунт или поделиться ими с кем-то
       </div>
       <div class="exp-imp-buttons">
-        <v-btn color="primary" variant="outlined" rounded @click="exportDataJSON">
+        <v-btn color="primary" rounded @click="exportData('json')">
           <v-icon left>mdi-download</v-icon>
           Экспортировать
         </v-btn>
-        <v-btn color="primary" variant="outlined" rounded @click="importDataJSON">
+        <v-btn color="primary" rounded @click="importDataJSON">
           <v-icon left>mdi-upload</v-icon>
           Импортировать
+        </v-btn>
+      </div>
+    </div>
+    <div v-if="userStore.isTeacher" class="container rounded-lg">
+      <div class="title">
+        <v-icon class="mr-2" color="primary">mdi-database-export</v-icon>
+        Создать отчет
+      </div>
+      <div class="text">Вы можете экспортировать данные в формате XLSX.</div>
+      <div class="text-field">
+        <FieldSet title="Созданный отчет будет содержать:">
+          <v-checkbox v-model="exportIncludesNorms" label="Лист с таблицей нормативов" />
+          <v-checkbox
+            v-model="exportIncludesResults"
+            label="Сводный лист с итоговыми результатами"
+          />
+          <v-checkbox
+            v-model="exportIncludesStandards"
+            label="Отдельные листы для каждого норматива"
+          />
+        </FieldSet>
+        <v-btn
+          :disabled="isSetExportButtonDisabled"
+          color="primary"
+          class="button"
+          rounded
+          @click="exportData('xlsx')"
+        >
+          <v-icon left>mdi-download</v-icon>
+          Скачать отчет
         </v-btn>
       </div>
     </div>
