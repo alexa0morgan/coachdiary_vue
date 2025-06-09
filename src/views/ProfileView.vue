@@ -74,6 +74,20 @@ const isSetExportButtonDisabled = computed(() => {
   );
 });
 
+const navigationItems = computed(() => {
+  if (userStore.isTeacher) {
+    return [
+      { title: 'Личные данные', value: 'personal-info', icon: 'mdi-account' },
+      { title: 'Безопасность', value: 'security', icon: 'mdi-lock' },
+      { title: 'Данные и отчеты', value: 'data-reports', icon: 'mdi-database' },
+    ];
+  }
+  return [
+    { title: 'Личные данные', value: 'personal-info', icon: 'mdi-account' },
+    { title: 'Безопасность', value: 'security', icon: 'mdi-lock' },
+  ];
+});
+
 async function getData() {
   try {
     const response = await get('/api/profile/');
@@ -305,7 +319,7 @@ onMounted(async () => {
       Данные и отчеты
     </v-btn>
     <v-divider class="divider" color="rgb(var(--v-theme-primary-darken-1))" />
-    <v-btn color="error" :variant="'text'" @click="userStore.logout">
+    <v-btn color="error" variant="text" @click="userStore.logout">
       <v-icon class="mr-2">mdi-logout</v-icon>
       Выйти из аккаунта
     </v-btn>
@@ -314,11 +328,7 @@ onMounted(async () => {
   <div v-else class="mobile-menu">
     <v-select
       v-model="pageType"
-      :items="[
-        { title: 'Личные данные', value: 'personal-info', icon: 'mdi-account' },
-        { title: 'Безопасность', value: 'security', icon: 'mdi-lock' },
-        { title: 'Данные и отчеты', value: 'data-reports', icon: 'mdi-database' },
-      ]"
+      :items="navigationItems"
       item-title="title"
       item-value="value"
       variant="outlined"
@@ -516,6 +526,14 @@ onMounted(async () => {
         </div>
       </div>
     </template>
+
+    <div v-if="!smAndUp" class="container rounded-lg">
+      <div class="title">Выход</div>
+      <v-btn color="error" variant="text" @click="userStore.logout">
+        <v-icon left>mdi-logout</v-icon>
+        Выйти из аккаунта
+      </v-btn>
+    </div>
   </div>
 
   <LoadingOverlay v-model="isImporting" task="импорт данных" />

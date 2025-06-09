@@ -10,7 +10,7 @@ const success = ref(false);
 const error = ref('');
 let emailToken = '';
 
-async function verfyEmail() {
+async function verifyEmail() {
   try {
     loading.value = true;
     const response = await get('/api/email/verify-email/' + emailToken + '/');
@@ -33,7 +33,7 @@ onMounted(async () => {
       case 'verify-email':
         title.value = 'Подтверждение Email';
         emailToken = route.params.token as string;
-        await verfyEmail();
+        await verifyEmail();
         break;
       default:
         title.value = 'Ошибка приглашения';
