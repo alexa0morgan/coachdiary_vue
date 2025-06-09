@@ -56,13 +56,13 @@ const standardButtonText = computed(() => {
     if (selectedStandardIds.value.length <= 1) {
       return 'Выберите минимум 2 норматива';
     }
-    return (
+    return 'Режим сравнения'; /*(
       standards.value
         .filter((v) => selectedStandardIds.value.includes(v.id))
         .map((v) => v.label)
         .sort((a, b) => a.localeCompare(b))
         .join(', ') ?? 'Нормативы'
-    );
+    );*/
   }
 });
 const classButtonText = computed(() => {
@@ -280,6 +280,16 @@ async function saveStudentsValue(changedData: StudentValueRequest[]) {
   }
 }
 
+function removeStandardId(id: number) {
+  selectedStandardIds.value = selectedStandardIds.value.filter((stdId) => stdId !== id);
+  if (selectedStandardIds.value.length > 1) {
+    getStudentsData();
+  } else {
+    selectedStandardIds.value = [];
+    filteredData.value = [];
+  }
+}
+
 onMounted(async () => {
   standardsData.value = await get('/api/standards/').then((res) => res.json());
   initSelectedStandards();
@@ -288,7 +298,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TopPanel v-if="smAndUp" class="top-panel">
+  <TopPanel v-if="smAndUp" :is-loading class="top-panel">
     <ClassesPanel
       :classes-data
       menu
@@ -387,6 +397,24 @@ onMounted(async () => {
     </BottomSheetWithButton>
   </div>
 
+  <div
+    v-if="!smAndUp && pageType === 'multiple' && selectedStandardIds.length > 1"
+    class="selected-standards-chips"
+  >
+    <v-chip
+      v-for="id in selectedStandardIds"
+      :key="id"
+      color="primary"
+      size="small"
+      variant="flat"
+      class="standard-chip"
+      closable
+      @click:close="removeStandardId(id)"
+    >
+      {{ standards.find((standard) => standard.id === id)?.label }}
+    </v-chip>
+  </div>
+
   <div class="grid">
     <FilterBlock v-if="!w800" v-model="filters" class="filters-block" @accept="acceptFilters" />
 
@@ -426,7 +454,6 @@ onMounted(async () => {
       />
     </div>
   </div>
-  <LoadingOverlay v-model="isLoading" task="загрузка данных" />
 </template>
 
 <style scoped>
@@ -454,8 +481,23 @@ onMounted(async () => {
 .top-panel-mobile {
   display: flex;
   justify-content: space-between;
-  margin: 0 10px 15px;
+  margin: 0 10px;
   align-items: center;
+}
+
+.selected-standards-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 15px 10px;
+  width: 100%;
+  scrollbar-width: thin;
+  gap: 8px;
+}
+
+.standard-chip {
+  flex: 0 0 auto;
 }
 
 .buttons-panel {

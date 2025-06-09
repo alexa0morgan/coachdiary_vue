@@ -292,6 +292,7 @@ onMounted(async () => {
       </template>
     </div>
   </div>
+
   <LoadingOverlay v-model="isLoading" :task="loadingText" />
 </template>
 
@@ -317,7 +318,7 @@ onMounted(async () => {
 }
 
 .container {
-  margin: 30px 0 60px 100px;
+  margin: 30px 10px 60px 100px;
 }
 
 .students-container {
@@ -352,6 +353,10 @@ onMounted(async () => {
 }
 
 @media (max-width: 600px) {
+  .top-panel {
+    top: 56px;
+  }
+
   .students-container {
     width: 100%;
   }

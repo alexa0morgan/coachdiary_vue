@@ -58,7 +58,11 @@ const labels = computed(() => {
     },
     {
       id: 3,
-      label: `Код приглашения: ${studentInfo.value.invitation_link.split('/').pop()}`,
+      label: `Код приглашения: ${
+        studentInfo.value.is_used_invitation
+          ? 'Использован'
+          : studentInfo.value.invitation_link.split('/').pop()
+      }`,
     },
   ];
 });

@@ -324,6 +324,7 @@ onMounted(async () => {
       variant="outlined"
       density="default"
       hide-details
+      color="primary"
     >
       <template #selection="{ item }">
         <v-icon class="mr-2">{{ item?.raw?.icon }}</v-icon>
