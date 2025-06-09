@@ -23,6 +23,7 @@ const route = useRoute();
 const uiStore = useUIStore();
 const userStore = useUserStore();
 const { smAndUp } = useDisplay();
+const isLoading = ref(false);
 const studentId = computed(() => +route.params.id);
 const studentInfo = ref<StudentResponse>();
 const standards = ref<StudentStandard[]>([]);
@@ -57,7 +58,11 @@ const labels = computed(() => {
     },
     {
       id: 3,
-      label: `Код приглашения: ${studentInfo.value.invitation_link.split('/').pop()}`,
+      label: `Код приглашения: ${
+        studentInfo.value.is_used_invitation
+          ? 'Использован'
+          : studentInfo.value.invitation_link.split('/').pop()
+      }`,
     },
   ];
 });
@@ -121,6 +126,7 @@ async function saveStudentValue(
   changedValues: { standard_id: number; level_number: number; value: number | null }[],
 ) {
   try {
+    isLoading.value = true;
     const request: StudentStandardRequest[] = changedValues.map((v) => ({
       student_id: studentId.value,
       standard_id: v.standard_id,
@@ -137,6 +143,8 @@ async function saveStudentValue(
     }
   } catch {
     toast.error('Произошла ошибка во время отправки данных, попробуйте еще раз');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -203,6 +211,7 @@ onUnmounted(() => {
         :summary-grade="standardsInfo.summary_grade"
         :hide-save-button="!userStore.isTeacher"
         :readonly-input="!userStore.isTeacher"
+        :is-loading
         class="table"
         @save-data="saveStudentValue"
       />

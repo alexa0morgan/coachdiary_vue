@@ -20,7 +20,13 @@ const invitationCode = computed(() => {
   <v-btn :to="{ name: 'student', params: { id: student.id } }" class="button" variant="text">
     {{ student.full_name }}
   </v-btn>
-  <v-btn :text="invitationCode" variant="tonal" @click="showCode = !showCode" />
+  <v-btn
+    v-if="!student.is_used_invitation"
+    :text="invitationCode"
+    variant="tonal"
+    @click="showCode = !showCode"
+  />
+  <div v-else class="text-center">Использован</div>
 </template>
 
 <style scoped>

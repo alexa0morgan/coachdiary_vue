@@ -20,6 +20,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
 import { useDisplay } from 'vuetify';
 import SideNavButtons from '@/components/SideNavButtons.vue';
+import LoadingOverlay from '@/components/LoadingOverlay.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -29,6 +30,8 @@ const w800 = computed(() => width.value <= 800);
 const pageType = ref<'single' | 'multiple'>(
   (route.query.pageType as 'single' | 'multiple') || 'single',
 );
+const isLoading = ref(false);
+
 const activeClassNumber = ref(+route.query.classNumber! || -1);
 const className = ref((route.query.letter as string) || '');
 const selectedStandardId = ref(-1);
@@ -53,13 +56,13 @@ const standardButtonText = computed(() => {
     if (selectedStandardIds.value.length <= 1) {
       return 'Выберите минимум 2 норматива';
     }
-    return (
+    return 'Режим сравнения'; /*(
       standards.value
         .filter((v) => selectedStandardIds.value.includes(v.id))
         .map((v) => v.label)
         .sort((a, b) => a.localeCompare(b))
         .join(', ') ?? 'Нормативы'
-    );
+    );*/
   }
 });
 const classButtonText = computed(() => {
@@ -165,6 +168,8 @@ async function getStudentsData() {
   setQuery();
   if (selectedStandardId.value === -1 && selectedStandardIds.value.length <= 1) return;
 
+  isLoading.value = true;
+
   let currentClasses: number[];
   let currentStudentsData: StudentResponse[];
 
@@ -210,26 +215,34 @@ async function getStudentsData() {
         pageType.value === 'single' ? selectedStandardId.value : selectedStandardIds.value,
     }).then((res) => res.json());
 
-    studentsValueData = currentStudentsData.map((student) => {
-      const result = currentStudentsValue.find((v) => v.id === student.id);
-      return (
-        result ?? {
-          ...student,
-          standards_details: [
-            {
-              grade: null,
-              value: null,
-              standard_id: selectedStandardId.value,
-            },
-          ],
-          average_value: null,
-          average_grade: null,
-        }
+    if (pageType.value === 'multiple' && selectedStandardIds.value.length > 1) {
+      studentsValueData = currentStudentsValue.filter(
+        (student) => student.average_grade && student.average_value,
       );
-    });
+    } else {
+      studentsValueData = currentStudentsData.map((student) => {
+        const result = currentStudentsValue.find((v) => v.id === student.id);
+        return (
+          result ?? {
+            ...student,
+            standards_details: [
+              {
+                grade: null,
+                value: null,
+                standard_id: selectedStandardId.value,
+              },
+            ],
+            average_value: null,
+            average_grade: null,
+          }
+        );
+      });
+    }
     acceptFilters();
   } catch {
     toast.error('Ошибка при получении данных, попробуйте позже');
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -251,6 +264,7 @@ function acceptFilters() {
 
 async function saveStudentsValue(changedData: StudentValueRequest[]) {
   try {
+    isLoading.value = true;
     const response = await post('/api/students/results/create/', changedData);
 
     if (response.ok) {
@@ -261,6 +275,18 @@ async function saveStudentsValue(changedData: StudentValueRequest[]) {
     }
   } catch {
     toast.error('Ошибка при сохранении данных, попробуйте позже');
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+function removeStandardId(id: number) {
+  selectedStandardIds.value = selectedStandardIds.value.filter((stdId) => stdId !== id);
+  if (selectedStandardIds.value.length > 1) {
+    getStudentsData();
+  } else {
+    selectedStandardIds.value = [];
+    filteredData.value = [];
   }
 }
 
@@ -272,7 +298,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TopPanel v-if="smAndUp" class="top-panel">
+  <TopPanel v-if="smAndUp" :is-loading class="top-panel">
     <ClassesPanel
       :classes-data
       menu
@@ -341,6 +367,7 @@ onMounted(async () => {
             :data="standards"
             :has-action-buttons="false"
             :multiple-select="pageType === 'multiple'"
+            :is-loading
             class="data-table-side-nav-mobile"
             @update:selected-id="
               getStudentsData();
@@ -368,6 +395,24 @@ onMounted(async () => {
         />
       </template>
     </BottomSheetWithButton>
+  </div>
+
+  <div
+    v-if="!smAndUp && pageType === 'multiple' && selectedStandardIds.length > 1"
+    class="selected-standards-chips"
+  >
+    <v-chip
+      v-for="id in selectedStandardIds"
+      :key="id"
+      color="primary"
+      size="small"
+      variant="flat"
+      class="standard-chip"
+      closable
+      @click:close="removeStandardId(id)"
+    >
+      {{ standards.find((standard) => standard.id === id)?.label }}
+    </v-chip>
   </div>
 
   <div class="grid">
@@ -436,8 +481,23 @@ onMounted(async () => {
 .top-panel-mobile {
   display: flex;
   justify-content: space-between;
-  margin: 0 10px 15px;
+  margin: 0 10px;
   align-items: center;
+}
+
+.selected-standards-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 15px 10px;
+  width: 100%;
+  scrollbar-width: thin;
+  gap: 8px;
+}
+
+.standard-chip {
+  flex: 0 0 auto;
 }
 
 .buttons-panel {

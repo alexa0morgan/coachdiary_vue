@@ -18,6 +18,7 @@ defineProps<{
 }
 
 legend {
+  text-align: left;
   margin-left: 8px;
   padding: 0 5px;
 }

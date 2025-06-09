@@ -47,6 +47,7 @@ function toggle() {
 <style scoped>
 .button {
   border-radius: var(--v-border-button-radius);
+  height: 36px !important;
 }
 
 .button:deep(.v-btn__content) {

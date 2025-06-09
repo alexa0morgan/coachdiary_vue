@@ -4,11 +4,16 @@ import { ref } from 'vue';
 
 type StudentStandardValue = { standard_id: number; level_number: number; value: number | null };
 
-const { standards, summaryGrade } = defineProps<{
+const {
+  standards,
+  summaryGrade,
+  isLoading = false,
+} = defineProps<{
   standards: StudentStandard[];
   summaryGrade: number;
   hideSaveButton?: boolean;
   readonlyInput?: boolean;
+  isLoading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -85,6 +90,7 @@ function saveData() {
         v-if="item.standard.has_numeric_value"
         v-model="item.value"
         type="number"
+        :disabled="isLoading"
         :readonly="readonlyInput"
         @update:model-value="trackValueChange(item.standard.id, item.value, item.level_number)"
       />
@@ -103,6 +109,7 @@ function saveData() {
         type="number"
         class="mark"
         max="5"
+        :disabled="isLoading"
         :rules="[validateValueByStandardType]"
         :readonly="readonlyInput"
         :class="getMarkColor(item.grade ?? 0)"

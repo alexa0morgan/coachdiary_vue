@@ -44,6 +44,7 @@ export type StudentResponse = {
   birthday: string;
   gender: Gender;
   invitation_link: string;
+  is_used_invitation: boolean;
 };
 
 export type StudentRequest = {

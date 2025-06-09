@@ -165,23 +165,22 @@ async function signUp() {
 
 async function studentSignUp() {
   pageType.value = 'signUp';
-  try {
-    const response = await get(`/api/create-user/from-invitation/${invitationToken.value}/`);
-    if (response.ok) {
-      const data = await response.json();
-      invitationData.value = data;
-      firstName.value = data.student.first_name;
-      lastName.value = data.student.last_name;
-      patronymic.value = data.student.patronymic;
-    } else {
-      toast.error(getErrorMessage(await response.json()));
-      invitationToken.value = '';
-      await router.push({ name: 'login' });
-      pageType.value = 'signIn';
-    }
-  } catch {
-    toast.error('Ошибка при получении данных приглашения');
+
+  const response = await get(`/api/create-user/from-invitation/${invitationToken.value}/`);
+  if (response.ok) {
+    const data = await response.json();
+    invitationData.value = data;
+    firstName.value = data.student.first_name;
+    lastName.value = data.student.last_name;
+    patronymic.value = data.student.patronymic;
+  } else {
+    const error = getErrorMessage(await response.json());
+    toast.error(error);
+    invitationToken.value = '';
+    pageType.value = 'signIn';
+    await router.push({ name: 'info', params: { error } });
   }
+  return response.json();
 }
 
 async function restore() {
@@ -313,7 +312,7 @@ onMounted(async () => {
           variant="outlined"
         />
 
-        <v-checkbox v-if="pageType === 'signUp'" v-model="privacyPolicy">
+        <v-checkbox v-if="pageType === 'signUp'" v-model="privacyPolicy" :disabled="isLoading">
           <template #label>
             <span>
               Я соглашаюсь с

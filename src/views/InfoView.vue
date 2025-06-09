@@ -4,12 +4,13 @@ import { useRoute } from 'vue-router';
 import { get, getErrorMessage } from '@/utils';
 
 const route = useRoute();
+const title = ref('');
 const loading = ref(false);
 const success = ref(false);
 const error = ref('');
 let emailToken = '';
 
-async function verfyEmail() {
+async function verifyEmail() {
   try {
     loading.value = true;
     const response = await get('/api/email/verify-email/' + emailToken + '/');
@@ -30,10 +31,13 @@ onMounted(async () => {
   if (route.params.token) {
     switch (route.name) {
       case 'verify-email':
+        title.value = 'Подтверждение Email';
         emailToken = route.params.token as string;
-        verfyEmail();
+        await verifyEmail();
         break;
       default:
+        title.value = 'Ошибка приглашения';
+        error.value = route.params.error as string;
         break;
     }
   }

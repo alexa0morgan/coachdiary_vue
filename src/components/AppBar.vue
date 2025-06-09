@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useDisplay } from 'vuetify';
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useUIStore } from '@/stores/ui';
@@ -24,6 +24,15 @@ const mobileTitle = computed(() => {
   if (uiStore.mobileTitle) return uiStore.mobileTitle;
 
   return route.meta.mobileTitle;
+});
+
+onMounted(() => {
+  setTimeout(() => {
+    const mainElement = document.querySelector('.v-main');
+    if (mainElement) {
+      (mainElement as HTMLElement).style.paddingTop = '60px';
+    }
+  }, 0);
 });
 </script>
 
@@ -96,8 +105,12 @@ const mobileTitle = computed(() => {
           <v-btn rounded variant="flat" @click="userStore.logout">Выйти</v-btn>
         </template>
 
-        <!--        <v-btn v-else-if="!smAndUp" :to="infoButtonLink" class="info-button"-->
-        <!--               icon="mdi-information-slab-circle-outline" />-->
+        <!--        <v-btn
+          v-else-if="!smAndUp"
+          :to="{ name: 'profile' }"
+          class="info-button"
+          icon="mdi-information-slab-circle-outline"
+        />-->
       </div>
     </template>
   </v-app-bar>
