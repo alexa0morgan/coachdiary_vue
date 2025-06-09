@@ -142,7 +142,7 @@ async function patchEmail() {
   } else if (
     (userId.value === 1 || userId.value === 2) &&
     userStore.isTeacher &&
-    import.meta.env.DEBUG === 'FALSE'
+    import.meta.env.VITE_DEBUG !== 'TRUE'
   ) {
     toast.error(
       'Это тестовый аккаунт, для проверки работоспособности приложения, на нем нельзя менять почту',
@@ -174,7 +174,7 @@ async function putPassword() {
   } else if (
     (userId.value === 1 || userId.value === 2) &&
     userStore.isTeacher &&
-    import.meta.env.DEBUG === 'FALSE'
+    import.meta.env.VITE_DEBUG !== 'TRUE'
   ) {
     toast.error(
       'Это тестовый аккаунт, для проверки работоспособности приложения, на нем нельзя менять пароль',
