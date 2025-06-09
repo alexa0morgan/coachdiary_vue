@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Create .env.local
-        run: echo "VITE_APP_API_BASE=${{ secrets.VITE_APP_API_BASE }}" > .env.local
+        run: echo "DEBUG=${{ secrets.DEBUG }}" > .env.local
 
       - name: Build the project
         run: npm run build
