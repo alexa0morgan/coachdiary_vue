@@ -39,6 +39,7 @@ yarn install
 
 ```env
 VITE_API_URL=http://localhost:5173
+VITE_DEBUG=(TRUE|FALSE)
 ```
 
 ### 4. Запустите проект в режиме разработки:
